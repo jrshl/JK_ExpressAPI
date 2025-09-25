@@ -43,6 +43,104 @@
     </div>
   </div>
 
-  <script src="game.js"></script>
+  <!-- Inline JavaScript -->
+  <script>
+    const factEl = document.getElementById("fact");
+    const inputEl = document.getElementById("input");
+    const startBtn = document.getElementById("startBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const resultEl = document.getElementById("result");
+    const progressEl = document.getElementById("progress");
+    const timerEl = document.getElementById("timer");
+    const catEl = document.getElementById("cat");
+    const difficultySelect = document.getElementById("difficulty");
+
+    let currentFact = "";
+    let progress = 0;
+    let timeLeft = 30;
+    let timer;
+
+    async function fetchFact() {
+      try {
+        const res = await fetch("/api/fact"); // Express API
+        const data = await res.json();
+        return data.fact;
+      } catch (error) {
+        return "Cats are amazing creatures!";
+      }
+    }
+
+    function setDifficulty() {
+      const level = difficultySelect.value;
+      if(level === "easy") timeLeft = 45;
+      else if(level === "medium") timeLeft = 30;
+      else if(level === "hard") timeLeft = 20;
+    }
+
+    async function startGame() {
+      setDifficulty();
+      currentFact = await fetchFact();
+      factEl.textContent = currentFact;
+      inputEl.value = "";
+      inputEl.focus();
+      progress = 0;
+      resultEl.textContent = "";
+      progressEl.textContent = "Progress: 0%";
+      timerEl.textContent = `Time left: ${timeLeft}s`;
+      catEl.style.left = "0px";
+
+      startBtn.disabled = true;
+      cancelBtn.disabled = false;
+      inputEl.disabled = false;
+
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `Time left: ${timeLeft}s`;
+        if (timeLeft <= 0) endGame(false, "⏳ Time’s up! The cat got caught!");
+      }, 1000);
+    }
+
+    function moveCat() {
+      const typed = inputEl.value;
+      const correctPart = currentFact.substring(0, typed.length);
+
+      if (typed === correctPart) {
+        progress = Math.floor((typed.length / currentFact.length) * 100);
+        progressEl.textContent = `Progress: ${progress}%`;
+
+        const trackWidth = document.querySelector(".track").offsetWidth;
+        const newLeft = (progress / 100) * (trackWidth - 140);
+        catEl.style.left = `${newLeft}px`;
+
+        if (progress === 100) endGame(true, "🎉 You finished in time! The cat reached the goal!");
+      }
+    }
+
+    function endGame(won, message) {
+      clearInterval(timer);
+      resultEl.textContent = message;
+      inputEl.disabled = true;
+      startBtn.disabled = false;
+      cancelBtn.disabled = true;
+    }
+
+    function cancelGame() {
+      clearInterval(timer);
+      resultEl.textContent = "❌ Game canceled!";
+      progress = 0;
+      progressEl.textContent = "Progress: 0%";
+      timerEl.textContent = `Time left: 0s`;
+      catEl.style.left = "0px";
+      inputEl.value = "";
+      inputEl.disabled = true;
+      startBtn.disabled = false;
+      cancelBtn.disabled = true;
+    }
+
+    inputEl.addEventListener("input", moveCat);
+    startBtn.addEventListener("click", startGame);
+    cancelBtn.addEventListener("click", cancelGame);
+  </script>
 </body>
 </html>
