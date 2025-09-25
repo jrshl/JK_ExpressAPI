@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cat Speed Typing Adventure</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="overlay">
+    <h1>🐱 Cat Speed Typing Adventure</h1>
+    <p class="instructions">
+      Type the cat fact as fast as you can! The faster you type, the further the cat runs toward the goal 🏁
+    </p>
+
+    <div class="controls">
+      <label for="difficulty">Choose Difficulty:</label>
+      <select id="difficulty">
+        <option value="easy">Easy</option>
+        <option value="medium" selected>Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+      <button id="startBtn">Start Game</button>
+      <button id="cancelBtn" disabled>Cancel</button>
+    </div>
+
+    <div class="game-area">
+      <div class="track">
+        <img src="images/running_cat.gif" class="cat" id="cat" alt="Running Cat">
+        <div class="finish-line">🏁</div>
+      </div>
+    </div>
+
+    <div class="typing-area">
+      <p id="fact">Press "Start Game" to begin!</p>
+      <textarea id="input" placeholder="Type here..." rows="3" disabled></textarea>
+    </div>
+
+    <div class="status">
+      <p id="progress">Progress: 0%</p>
+      <p id="timer">Time left: 0s</p>
+      <p id="result"></p>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

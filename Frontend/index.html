@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="dashboard">
+    <h1>🎮 Welcome to the Game Hub</h1>
+    <p>Select a game to play:</p>
+
+    <select id="gameSelector">
+      <option value="">-- Choose a Game --</option>
+      <option value="speed-typing.html">🐱 Cat Speed Typing Adventure</option>
+      <option value="trivia.html">❓ Trivia Challenge</option>
+      <option value="puzzle.html">🧩 Puzzle Master</option>
+    </select>
+
+    <button onclick="goToGame()">Play</button>
+  </div>
+
+  <script>
+    function goToGame() {
+      let game = document.getElementById("gameSelector").value;
+      if (game) {
+        window.location.href = game; // redirect to the selected game page
+      } else {
+        alert("Please select a game first!");
+      }
+    }
+  </script>
+</body>
+</html>
+
+
+
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cat Ferris Wheel Facts</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wheel-wrapper">
+  <div class="ferris-wheel" id="ferrisWheel">
+     Cabins will be dynamically added here -->
+  <!--</div>
+</div>-->
+
+<!-- Zoom modal -->
+<!--<div class="zoom-container" id="zoomContainer">
+  <span id="closeZoom">✖</span>
+  <img id="catImage" src="" alt="Cat">
+  <p id="catFact"></p>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>-->
+
