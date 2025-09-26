@@ -11,11 +11,11 @@ app.use(express.static(path.join(__dirname, '../Frontend')));
 // API route to fetch cat facts
 app.get('/api/facts', async (req, res) => {
   try {
-    const response = await fetch('https://meowfacts.herokuapp.com/?count=10');
+    const response = await fetch('https://meowfacts.herokuapp.com/?count=12');
     const data = await response.json();
     res.json({ fact: data.data });
   } catch (err) {
-    res.status(500).json({ fact: "Cats are amazing creatures!" });
+    res.status(500).json({ fact: ["Cats are amazing creatures!"] });
   }
 });
 

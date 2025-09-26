@@ -1,0 +1,217 @@
+/* Trivia Master Game Styles */
+.trivia-container {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to top, #87ceeb 60%, #ffffff 100%);
+}
+
+.trivia-overlay {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 15px;
+  max-width: 900px;
+  width: 95%;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.trivia-title {
+  margin-bottom: 10px;
+  font-size: 2rem;
+  color: #333;
+}
+
+.trivia-instructions {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.trivia-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.trivia-controls .controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.trivia-controls button,
+.trivia-controls .start-btn,
+.trivia-controls .cancel-btn {
+  padding: 10px 15px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.trivia-controls .start-btn {
+  background: #4CAF50;
+  color: white;
+}
+
+.trivia-controls .start-btn:hover:not(:disabled) {
+  background: #45a049;
+}
+
+.trivia-controls .start-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.trivia-controls .cancel-btn {
+  background: #f44336;
+  color: white;
+}
+
+.trivia-controls .cancel-btn:hover:not(:disabled) {
+  background: #d32f2f;
+}
+
+.trivia-controls .cancel-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.trivia-game-area {
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(240, 248, 255, 0.5);
+  border-radius: 10px;
+  border: 2px solid #ddd;
+}
+
+.trivia-fact {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  color: #333;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.trivia-input-area {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.trivia-answer-input {
+  padding: 10px 15px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 2px solid #ccc;
+  width: 200px;
+  transition: border-color 0.3s;
+}
+
+.trivia-answer-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.trivia-answer-input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.trivia-submit-btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  background: #2196F3;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.trivia-submit-btn:hover:not(:disabled) {
+  background: #1976D2;
+}
+
+.trivia-submit-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.trivia-status {
+  margin-top: 20px;
+}
+
+.trivia-status .status {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.trivia-status .status p {
+  margin: 5px;
+  font-weight: bold;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.trivia-status .score {
+  color: #4CAF50;
+}
+
+.trivia-status .timer {
+  color: #FF9800;
+}
+
+.trivia-status .result {
+  color: #2196F3;
+  font-size: 1.2rem;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .trivia-overlay {
+    padding: 15px;
+    margin: 10px;
+  }
+  
+  .trivia-title {
+    font-size: 1.5rem;
+  }
+  
+  .trivia-input-area {
+    flex-direction: column;
+  }
+  
+  .trivia-answer-input {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .trivia-status {
+    flex-direction: column;
+    text-align: center;
+  }
+}
