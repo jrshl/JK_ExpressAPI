@@ -1,150 +1,174 @@
-
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import SpeedTyping from "./pages/SpeedTyping";
 import TriviaMaster from "./pages/TriviaMaster";
-import JumbledFacts from "./pages/JumbledFacts"
+import JumbledFacts from "./pages/JumbledFacts";
 import "./App.css";
 
-const GAME_OPTIONS = [
-  { value: "", label: "-- Choose a Game --" },
-  { value: "/speed-typing", label: "🐱 Cat Speed Typing Adventure" },
-  { value: "/trivia", label: "❓ Trivia Challenge" },
-  { value: "/jumbled-facts", label: "🧩 Jumbled Facts" },
-];
-
-function randomCatImage() {
-  const width = 280 + Math.floor(Math.random() * 50);
-  const height = 180 + Math.floor(Math.random() * 30);
-  return `https://placekitten.com/${width}/${height}`;
-}
-
-function chunkArray(arr, size) {
-  const result = [];
-  for (let i = 0; i < arr.length; i += size) result.push(arr.slice(i, i + size));
-  return result;
-}
-
 function HomePage() {
-  const [chunks, setChunks] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedGame, setSelectedGame] = useState("");
-  const autoSlideRef = useRef();
+  const [rotation, setRotation] = useState(0);
+  const [spinning, setSpinning] = useState(false);
+  const [facts, setFacts] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [count, setCount] = useState(1);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    async function loadFacts() {
-      try {
-        const res = await fetch("/api/facts");
-        const data = await res.json();
-        setChunks(chunkArray(data.fact, 3));
-      } catch {
-        setChunks([["😿 Couldn’t load facts."]]);
-      }
+  const slices = 6; // number of slots
+  const sliceAngle = 360 / slices;
+
+  // Your images in public/images
+  const sliceImages = [
+    "images/slice1.png",
+    "/images/slice2.png",
+    "/images/slice3.png",
+    "/images/slice4.png",
+    "/images/slice5.png",
+    "/images/slice6.png",
+  ];
+
+  async function spinWheel() {
+    if (spinning) return;
+    setSpinning(true);
+
+    try {
+      // Fetch cat facts
+      const res = await fetch(`https://meowfacts.herokuapp.com/?count=${count}`);
+      const data = await res.json();
+      const factList = Array.isArray(data.data) ? data.data : [data.data];
+      setFacts(factList);
+
+      // Random stop slice
+      const selectedSlice = Math.floor(Math.random() * slices);
+      const stopAngle = selectedSlice * sliceAngle + sliceAngle / 2;
+
+      // Add 2–3 extra spins (720–1080 degrees)
+      const extraSpins = 720 + Math.floor(Math.random() * 360);
+
+      // Compute final rotation
+      const finalRotation =
+        rotation + extraSpins + (360 - (rotation % 360)) + stopAngle;
+
+      setRotation(finalRotation);
+
+      // End spinning after animation
+      setTimeout(() => {
+        setSpinning(false);
+        setShowModal(true);
+        console.log("Stopped at slice:", selectedSlice + 1);
+      }, 3000);
+    } catch {
+      setFacts(["😿 Error loading facts."]);
+      setSpinning(false);
+      setShowModal(true);
     }
-    loadFacts();
-  }, []);
-
-  useEffect(() => {
-    autoSlideRef.current = setInterval(() => {
-      setCurrentIndex((prev) => (chunks.length ? (prev + 1) % chunks.length : 0));
-    }, 5000);
-    return () => clearInterval(autoSlideRef.current);
-  }, [chunks]);
-
-  function showSlide(index) {
-    if (!chunks.length) return;
-    if (index < 0) setCurrentIndex(chunks.length - 1);
-    else if (index >= chunks.length) setCurrentIndex(0);
-    else setCurrentIndex(index);
-  }
-
-  function goToGame() {
-    if (selectedGame) {
-      if (selectedGame.endsWith('.html')) {
-        // For HTML pages, redirect to the static file
-        window.location.href = selectedGame;
-      } else {
-        // For React routes, use navigate
-        navigate(selectedGame);
-      }
-    } else {
-      alert("Please select a game first!");
-    }
-  }
-
-  function prevSlide() {
-    showSlide(currentIndex - 1);
-    resetAutoSlide();
-  }
-  function nextSlide() {
-    showSlide(currentIndex + 1);
-    resetAutoSlide();
-  }
-  function resetAutoSlide() {
-    clearInterval(autoSlideRef.current);
-    autoSlideRef.current = setInterval(() => {
-      setCurrentIndex((prev) => (chunks.length ? (prev + 1) % chunks.length : 0));
-    }, 5000);
   }
 
   return (
-    <div className="dashboard">
-      <div className="sidebar">
-        <h2>🎮 Select a Game</h2>
-        <select
-          value={selectedGame}
-          onChange={(e) => setSelectedGame(e.target.value)}
-        >
-          {GAME_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-        <button onClick={goToGame}>Play</button>
-      </div>
+    <div className="homepage">
+      <h1 className="title">MEÖW FACTS</h1>
 
-      <div className="main-content">
-        <h1>Welcome to the Game Hub</h1>
-        <p>Cat facts with cute frames! 🐾</p>
+      <div className="layout">
+        {/* LEFT CAT */}
+        <div className="left-side">
+          <img src="/images/cat-left.png" alt="cat-left" className="cat-left" />
+        </div>
 
-        <div className="slider-container">
-          <div
-            className="slides"
-            style={{
-              display: "flex",
-              transition: "transform 0.5s ease-in-out",
-              transform: `translateX(-${currentIndex * 100}%)`,
-            }}
-          >
-            {chunks.map((group, i) => (
-              <div className="slide" key={i}>
-                {group.map((fact, j) => (
-                  <div className="fact-card" key={j}>
-                    {typeof fact === "string" && fact.startsWith("😿") ? (
-                      <p>{fact}</p>
-                    ) : (
-                      <>
-                        <img src={randomCatImage()} alt="Cute Cat" />
-                        <p>{fact}</p>
-                      </>
-                    )}
+        {/* WHEEL */}
+        <div className="center-section">
+          <div className="wheel-container">
+            <div
+              className="wheel"
+              style={{
+                transform: `rotate(${rotation}deg)`,
+                transition: spinning
+                  ? "transform 3s cubic-bezier(0.33, 1, 0.68, 1)"
+                  : "none",
+              }}
+            >
+              {sliceImages.map((img, i) => (
+                <div
+                  key={i}
+                  className="slice"
+                  style={{
+                    transform: `rotate(${i * sliceAngle}deg) skewY(${
+                      90 - sliceAngle
+                    }deg)`,
+                  }}
+                >
+                  <div className="slice-content">
+                    <img src={img} alt={`slice-${i}`} />
                   </div>
-                ))}
-              </div>
-            ))}
-          </div>
-          <div className="controls">
-            <button className="btn" onClick={prevSlide}>
-              ⟨
+                </div>
+              ))}
+            </div>
+
+            {/* SPIN BUTTON */}
+            <button
+              className="btn-spin"
+              onClick={spinWheel}
+              disabled={spinning}
+            >
+              {spinning ? "..." : "SPIN"}
             </button>
-            <button className="btn" onClick={nextSlide}>
-              ⟩
+
+            {/* ARROW */}
+            <div className="arrow"></div>
+          </div>
+
+          {/* COUNT CONTROLLER */}
+          <div className="controller">
+            <button
+              className="btn-control"
+              onClick={() => setCount(Math.max(1, count - 1))}
+            >
+              -
+            </button>
+            <div className="count-display">x{count}</div>
+            <button className="btn-control" onClick={() => setCount(count + 1)}>
+              +
             </button>
           </div>
         </div>
+
+        {/* RIGHT SIDE GAMES */}
+        <div className="right-side">
+          <div className="game-modal" onClick={() => navigate("/speed-typing")}>
+            Game 1
+          </div>
+          <div className="game-modal" onClick={() => navigate("/trivia")}>
+            Game 2
+          </div>
+          <div
+            className="game-modal"
+            onClick={() => navigate("/jumbled-facts")}
+          >
+            Game 3
+          </div>
+        </div>
       </div>
+
+      {/* FACT MODAL */}
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>🐱 Cat Facts</h3>
+            {facts.length > 1 ? (
+              <div className="fact-slider">
+                {facts.map((fact, i) => (
+                  <div key={i} className="fact-card">
+                    {fact}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>{facts[0]}</p>
+            )}
+            <button className="close-btn" onClick={() => setShowModal(false)}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

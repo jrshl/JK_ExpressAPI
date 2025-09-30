@@ -21,7 +21,7 @@ export default function SpeedTyping() {
       const res = await fetch("/api/facts");
       const data = await res.json();
       return data.fact[0];
-    } catch (error) {
+    } catch  {
       return "Cats are amazing creatures!";
     }
   }
