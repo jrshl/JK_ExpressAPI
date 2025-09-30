@@ -1,25 +1,67 @@
-/* Trivia Master Game Styles */
-.trivia-container {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  min-height: 100vh;
+/* ===========================
+   MAIN WRAPPER
+   Background is fixed
+=========================== */
+.trivia-container,
+.trivia-wrapper {
+  position: relative; /* important so absolute elements stay inside */
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(to top, #87ceeb 60%, #ffffff 100%);
+  min-height: 100vh;
 }
 
-.trivia-overlay {
-  background: rgba(255, 255, 255, 0.95);
+/* ✅ The box should always stay ABOVE the cat */
+.trivia-box {
+  position: relative;
+  z-index: 2; /* higher = in front */
+  background: white;
   padding: 25px;
-  border-radius: 15px;
+  border-radius: 12px;
+  border: 4px solid #8b5a2b;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  width: 60%;
   max-width: 900px;
-  width: 95%;
   text-align: center;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
+/* ✅ Cat stays behind (back layer) */
+.background-cat {
+  position: absolute;
+  bottom: 100px;        /* adjust so it "peeks" behind the box */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 650px;
+  height: 800px;
+  background-image: url('/images/tmCat.png'); /* change path as needed */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom center;
+  z-index: 1;  /* Lower than the box */
+  pointer-events: none; /* So it won’t block clicks */
+}
+
+
+
+/* ===========================
+   TRIVIA BOX
+=========================== */
+.trivia-box {
+  width: 60%;
+  max-width: 900px;
+  background: white;
+  padding: 25px;
+  text-align: center;
+  border-radius: 12px;
+  border: 4px solid #8b5a2b;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  position: relative;
+  z-index: 10;
+}
+
+/* ===========================
+   TITLE + INSTRUCTIONS
+=========================== */
 .trivia-title {
   margin-bottom: 10px;
   font-size: 2rem;
@@ -32,6 +74,9 @@
   margin-bottom: 20px;
 }
 
+/* ===========================
+   BUTTONS
+=========================== */
 .trivia-controls {
   display: flex;
   justify-content: center;
@@ -40,16 +85,7 @@
   margin-bottom: 20px;
 }
 
-.trivia-controls .controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-}
-
-.trivia-controls button,
-.trivia-controls .start-btn,
-.trivia-controls .cancel-btn {
+.trivia-controls button {
   padding: 10px 15px;
   font-size: 1rem;
   border-radius: 8px;
@@ -58,42 +94,69 @@
   transition: background-color 0.3s;
 }
 
-.trivia-controls .start-btn {
+.start-btn {
   background: #4CAF50;
   color: white;
 }
 
-.trivia-controls .start-btn:hover:not(:disabled) {
+.start-btn:hover:not(:disabled) {
   background: #45a049;
 }
 
-.trivia-controls .start-btn:disabled {
+.start-btn:disabled {
   background: #cccccc;
   cursor: not-allowed;
 }
 
-.trivia-controls .cancel-btn {
+.cancel-btn {
   background: #f44336;
   color: white;
 }
 
-.trivia-controls .cancel-btn:hover:not(:disabled) {
+.cancel-btn:hover:not(:disabled) {
   background: #d32f2f;
 }
 
-.trivia-controls .cancel-btn:disabled {
+.cancel-btn:disabled {
   background: #cccccc;
   cursor: not-allowed;
 }
 
+/* ===========================
+   TRIVIA GAME AREA
+=========================== */
 .trivia-game-area {
   margin: 20px 0;
   padding: 20px;
-  background: rgba(240, 248, 255, 0.5);
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 10px;
   border: 2px solid #ddd;
+  position: relative;
 }
 
+/* ===========================
+   CURTAIN OVERLAY
+=========================== */
+.curtain {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(139, 69, 19, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: white;
+  z-index: 50;
+  font-weight: bold;
+}
+
+
+/* ===========================
+   TRIVIA FACT
+=========================== */
 .trivia-fact {
   font-weight: bold;
   font-size: 1.2rem;
@@ -110,6 +173,9 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
+/* ===========================
+   INPUT + SUBMIT
+=========================== */
 .trivia-input-area {
   margin: 20px 0;
   display: flex;
@@ -157,6 +223,9 @@
   cursor: not-allowed;
 }
 
+/* ===========================
+   SCORE + TIMER
+=========================== */
 .trivia-status {
   margin-top: 20px;
 }
@@ -190,26 +259,28 @@
   margin-top: 10px;
 }
 
-/* Responsive design */
+/* ===========================
+   RESPONSIVE
+=========================== */
 @media (max-width: 768px) {
-  .trivia-overlay {
+  .trivia-box {
+    width: 90%;
     padding: 15px;
-    margin: 10px;
   }
-  
+
   .trivia-title {
     font-size: 1.5rem;
   }
-  
+
   .trivia-input-area {
     flex-direction: column;
   }
-  
+
   .trivia-answer-input {
     width: 100%;
     max-width: 300px;
   }
-  
+
   .trivia-status {
     flex-direction: column;
     text-align: center;

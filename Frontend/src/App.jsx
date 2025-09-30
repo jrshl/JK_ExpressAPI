@@ -16,22 +16,12 @@ function HomePage() {
   const slices = 6; // number of slots
   const sliceAngle = 360 / slices;
 
-  // Your images in public/images
-  const sliceImages = [
-    "images/slice1.png",
-    "/images/slice2.png",
-    "/images/slice3.png",
-    "/images/slice4.png",
-    "/images/slice5.png",
-    "/images/slice6.png",
-  ];
-
   async function spinWheel() {
     if (spinning) return;
     setSpinning(true);
 
     try {
-      // Fetch cat facts
+      // fetch cat facts
       const res = await fetch(`https://meowfacts.herokuapp.com/?count=${count}`);
       const data = await res.json();
       const factList = Array.isArray(data.data) ? data.data : [data.data];
@@ -41,16 +31,15 @@ function HomePage() {
       const selectedSlice = Math.floor(Math.random() * slices);
       const stopAngle = selectedSlice * sliceAngle + sliceAngle / 2;
 
-      // Add 2–3 extra spins (720–1080 degrees)
+      // Extra spins
       const extraSpins = 720 + Math.floor(Math.random() * 360);
 
-      // Compute final rotation
+      // Final rotation
       const finalRotation =
         rotation + extraSpins + (360 - (rotation % 360)) + stopAngle;
 
       setRotation(finalRotation);
 
-      // End spinning after animation
       setTimeout(() => {
         setSpinning(false);
         setShowModal(true);
@@ -70,64 +59,52 @@ function HomePage() {
       <div className="layout">
         {/* LEFT CAT */}
         <div className="left-side">
-          <img src="/images/cat-left.png" alt="cat-left" className="cat-left" />
+          <img src="/images/homeCat.png" alt="cat-left" className="cat-left" />
         </div>
-
         {/* WHEEL */}
-        <div className="center-section">
-          <div className="wheel-container">
-            <div
-              className="wheel"
-              style={{
-                transform: `rotate(${rotation}deg)`,
-                transition: spinning
-                  ? "transform 3s cubic-bezier(0.33, 1, 0.68, 1)"
-                  : "none",
-              }}
-            >
-              {sliceImages.map((img, i) => (
-                <div
-                  key={i}
-                  className="slice"
-                  style={{
-                    transform: `rotate(${i * sliceAngle}deg) skewY(${
-                      90 - sliceAngle
-                    }deg)`,
-                  }}
-                >
-                  <div className="slice-content">
-                    <img src={img} alt={`slice-${i}`} />
-                  </div>
-                </div>
-              ))}
-            </div>
+<div className="center-section">
+  <div className="wheel-wrapper">
 
-            {/* SPIN BUTTON */}
-            <button
-              className="btn-spin"
-              onClick={spinWheel}
-              disabled={spinning}
-            >
-              {spinning ? "..." : "SPIN"}
-            </button>
+    {/* Wheel */}
+    <div
+      className="wheel"
+      style={{
+        transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+        transition: spinning
+          ? "transform 3s cubic-bezier(0.33, 1, 0.68, 1)"
+          : "none",
+      }}
+    />
 
-            {/* ARROW */}
-            <div className="arrow"></div>
-          </div>
+    {/* WHITE BACKGROUND AREA FOR SPIN + CONTROLLER */}
+    <div className="spin-area">
+      {/* SPIN BUTTON */}
+      <button
+        className="btn-spin"
+        onClick={spinWheel}
+        disabled={spinning}
+      >
+        {spinning ? "..." : "SPIN"}
+      </button>
 
-          {/* COUNT CONTROLLER */}
-          <div className="controller">
-            <button
-              className="btn-control"
-              onClick={() => setCount(Math.max(1, count - 1))}
-            >
-              -
-            </button>
-            <div className="count-display">x{count}</div>
-            <button className="btn-control" onClick={() => setCount(count + 1)}>
-              +
-            </button>
-          </div>
+      {/* COUNT CONTROLLER */}
+      <div className="controller">
+        <button
+          className="btn-control"
+          onClick={() => setCount(Math.max(1, count - 1))}
+        >
+          -
+        </button>
+        <div className="count-display">x{count}</div>
+        <button className="btn-control" onClick={() => setCount(count + 1)}>
+          +
+        </button>
+      </div>
+    </div>
+
+    {/* ARROW */}
+    {!showModal && <div className="arrow"></div>}
+        </div>
         </div>
 
         {/* RIGHT SIDE GAMES */}
