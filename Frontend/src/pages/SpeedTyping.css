@@ -71,17 +71,16 @@
   border-radius: 8px;
   border: none;
   cursor: pointer;
+  background: #d28b5b;
 }
 
 .start-btn { 
-  
   color: white; 
 }
 .start-btn:hover:not(:disabled) { 
-  background: #a07a45; 
+  background: #65400c; 
 }
 .cancel-btn { 
-  background: #9b1d14; 
   color: white; 
 }
 .cancel-btn:hover:not(:disabled) { 
@@ -120,21 +119,37 @@
   animation-play-state: paused;
   top: -80%; 
 }
-.track.active .bg-layer { animation-play-state: running; }
-.bg3 { 
-  background-image: url("images/speedBG3.png"); 
+.track.active .bg-layer { 
+  animation-play-state: running; 
+}
+.bg-static {
+  position: absolute;
+  inset: 0;
+  width: 200%;
+  height: 180%;
+  background-size: cover;
+  top: -80%; 
+}
+
+.gif { 
+  background-image: url("images/speedStaticBG.gif"); 
   animation: bg1Scroll 60s linear infinite; 
   z-index: 0; 
+}
+.bg1 { 
+  background-image: url("images/speedBG1.png"); 
+  animation: bg3Scroll 15s linear infinite; 
+  z-index: 1; 
 }
 .bg2 { 
   background-image: url("images/speedBG2.png"); 
   animation: bg2Scroll 30s linear infinite; 
   z-index: 0.5; 
 }
-.bg1 { 
-  background-image: url("images/speedBG1.png"); 
-  animation: bg3Scroll 15s linear infinite; 
-  z-index: 1; 
+.bg3 { 
+  background-image: url("images/speedBG3.png"); 
+  animation: bg1Scroll 60s linear infinite; 
+  z-index: 0; 
 }
 
 @keyframes bg1Scroll { 
