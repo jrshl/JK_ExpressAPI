@@ -74,7 +74,7 @@
 }
 
 .start-btn { 
-  background: #9d713a; 
+  
   color: white; 
 }
 .start-btn:hover:not(:disabled) { 
@@ -129,35 +129,100 @@
 .bg2 { 
   background-image: url("images/speedBG2.png"); 
   animation: bg2Scroll 30s linear infinite; 
-  z-index: 1; 
+  z-index: 0.5; 
 }
 .bg1 { 
   background-image: url("images/speedBG1.png"); 
   animation: bg3Scroll 15s linear infinite; 
-  z-index: 2; 
+  z-index: 1; 
 }
 
-@keyframes bg1Scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-@keyframes bg2Scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-@keyframes bg3Scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-20%); } }
+@keyframes bg1Scroll { 
+  0% { transform: translateX(0); } 
+  100% { transform: translateX(-50%); } 
+}
+@keyframes bg2Scroll { 
+  0% { transform: translateX(0); } 
+  100% { transform: translateX(-50%); } 
+}
+@keyframes bg3Scroll { 
+  0% { transform: translateX(0); } 
+  100% { transform: translateX(-20%); } 
+}
 
 /* Road, bushes, foreground */
-.road { position: absolute; bottom: 0; left: 0; width: 200%; height: 200px; background: url("images/speedRoad.png") repeat-x; background-size: contain; animation: roadScroll 3s linear infinite; z-index: 2; animation-play-state: paused; }
-.track.active .road { animation-play-state: running; }
+.road { 
+  position: absolute; 
+  bottom: 0; 
+  left: 0; 
+  width: 200%; 
+  height: 200px; 
+  background: url("images/speedRoad.png") repeat-x; 
+  background-size: contain; 
+  animation: roadScroll 3s linear infinite; 
+  z-index: 2; 
+  animation-play-state: paused; 
+}
+.track.active .road { 
+  animation-play-state: running; 
+}
 
-.bushes { position: absolute; bottom: 0; left: 0; width: 200%; height: 200px; background: url("images/speedTrees.png") repeat-x; background-size: contain; animation: bushScroll 6s linear infinite; z-index: 1; animation-play-state: paused; }
-.track.active .bushes { animation-play-state: running; }
+.bushes { 
+  position: absolute; 
+  bottom: 0; 
+  left: 0; 
+  width: 200%; 
+  height: 200px; 
+  background: url("images/speedTrees.png") repeat-x; 
+  background-size: contain; 
+  animation: bushScroll 6s linear infinite; 
+  z-index: 1; 
+  animation-play-state: paused; 
+}
+.track.active .bushes { 
+  animation-play-state: running; 
+}
 
-.foreground-layer { position: absolute; bottom: 0; left: 0; width: 200%; height: 150px; background: url("images/speedForeground.png") repeat-x; background-size: contain; animation: roadScroll 3s linear infinite; z-index: 3; animation-play-state: paused; }
+.foreground-layer { 
+  position: absolute; 
+  bottom: 0; 
+  left: 0; 
+  width: 200%; 
+  height: 150px; 
+  background: url("images/speedForeground.png") repeat-x; 
+  background-size: contain; 
+  animation: roadScroll 3s linear infinite; 
+  z-index: 3; 
+  animation-play-state: paused; 
+}
 
-@keyframes roadScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-@keyframes bushScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes roadScroll { 
+  0% { transform: translateX(0); } 
+  100% { transform: translateX(-50%); } 
+}
+@keyframes bushScroll { 
+  0% { transform: translateX(0); } 
+  100% { transform: translateX(-50%); } 
+}
 
 /* Cat */
-.cat { position: absolute; bottom: 20px; width: 100px; height: auto; transition: left 0.3s ease; z-index: 4; }
+.cat { 
+  position: absolute; 
+  bottom: 20px; 
+  width: 100px; 
+  height: auto; 
+  transition: left 0.3s ease; 
+  z-index: 4; 
+}
 
 /* Finish line */
-.finish-line { position: absolute; right: 15px; bottom: 20px; font-size: 2rem; z-index: 5; }
+.finish-line { 
+  position: absolute; 
+  right: 15px; 
+  bottom: 20px; 
+  font-size: 2rem; 
+  z-index: 5; 
+}
 
 /* Fact box */
 .fact-box { 
@@ -174,6 +239,83 @@
   word-wrap: break-word; 
 }
 
-.typed-char { color: black; font-weight: bold; }
-.wrong-char { color: red; font-weight: bold; }
-.untyped-char { color: #aaa; }
+.typed-char { 
+  color: black; 
+  font-weight: bold; 
+}
+.wrong-char { 
+  color: red; 
+  font-weight: bold; 
+}
+.untyped-char { 
+  color: #aaa; 
+}
+
+/* Progress tracker inside track */
+.progress-line {
+  position: absolute;
+  top: 20px; /* adjust vertical position */
+  left: 20%;
+  width: 60%;
+  height: 15px;
+  background: rgba(119, 55, 25, 0.914);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  transform: translateY(-50%);
+  z-index: 6;
+}
+
+.tracker-cat {
+  position: absolute;
+  transform: translateX(-72%);
+  font-size: 25px;
+  transition: left 0.3s ease;
+  z-index: 8;
+  top: -17px;
+}
+
+.line-end {
+  position: absolute;
+  transform: translateX(1200%);
+  font-size: 24px;
+  z-index: 7;
+  top: -14px;
+}
+
+.answer-timer {
+  position: absolute;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 8;
+}
+
+.timer-svg {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+}
+
+.timer-bg {
+  stroke: #ccc;
+  stroke-width: 2;
+  fill: none;
+}
+
+.timer-progress {
+  stroke-width: 2;
+  fill: none;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.timer-text {
+  font-size: 10px;
+  font-weight: bold;
+  color: black;
+  position: relative;
+}
+

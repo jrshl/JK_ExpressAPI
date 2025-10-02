@@ -16,7 +16,7 @@ export default function SpeedTyping() {
   const [modalOpen, setModalOpen] = useState(false);
   const timerRef = useRef(null);
 
-  const R = 16;
+  const R = 12;
   const circumference = 2 * Math.PI * R;
   const fraction = maxTime ? timeLeft / maxTime : 0;
   const dashOffset = circumference * (1 - fraction);
@@ -176,36 +176,55 @@ export default function SpeedTyping() {
 
                 {/* SVG Timer */}
                 <div className="answer-timer">
-                  <svg viewBox="0 0 36 36" className="answer-timer-ring">
-                    <circle className="ring-track" cx={R} cy={R} r={R} />
+                   <svg
+                      viewBox={`0 0 ${R * 2 + 6} ${R * 2 + 6}`}
+                      style={{ width: "40px", height: "40px" }}
+                  >
                     <circle
-                      className="ring-progress"
-                      cx={R}
-                      cy={R}
+                      cx={R + 3}
+                      cy={R + 3}
                       r={R}
+                      className="timer-bg"
+                  />
+                    <circle
+                      cx={R + 3}
+                      cy={R + 3}
+                      r={R}
+                      className="timer-progress"
+                      stroke={strokeColor}
                       strokeDasharray={circumference}
                       strokeDashoffset={dashOffset}
-                      stroke={strokeColor}
-                    />
-                  </svg>
-                  <span className="timer-text">{timeLeft}s</span>
-                </div>
+                  />
+                </svg>
+                  <span className="timer-text">{timeLeft}</span>
+              </div>
 
                 {/* Moving layers */}
                 <div className="road"></div>
                 <div className="bushes"></div>
                 <div className="foreground-layer"></div>
 
-                {/* Cat */}
+                {/* Main cat */}
                 <img
                   src="images/running_cat.gif"
                   alt="Cat"
                   className="cat"
                   style={{ left: catMovable ? `${progress}%` : `${prevCatPosition}%` }}
                 />
-                <div className="finish-line">🏁</div>
+
+                {/* Progress tracker inside track */}
+                <div className="progress-line">
+                  <div
+                    className="tracker-cat"
+                    style={{ left: catMovable ? `${progress}%` : `${prevCatPosition}%` }}
+                  >
+                    😺
+                  </div>
+                  <div className="line-end">🏁</div>
+                </div>
               </div>
 
+              {/* Fact box */}
               <div className="fact-box">
                 {currentFact.split("").map((char, idx) => {
                   let cls = "untyped-char";
@@ -214,6 +233,7 @@ export default function SpeedTyping() {
                 })}
               </div>
 
+              {/* Controls */}
               <div className="controls bottom-controls">
                 <label>Difficulty:</label>
                 <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} disabled={gameActive}>
