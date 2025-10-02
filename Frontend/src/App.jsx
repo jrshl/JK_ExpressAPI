@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import FlipBookModal from "./components/FlipBookModal";
+import CatGallery from "./components/CatGallery";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import SpeedTyping from "./pages/SpeedTyping";
 import TriviaMaster from "./pages/TriviaMaster";
@@ -11,7 +13,21 @@ function HomePage() {
   const [facts, setFacts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [count, setCount] = useState(1);
+  const [showBook, setShowBook] = useState(false);
+  const [showCatGallery, setShowCatGallery] = useState(false);
+  const [encounteredFacts, setEncounteredFacts] = useState({});
   const navigate = useNavigate();
+
+  // Generate consistent fact ID from fact content
+  const generateFactId = (fact) => {
+    let hash = 0;
+    for (let i = 0; i < fact.length; i++) {
+      const char = fact.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash) % 234 + 1; // Map to 1-234 range
+  };
 
   const slices = 6; // number of slots
   const sliceAngle = 360 / slices;
@@ -26,6 +42,17 @@ function HomePage() {
       const data = await res.json();
       const factList = Array.isArray(data.data) ? data.data : [data.data];
       setFacts(factList);
+      // Add new facts to encounteredFacts with their generated IDs
+      setEncounteredFacts(prev => {
+        const newEncounteredFacts = { ...prev };
+        factList.forEach(fact => {
+          const factId = generateFactId(fact);
+          if (!newEncounteredFacts[factId]) {
+            newEncounteredFacts[factId] = fact;
+          }
+        });
+        return newEncounteredFacts;
+      });
 
       // Random stop slice
       const selectedSlice = Math.floor(Math.random() * slices);
@@ -59,70 +86,55 @@ function HomePage() {
       <div className="layout">
         {/* LEFT CAT */}
         <div className="left-side">
-
-        <div className="cat-gallery" onClick={() => navigate("/")}>
-            Cat Gallery
-          </div>
-          <div className="fact-collection" onClick={() => navigate("/")}>
-            Fact Library
-          </div>
-
+          <div className="cat-gallery" onClick={() => setShowCatGallery(true)}>Cat Gallery</div>
+          <div className="fact-collection" onClick={() => setShowBook(true)}>Fact Library</div>
           {/*<img src="/images/homeCat.png" alt="cat-left" className="cat-left" />*/}
         </div>
         {/* WHEEL */}
-<div className="center-section">
-  <div className="wheel-wrapper">
-
-    {/* Wheel */}
-    <div
-      className="wheel"
-      style={{
-        transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
-        transition: spinning
-          ? "transform 3s cubic-bezier(0.33, 1, 0.68, 1)"
-          : "none",
-      }}
-    />
-
-    {/* WHITE BACKGROUND AREA FOR SPIN + CONTROLLER */}
-    <div className="spin-area">
-      {/* SPIN BUTTON */}
-      <button
-        className="btn-spin"
-        onClick={spinWheel}
-        disabled={spinning}
-      >
-        {spinning ? "..." : "SPIN"}
-      </button>
-
-      {/* COUNT CONTROLLER */}
-      <div className="controller">
-        <button
-          className="btn-control"
-          onClick={() => setCount(Math.max(1, count - 1))}
-        >
-          -
-        </button>
-        <div className="count-display">x{count}</div>
-        <button className="btn-control" onClick={() => setCount(count + 1)}>
-          +
-        </button>
-      </div>
-    </div>
-
-    {/* ARROW */}
-    {!showModal && <div className="arrow"></div>}
+        <div className="center-section">
+          <div className="wheel-wrapper">
+            {/* Wheel */}
+            <div
+              className="wheel"
+              style={{
+                transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+                transition: spinning
+                  ? "transform 3s cubic-bezier(0.33, 1, 0.68, 1)"
+                  : "none",
+              }}
+            />
+            {/* WHITE BACKGROUND AREA FOR SPIN + CONTROLLER */}
+            <div className="spin-area">
+              {/* SPIN BUTTON */}
+              <button
+                className="btn-spin"
+                onClick={spinWheel}
+                disabled={spinning}
+              >
+                {spinning ? "..." : "SPIN"}
+              </button>
+              {/* COUNT CONTROLLER */}
+              <div className="controller">
+                <button
+                  className="btn-control"
+                  onClick={() => setCount(Math.max(1, count - 1))}
+                >
+                  -
+                </button>
+                <div className="count-display">x{count}</div>
+                <button className="btn-control" onClick={() => setCount(count + 1)}>
+                  +
+                </button>
+              </div>
+            </div>
+            {/* ARROW */}
+            {!showModal && <div className="arrow"></div>}
+          </div>
         </div>
-        </div>
-
         {/* RIGHT SIDE GAMES */}
         <div className="right-side">
-          <div className="game-modal" onClick={() => navigate("/speed-typing")}>
-            Game 1
-          </div>
-          <div className="game-modal" onClick={() => navigate("/trivia")}>
-            Game 2
-          </div>
+          <div className="game-modal" onClick={() => navigate("/speed-typing")}>Game 1</div>
+          <div className="game-modal" onClick={() => navigate("/trivia")}>Game 2</div>
           <div
             className="game-modal"
             onClick={() => navigate("/jumbled-facts")}
@@ -131,7 +143,6 @@ function HomePage() {
           </div>
         </div>
       </div>
-
       {/* FACT MODAL */}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
@@ -153,6 +164,14 @@ function HomePage() {
             </button>
           </div>
         </div>
+      )}
+      {/* FACT LIBRARY BOOK MODAL */}
+      {showBook && (
+        <FlipBookModal encounteredFacts={encounteredFacts} onClose={() => setShowBook(false)} />
+      )}
+      {/* CAT GALLERY MODAL */}
+      {showCatGallery && (
+        <CatGallery onClose={() => setShowCatGallery(false)} />
       )}
     </div>
   );
