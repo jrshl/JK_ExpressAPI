@@ -40,14 +40,46 @@ body {
 }
 
 /* Left Cat */
-.cat-left {
-  width: 400px;
-  height: 300px;
-  left: 51%;
-  margin-top: 400px;
-  background-repeat: no-repeat;
+/*.cat-left {
+  width: 1050px;
+  width: 800px;
+  height: auto; 
+  position: absolute;
+  top: 65px;   
+  left: -20%;  
+  z-index: 6;   
+  background: transparent; 
+  pointer-events: none; 
+}*/
+
+.fact-collection {
+  background: #d9b89c;
+  padding: 40px 40px;
+  border-radius: 14px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 6px #8b5e3c;
+  border: 3px solid #8b5e3c;
+  transition: transform 0.1s ease-in-out;
+  width: 150px;
 }
 
+.cat-gallery {
+  background: #d9b89c;
+  padding: 40px 40px;
+  border-radius: 14px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 6px #8b5e3c;
+  border: 3px solid #8b5e3c;
+  transition: transform 0.1s ease-in-out;
+  margin-bottom: 20px;
+  width: 150px;
+}
 /* =========================
    Wheel
 ========================= */
@@ -60,6 +92,7 @@ body {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+
 }
 
 .wheel {
@@ -71,7 +104,7 @@ body {
   width: 900px;
   height: 900px;
   border-radius: 50%;
-  background-image: url('/images/wheelBG.png');
+  background-image: url('/images/wheel1.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -155,7 +188,7 @@ button {
   left: 51%;
   transform: translateX(-50%);
   background: white;
-  padding: 30px 180px 150px;
+  padding: 30px 250px 150px;
   border-radius: 200px;
   display: flex;
   flex-direction: column;

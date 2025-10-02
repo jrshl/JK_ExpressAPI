@@ -1,162 +1,460 @@
 /* ===========================
    MAIN WRAPPER
-   Background is fixed
 =========================== */
-.trivia-container,
 .trivia-wrapper {
-  position: relative; /* important so absolute elements stay inside */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
   min-height: 100vh;
-}
-
-/* ✅ The box should always stay ABOVE the cat */
-.trivia-box {
-  position: relative;
-  z-index: 2; /* higher = in front */
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  border: 4px solid #8b5a2b;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-  width: 60%;
-  max-width: 900px;
-  text-align: center;
-}
-
-/* ✅ Cat stays behind (back layer) */
-.background-cat {
-  position: absolute;
-  bottom: 100px;        /* adjust so it "peeks" behind the box */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 650px;
-  height: 800px;
-  background-image: url('/images/tmCat.png'); /* change path as needed */
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: bottom center;
-  z-index: 1;  /* Lower than the box */
-  pointer-events: none; /* So it won’t block clicks */
-}
-
-
-
-/* ===========================
-   TRIVIA BOX
-=========================== */
-.trivia-box {
-  width: 60%;
-  max-width: 900px;
-  background: white;
-  padding: 25px;
-  text-align: center;
-  border-radius: 12px;
-  border: 4px solid #8b5a2b;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-  position: relative;
-  z-index: 10;
-}
-
-/* ===========================
-   TITLE + INSTRUCTIONS
-=========================== */
-.trivia-title {
-  margin-bottom: 10px;
-  font-size: 2rem;
-  color: #333;
-}
-
-.trivia-instructions {
-  font-size: 1rem;
-  color: #555;
-  margin-bottom: 20px;
-}
-
-/* ===========================
-   BUTTONS
-=========================== */
-.trivia-controls {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 15px;
+  background: url('/images/homeBG.png');
+  background-size: 70%;
+  flex-direction: column;
+  padding: 20px;
+}
+
+/* ===========================
+   TITLE (top, outside box)
+=========================== */
+.intro-title {
+  font-size: 2.6rem;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #2c2c2c;
+  text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff;
+}
+
+/* ===========================
+   HAMBURGER MENU
+=========================== */
+.hamburger {
+  position: fixed;
+  top: 45px;
+  left: 50px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  background: #e3c5a4;
+  border: 2px solid #8a3c09;
+  border-radius: 8px;
+  z-index: 1000;
+}
+
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  border: 2px solid #8a3c09;
+  border-radius: 4px;
+}
+
+/* ===========================
+   INTRO SCREEN
+=========================== */
+.intro-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+}
+
+/* Wrap cat + box */
+.intro-content-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.intro-cat {
+  width: 260px;
+  height: auto;
+}
+
+.intro-box {
+  background: #fff;
+  border: 4px solid #8b5a2b;
+  border-radius: 14px;
+  padding: 25px 20px;
+  width: 360px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.intro-content {
   margin-bottom: 20px;
 }
 
-.trivia-controls button {
-  padding: 10px 15px;
+.intro-content p {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #444;
+}
+
+.intro-image {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 2px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* ===========================
+   INTRO CONTROLS
+=========================== */
+.intro-controls {
+  margin-top: auto;   /* push controls to bottom */
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.prev-btn,
+.next-btn,
+.start-btn {
+  padding: 5px 10px;
   font-size: 1rem;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s;
+  flex: 1;
+}
+
+.prev-btn {
+  background: #9c571f;
+  color: white;
+}
+
+
+.next-btn {
+  background: #5e3201;
+  color: #fff;
 }
 
 .start-btn {
-  background: #4CAF50;
-  color: white;
-}
-
-.start-btn:hover:not(:disabled) {
-  background: #45a049;
-}
-
-.start-btn:disabled {
-  background: #cccccc;
-  cursor: not-allowed;
-}
-
-.cancel-btn {
-  background: #f44336;
-  color: white;
-}
-
-.cancel-btn:hover:not(:disabled) {
-  background: #d32f2f;
-}
-
-.cancel-btn:disabled {
-  background: #cccccc;
-  cursor: not-allowed;
+  background: #4caf50;
+  color: #fff;
 }
 
 /* ===========================
-   TRIVIA GAME AREA
+   BACKGROUND CAT
+=========================== */
+.intro-screen {
+  display: flex;
+  flex-direction: column; /* Title on top, Cat + Box below */
+  align-items: center;
+  justify-content: flex-start;
+  gap: 20px; /* gap between title and main row */
+  margin-top: 30px;
+  padding-left: -10%;
+}
+
+.intro-header {
+  width: 100%;
+  display: flex;
+  margin-bottom: -80px; /* overlap slightly */
+}
+
+.intro-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  font-family: "Press Start 2P", monospace;
+  letter-spacing: 2px;
+  position: relative;
+  padding-left: 675px;
+}
+
+.intro-row {
+  display: flex;
+  align-items: flex-start;  /* align top edges */
+  gap: 20px; /* spacing between cat and box */
+}
+
+.intro-cat-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.intro-cat {
+  width: 600px;
+  height: 600px;
+
+}
+
+.cat-question {
+  position: absolute;
+  top: -90px;   /* adjust para mo-above sa ulo */
+  left: 42%;
+  transform: rotate(5deg);
+  width: 190px;  /* adjust size sa question mark */
+  height: auto;
+  pointer-events: none; /* para dili ma-click */
+  
+}
+
+.cat-question1 {
+  position: absolute;
+  top: -100px;   /* adjust para mo-above sa ulo */
+  left: 55%;
+  transform: rotate(30deg);
+  width: 190px;  /* adjust size sa question mark */
+  height: auto;
+  pointer-events: none; /* para dili ma-click */
+  
+}
+
+.cat-question2 {
+  position: absolute;
+  top: -20px;   /* adjust para mo-above sa ulo */
+  left: 60%;
+  transform: rotate(40deg);
+  width: 190px;  /* adjust size sa question mark */
+  height: auto;
+  pointer-events: none; /* para dili ma-click */
+  
+}
+
+.intro-box-wrapper {
+  display: flex;
+  padding-top: 60px;
+}
+
+.intro-bigbox {
+  background: #c3ab91;
+  border: 4px solid #5c4033;
+  border-radius: 16px;
+  padding: 30px 50px 30px 50px; /* more padding-top para sa content */
+  width: 560px;
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* content above, buttons pushed by margin-top:auto */
+  box-shadow: 4px 4px 0px #541b01;
+}
+
+.intro-smallbox {
+  background: #fff;
+  border: 3px solid #6b2c0a;
+  border-radius: 10px;
+  padding: 30px;
+  min-height: 300px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.9rem;
+  text-align: center;
+  line-height: 1.4; 
+}
+
+
+
+.intro-smallbox p {
+  font-size: 1rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+.intro-smallbox img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid #bbb;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Buttons at bottom of big box */
+.intro-controls button {
+  padding: 10px 10px 10px 10px;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-family: "Press Start 2P", monospace;
+  size: 10px;
+}
+
+.intro-controls {
+  padding-top: 15px;
+}
+
+
+/* Cat behind the box */
+.game-cat-wrapper {
+    position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-cat {
+   position: absolute;
+  top: -250px;        /* adjust para murag nag bitay */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;       /* mas dako kaysa box width */
+  height: 700px;
+  z-index: 5; 
+}
+
+/* Trivia box always in front */
+.trivia-box {
+  position: relative;
+  background: #fff;
+  border: 4px solid #5c4033;
+  border-radius: 16px;
+  width: 700px;
+  height: 260px;
+  z-index: 10;
+  box-shadow: 4px 4px 0px #541b01;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Fact text auto-shrink */
+.trivia-fact.dynamic-font {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+  color: #333;
+  font-size: clamp(0.6rem, 2vw, 1.2rem); /* auto shrink */
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* Results grid */
+.results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.result-item {
+  background: #f9f9f9;
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+.results-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+
+/* Auto shrink font if text too long */
+.dynamic-font {
+  font-size: clamp(0.8rem, 2vw, 1.3rem);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* Fact timer (showFact stage) */
+.fact-timer {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 46px;
+  height: 46px;
+  z-index: 20;
+}
+
+
+
+/* ===========================
+   TIMER
+=========================== */
+.answer-timer {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 60px;
+  height: 60px;
+  z-index: 20;
+}
+
+.answer-timer-ring {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.ring-track {
+  stroke: rgba(0,0,0,0.15);
+  stroke-width: 3;
+  fill: none;
+}
+
+.ring-progress {
+  stroke: #000;
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.timer-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #000;
+}
+
+
+/* ===========================
+   GAME AREA
 =========================== */
 .trivia-game-area {
   margin: 20px 0;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 10px;
+  background: rgba(255,255,255,0.65);
+  border-radius: 12px;
   border: 2px solid #ddd;
   position: relative;
+  min-height: 140px;
 }
 
-/* ===========================
-   CURTAIN OVERLAY
-=========================== */
 .curtain {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(139, 69, 19, 0.9);
+  inset: 0;
+  background: rgba(139,69,19,0.95);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
-  color: white;
+  color: #fff;
   z-index: 50;
   font-weight: bold;
+  border-radius: 12px;
 }
 
-
-/* ===========================
-   TRIVIA FACT
-=========================== */
 .trivia-fact {
   font-weight: bold;
   font-size: 1.2rem;
@@ -168,13 +466,13 @@
   align-items: center;
   justify-content: center;
   background: white;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 15px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
 /* ===========================
-   INPUT + SUBMIT
+   INPUT + BUTTON
 =========================== */
 .trivia-input-area {
   margin: 20px 0;
@@ -189,18 +487,7 @@
   font-size: 1rem;
   border-radius: 8px;
   border: 2px solid #ccc;
-  width: 200px;
-  transition: border-color 0.3s;
-}
-
-.trivia-answer-input:focus {
-  outline: none;
-  border-color: #4CAF50;
-}
-
-.trivia-answer-input:disabled {
-  background: #f5f5f5;
-  cursor: not-allowed;
+  width: 220px;
 }
 
 .trivia-submit-btn {
@@ -211,78 +498,58 @@
   background: #2196F3;
   color: white;
   cursor: pointer;
-  transition: background-color 0.3s;
 }
-
-.trivia-submit-btn:hover:not(:disabled) {
-  background: #1976D2;
-}
-
-.trivia-submit-btn:disabled {
-  background: #cccccc;
-  cursor: not-allowed;
-}
+.trivia-submit-btn:hover { background: #1976d2; }
 
 /* ===========================
-   SCORE + TIMER
+   MODAL
 =========================== */
-.trivia-status {
-  margin-top: 20px;
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1500;
 }
 
-.trivia-status .status {
+.modal-content {
+  width: 92%;
+  max-width: 360px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  border: 2px solid #333;
+  padding: 18px 16px;
+  text-align: center;
+}
+
+.modal-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 14px;
+}
+
+.modal-actions {
   display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 10px;
 }
 
-.trivia-status .status p {
-  margin: 5px;
-  font-weight: bold;
-  color: #333;
-  font-size: 1.1rem;
+.modal-btn {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #2196F3;
+  color: white;
+  cursor: pointer;
 }
+.modal-btn:hover { background: #1976d2; }
 
-.trivia-status .score {
-  color: #4CAF50;
+.modal-btn.danger {
+  background: #e53935;
 }
-
-.trivia-status .timer {
-  color: #FF9800;
-}
-
-.trivia-status .result {
-  color: #2196F3;
-  font-size: 1.2rem;
-  width: 100%;
-  margin-top: 10px;
-}
-
-/* ===========================
-   RESPONSIVE
-=========================== */
-@media (max-width: 768px) {
-  .trivia-box {
-    width: 90%;
-    padding: 15px;
-  }
-
-  .trivia-title {
-    font-size: 1.5rem;
-  }
-
-  .trivia-input-area {
-    flex-direction: column;
-  }
-
-  .trivia-answer-input {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .trivia-status {
-    flex-direction: column;
-    text-align: center;
-  }
+.modal-btn.danger:hover {
+  background: #c62828;
 }

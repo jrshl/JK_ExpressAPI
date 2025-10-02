@@ -1,83 +1,51 @@
-/* Speed Typing Game Styles */
-/*.speed-typing-game {
-  background: linear-gradient(to top, #87ceeb 60%, #ffffff 100%) !important;
-  min-height: 100vh !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  padding: 20px !important;
-  box-sizing: border-box !important;
-}*/
-
+/* Whole container */
 .speed-typing-game {
-  background: linear-gradient(to top, #87ceeb 60%, #ffffff 100%) !important;
-  min-height: 100vh !important;
-  width: 100% !important;
-
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-
-  padding: 20px !important;
-  box-sizing: border-box !important;
-}
-
-
-/*.overlay {
-  background: rgba(255, 255, 255, 0.95) !important;
-  padding: 25px !important;
-  border-radius: 15px !important;
-  max-width: 900px !important;
-  min-height: auto !important;
-  display: block !important;
-  width: 95% !important;
-  text-align: center !important;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
-  margin: 0 auto !important;
-  color: #333 !important;
-  font-family: Arial, sans-serif !important;
-  max-width: none;
+  position: relative;
   width: 100%;
-  height: 100%;
-  flex-direction: column;
-  justify-content:center;
+  min-height: 100vh;
+  overflow: hidden;
   display: flex;
+  justify-content: center;
   align-items: center;
-}*/
-
-.overlay {
-  background: rgba(255, 255, 255, 0.95) !important;
-  padding: 25px !important;
-  border-radius: 15px !important;
-  text-align: center !important;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
-  margin: 0 auto !important;
-
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  max-width: 900px !important;   /* ✔ center box only */
-  width: 100% !important;        /* responsive */
-  height: auto !important;       /* remove forced full height */
 }
 
-
-
-.overlay h1 {
-  margin-bottom: 10px !important;
-  font-size: 2rem !important;
-  color: #333 !important;
-  font-weight: bold !important;
+/* Background grid */
+.background-layer {
+  position: absolute;
+  inset: 0;
+  background-image: url("images/grid.png");
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
 }
 
+/* Foreground box */
+.Container {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 20px;
+  border-radius: 15px;
+  width: 95%;
+  max-width: 900px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+/* Title & instructions */
+.Container h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #333;
+}
 .instructions {
-  font-size: 1rem !important;
-  color: #555 !important;
-  margin-bottom: 20px !important;
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 20px;
 }
 
+/* Controls */
 .controls {
   display: flex;
   justify-content: center;
@@ -86,87 +54,131 @@
   margin-bottom: 20px;
   flex-wrap: wrap;
 }
-
-.controls label {
-  font-weight: bold;
-  color: #333;
-}
-
 .controls select, .controls button {
-  padding: 10px 15px !important;
-  font-size: 1rem !important;
-  border-radius: 8px !important;
-  border: none !important;
-  cursor: pointer !important;
-  color: #333 !important;
+  padding: 10px 15px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
 }
-
-.controls select {
-  background: #f0f0f0;
-  border: 1px solid #ccc;
-}
-
 .start-btn {
-  background: #4CAF50 !important;
-  color: white !important;
+  background: #4CAF50;
+  color: white;
 }
-
 .start-btn:hover:not(:disabled) {
   background: #45a049;
 }
-
 .cancel-btn {
-  background: #f44336 !important;
-  color: white !important;
+  background: #f44336;
+  color: white;
 }
-
 .cancel-btn:hover:not(:disabled) {
   background: #d32f2f;
 }
-
 .controls button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
+/* Game area */
 .game-area {
   margin: 20px 0;
 }
-
 .track {
   position: relative;
   width: 100%;
-  max-width: 600px;
-  height: 180px;
-  background: rgba(200,200,200,0.3);
-  border-radius: 10px;
-  border: 2px solid #444;
-  overflow: hidden;
+  max-width: 700px;
+  height: 200px;
+  background-image: url("images/speedBG.png");
+  background-size: cover;
+  background-position: center;
+  border: 3px solid #444;
+  border-radius: 12px;
   margin: 0 auto;
+  overflow: hidden;
 }
 
+/* Road foreground */
+.road {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 200px;
+  background: url("images/speedRoad.png") repeat-x;
+  background-size: contain;
+  animation: roadScroll 3s linear infinite;
+  z-index: 2;
+  animation-play-state: paused;
+}
+.track.active .road {
+  animation-play-state: running;
+}
+
+/* Bushes foreground */
+.bushes {
+  position: absolute;
+  bottom: 0%;
+  left: 0;
+  width: 200%;
+  height: 200px;
+  background: url("images/speedTrees.png") repeat-x;
+  background-size: contain;
+  animation: bushScroll 6s linear infinite;
+  z-index: 1;
+  pointer-events: none;
+  animation-play-state: paused;
+}
+.track.active .bushes {
+  animation-play-state: running;
+}
+
+/* Animations */
+@keyframes roadScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes bushScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Cat */
 .cat {
   position: absolute;
-  bottom: 15px;
-  left: 0;
-  width: 120px;
+  bottom: 20px;
+  width: 100px;
   height: auto;
   transition: left 0.3s ease;
-  z-index: 2;
+  z-index: 4;
 }
 
+.foreground-layer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 150px;
+  background: url("images/speedForeground.png") repeat-x;
+  background-size: contain;
+  animation: roadScroll 3s linear infinite;
+  z-index: 1;
+  animation-play-state: paused;
+}
+
+/* Finish line */
 .finish-line {
   position: absolute;
-  right: 10px;
+  right: 15px;
   bottom: 20px;
   font-size: 2rem;
-  z-index: 1;
+  z-index: 5;
 }
 
+/* Typing area */
 .typing-area {
   margin: 20px 0;
 }
-
 .fact {
   font-weight: bold;
   margin-bottom: 15px;
@@ -180,7 +192,6 @@
   align-items: center;
   justify-content: center;
 }
-
 .typing-input {
   width: 100%;
   max-width: 600px;
@@ -188,21 +199,13 @@
   font-size: 1rem;
   border-radius: 8px;
   border: 2px solid #ccc;
-  resize: vertical;
-  font-family: inherit;
 }
-
 .typing-input:focus {
-  outline: none;
   border-color: #4CAF50;
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
 }
 
-.typing-input:disabled {
-  background: #f5f5f5;
-  cursor: not-allowed;
-}
-
+/* Status */
 .status {
   margin-top: 20px;
   display: flex;
@@ -210,52 +213,20 @@
   flex-wrap: wrap;
   gap: 15px;
 }
-
 .status p {
   font-weight: bold;
-  color: #333;
-  margin: 5px;
-  padding: 8px 12px;
   background: #f0f0f0;
+  padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid #ddd;
 }
+.progress { color: #2196F3; }
+.timer { color: #FF9800; }
+.result { color: #4CAF50; }
 
-.progress {
-  color: #2196F3;
-}
-
-.timer {
-  color: #FF9800;
-}
-
-.result {
-  color: #4CAF50;
-  font-size: 1.1rem;
-}
-
-/* Responsive design */
+/* Responsive */
 @media (max-width: 768px) {
-  .overlay {
-    padding: 15px;
-    width: 98%;
-  }
-  
-  .controls {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .status {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .track {
-    height: 120px;
-  }
-  
-  .cat {
-    width: 80px;
-  }
+  .track { height: 140px; }
+  .cat { width: 70px; }
+  .road { height: 60px; }
+  .bushes { height: 70px; bottom: 50px; }
 }

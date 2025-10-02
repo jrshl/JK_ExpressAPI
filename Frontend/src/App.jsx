@@ -59,7 +59,15 @@ function HomePage() {
       <div className="layout">
         {/* LEFT CAT */}
         <div className="left-side">
-          <img src="/images/homeCat.png" alt="cat-left" className="cat-left" />
+
+        <div className="cat-gallery" onClick={() => navigate("/")}>
+            Cat Gallery
+          </div>
+          <div className="fact-collection" onClick={() => navigate("/")}>
+            Fact Library
+          </div>
+
+          {/*<img src="/images/homeCat.png" alt="cat-left" className="cat-left" />*/}
         </div>
         {/* WHEEL */}
 <div className="center-section">
