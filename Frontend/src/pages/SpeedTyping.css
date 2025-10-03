@@ -207,7 +207,7 @@
   background: url("images/speedForeground.png") repeat-x; 
   background-size: contain; 
   animation: roadScroll 3s linear infinite; 
-  z-index: 3; 
+  z-index: 1; 
   animation-play-state: paused; 
 }
 
@@ -283,11 +283,17 @@
 
 .tracker-cat {
   position: absolute;
-  transform: translateX(-72%);
-  font-size: 25px;
+  transform: translateX(-65%);
+  font-size: 5px;
   transition: left 0.3s ease;
   z-index: 8;
-  top: -17px;
+  top: -15px;
+  height: 40px;
+  width: 40px;
+  background-image: url('images/speedTrackerCat.png');
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .line-end {
@@ -333,4 +339,105 @@
   color: black;
   position: relative;
 }
+
+/* === Responsive Design for SpeedTyping === */
+
+/* Small phones (portrait) */
+@media (max-width: 480px) {
+  .speed-typing-wrapper {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .typing-box {
+    width: 100%;
+    height: auto;
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .typing-cat {
+    width: 80px;
+    height: auto;
+  }
+
+  .timer-circle {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* Tablets */
+@media (min-width: 481px) and (max-width: 768px) {
+  .speed-typing-wrapper {
+    padding: 15px;
+    font-size: 14px;
+  }
+
+  .typing-box {
+    width: 90%;
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .typing-cat {
+    width: 100px;
+  }
+
+  .timer-circle {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Small laptops */
+@media (min-width: 769px) and (max-width: 1366px) {
+  .speed-typing-wrapper {
+    padding: 20px;
+    font-size: 16px;
+  }
+
+  .typing-box {
+    width: 80%;
+    font-size: 18px;
+    padding: 15px;
+  }
+
+  .typing-cat {
+    width: 120px;
+  }
+
+  .timer-circle {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+/* Large screens (1920x1080 and above) */
+@media (min-width: 1367px) {
+  .speed-typing-wrapper {
+    max-width: 1600px;
+    margin: 0 auto;
+    font-size: 20px;
+    padding: 30px;
+  }
+
+  .typing-box {
+    width: 70%;
+    font-size: 22px;
+    padding: 20px;
+  }
+
+  .typing-cat {
+    width: 180px;
+  }
+
+  .timer-circle {
+    width: 180px;
+    height: 180px;
+  }
+}
+
 

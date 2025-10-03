@@ -25,7 +25,6 @@ export default function JumbledFacts() {
   const [showAnswer, setShowAnswer] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
 
-  // Modal state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -38,11 +37,9 @@ export default function JumbledFacts() {
   function handlePrev() {
     setIndex(prev => (prev > 0 ? prev - 1 : prev));
   }
-
   function handleNextGuide() {
     setIndex(prev => (prev + 1) % guides.length);
   }
-
   function handleStartGame() {
     setGameStarted(true);
     fetchFact();
@@ -72,11 +69,10 @@ export default function JumbledFacts() {
     if (gameStarted) fetchFact();
   }, [gameStarted]);
 
-  // === Drag & Drop Handlers ===
+  // === Drag & Drop ===
   function handleDragStart(area, idx) {
     setDragSource({ area, idx });
   }
-
   function handleDragOver(e, area, idx) {
     e.preventDefault();
     e.stopPropagation();
@@ -88,7 +84,6 @@ export default function JumbledFacts() {
     setDropArea(area);
     setDropPosition(position);
   }
-
   function handleDragLeave(e) {
     e.stopPropagation();
     if (!e.currentTarget.contains(e.relatedTarget)) {
@@ -97,7 +92,6 @@ export default function JumbledFacts() {
       setDropPosition(null);
     }
   }
-
   function handleDrop(e, area, idx) {
     e.preventDefault();
     e.stopPropagation();
@@ -137,11 +131,9 @@ export default function JumbledFacts() {
     setDropArea(null);
     setDropPosition(null);
   }
-
   function handleContainerDrop(e, area) {
     e.preventDefault();
     if (!dragSource) return;
-
     let newWords = [...words];
     let newSequence = [...userSequence];
 
@@ -170,169 +162,129 @@ export default function JumbledFacts() {
       setShowAnswer(true);
     }
   }
-
   function handleReset() {
     setWords(shuffle(fact.split(" ")));
     setUserSequence([]);
     setResult("");
     setShowAnswer(false);
   }
-
   function handleNextFact() {
     fetchFact();
   }
 
   return (
     <div className="jumbled-facts-container">
-      {/* Hamburger button */}
-      <button
-        className="hamburger"
-        onClick={() => setIsMenuOpen(true)}
-      >
+      {/* Hamburger */}
+      <button className="hamburger" onClick={() => setIsMenuOpen(true)}>
         <span></span><span></span><span></span>
       </button>
 
       {/* Modal */}
       {isMenuOpen && (
         <div className="modal-overlay" onClick={() => setIsMenuOpen(false)}>
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Menu</h2>
             <div className="menu-buttons">
-              <button
-                className="menu-btn restart-btn"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  handleStartGame();
-                }}
-              >
-                Restart
-              </button>
-              <button
-                className="menu-btn resume-btn"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Resume
-              </button>
-              <button
-                className="menu-btn exit-btn"
-                onClick={() => navigate("/")}
-              >
-                Exit
-              </button>
+              <button className="menu-btn resume-btn" onClick={() => setIsMenuOpen(false)}>Resume</button>
+              <button className="menu-btn restart-btn" onClick={() => { setIsMenuOpen(false); handleStartGame(); }}>Restart</button>
+              <button className="menu-btn exit-btn" onClick={() => navigate("/")}>Exit</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Cat outside box */}
-      <div className="cat-wrapper">
-        <img src="/images/jumbledGuide.png" alt="Cat" className="cat-image" />
-      </div>
+      {!gameStarted ? (
+        /* ===== GUIDE SCREEN ===== */
+        <>
 
-      {/* Main box */}
-      <div className="jumbled-main-box">
-        <h1 className="jumbled-title">JUMBLED CAT FACTS</h1>
-
-        <div className="jumbled-guide-box">
-          <p className="jumbled-subtitle">{guides[index]}</p>
-          <div className="nav-buttons">
-            {index > 0 && (
-              <button className="nav-btn" onClick={handlePrev}>Prev</button>
-            )}
-            <button className="nav-btn" onClick={handleNextGuide}>Next</button>
-            <button className="nav-btn start" onClick={handleStartGame}>Start Game</button>
+        <div className="cat-wrapper">
+            <img src="/images/jumbledGuide.png" alt="Cat" className="cat-image" />
           </div>
-        </div>
-
-        {/* Show game only after start */}
-        {gameStarted && (
-          <>
-            {/* Words area */}
-            <div
-              className="jumbled-words-area"
-              onDragOver={(e) => { e.preventDefault(); setDropArea("words"); }}
-              onDrop={(e) => handleContainerDrop(e, "words")}
-              onDragLeave={handleDragLeave}
-            >
-              {words.map((word, idx) => (
-                <div key={`word-${idx}-${word}`} className="word-wrapper">
-                  {dropTargetIdx === idx && dropArea === "words" && dropPosition === "before" && (
-                    <div className="drop-line words" />
-                  )}
-                  <span
-                    className="word-tile jumbled"
-                    draggable
-                    onDragStart={() => handleDragStart("words", idx)}
-                    onDragOver={(e) => handleDragOver(e, "words", idx)}
-                    onDrop={(e) => handleDrop(e, "words", idx)}
-                  >
-                    {word}
-                  </span>
-                  {dropTargetIdx === idx && dropArea === "words" && dropPosition === "after" && (
-                    <div className="drop-line words" />
-                  )}
-                </div>
-              ))}
+          <div className="jumbled-main-box">
+            <h1 className="jumbled-title">JUMBLED CAT FACTS</h1>
+            <div className="jumbled-guide-box">
+              <p className="jumbled-subtitle">{guides[index]}</p>
+              <div className="nav-buttons">
+                {index > 0 && <button className="nav-btn" onClick={handlePrev}>Prev</button>}
+                <button className="nav-btn" onClick={handleNextGuide}>Next</button>
+                <button className="nav-btn start" onClick={handleStartGame}>Start Game</button>
+              </div>
             </div>
+          </div>
+        </>
+      ) : (
+        /* ===== GAME SCREEN ===== */
+        <div className="jumbled-game-layout">
+          <h1 className="jumbled-title">Arrange the Cat Fact!</h1>
 
-            {/* Sequence area */}
-            <div
-              className="user-sequence-area"
-              onDragOver={(e) => { e.preventDefault(); setDropArea("sequence"); }}
-              onDrop={(e) => handleContainerDrop(e, "sequence")}
-              onDragLeave={handleDragLeave}
-            >
-              {userSequence.length === 0 && (
-                <div className="user-sequence-placeholder">
-                  Drop words here to build your sentence
-                </div>
-              )}
-              {userSequence.map((word, idx) => (
-                <div key={`seq-${idx}-${word}`} className="word-wrapper">
-                  {dropTargetIdx === idx && dropArea === "sequence" && dropPosition === "before" && (
-                    <div className="drop-line sequence" />
-                  )}
-                  <span
-                    className="word-tile sequence"
-                    draggable
-                    onDragStart={() => handleDragStart("sequence", idx)}
-                    onDragOver={(e) => handleDragOver(e, "sequence", idx)}
-                    onDrop={(e) => handleDrop(e, "sequence", idx)}
-                  >
-                    {word}
-                  </span>
-                  {dropTargetIdx === idx && dropArea === "sequence" && dropPosition === "after" && (
-                    <div className="drop-line sequence" />
-                  )}
-                </div>
-              ))}
-            </div>
+          {/* Upper box (top right) */}
+          <div
+            className="jumbled-box upper-box"
+            onDragOver={(e) => { e.preventDefault(); setDropArea("words"); }}
+            onDrop={(e) => handleContainerDrop(e, "words")}
+            onDragLeave={handleDragLeave}
+          >
+            {words.map((word, idx) => (
+              <div key={`word-${idx}-${word}`} className="word-wrapper">
+                {dropTargetIdx === idx && dropArea === "words" && dropPosition === "before" && <div className="drop-line words" />}
+                <span
+                  className="word-tile jumbled"
+                  draggable
+                  onDragStart={() => handleDragStart("words", idx)}
+                  onDragOver={(e) => handleDragOver(e, "words", idx)}
+                  onDrop={(e) => handleDrop(e, "words", idx)}
+                >
+                  {word}
+                </span>
+                {dropTargetIdx === idx && dropArea === "words" && dropPosition === "after" && <div className="drop-line words" />}
+              </div>
+            ))}
+          </div>
 
-            {/* Buttons */}
+          {/* Lower box (bottom left) */}
+          <div
+            className="jumbled-box lower-box"
+            onDragOver={(e) => { e.preventDefault(); setDropArea("sequence"); }}
+            onDrop={(e) => handleContainerDrop(e, "sequence")}
+            onDragLeave={handleDragLeave}
+          >
+            {userSequence.length === 0 && (
+              <div className="user-sequence-placeholder">Drop words here to build your sentence</div>
+            )}
+            {userSequence.map((word, idx) => (
+              <div key={`seq-${idx}-${word}`} className="word-wrapper">
+                {dropTargetIdx === idx && dropArea === "sequence" && dropPosition === "before" && <div className="drop-line sequence" />}
+                <span
+                  className="word-tile sequence"
+                  draggable
+                  onDragStart={() => handleDragStart("sequence", idx)}
+                  onDragOver={(e) => handleDragOver(e, "sequence", idx)}
+                  onDrop={(e) => handleDrop(e, "sequence", idx)}
+                >
+                  {word}
+                </span>
+                {dropTargetIdx === idx && dropArea === "sequence" && dropPosition === "after" && <div className="drop-line sequence" />}
+              </div>
+            ))}
+
+            {/* Action buttons inside lower box */}
             <div className="jumbled-actions">
               <button onClick={handleSubmit} className="jumbled-btn submit">Submit</button>
-              <button onClick={handleReset} className="jumbled-btn reset">Reset</button>
               <button onClick={handleNextFact} className="jumbled-btn next">Next Fact</button>
             </div>
+          </div>
 
-            {result && (
-              <div className={`result-text ${result.includes("Correct") ? "correct" : "incorrect"}`}>
-                {result}
-              </div>
-            )}
+          {/* Reset stays outside lower box */}
+          <button onClick={handleReset} className="jumbled-btn reset">Reset</button>
 
-            {showAnswer && (
-              <AnswerReveal
-                correctAnswer={fact}
-                onClose={() => setShowAnswer(false)}
-              />
-            )}
-          </>
-        )}
-      </div>
+          {result && (
+            <div className={`result-text ${result.includes("Correct") ? "correct" : "incorrect"}`}>
+              {result}
+            </div>
+          )}
+          {showAnswer && <AnswerReveal correctAnswer={fact} onClose={() => setShowAnswer(false)} />}
+        </div>
+      )}
     </div>
   );
 }

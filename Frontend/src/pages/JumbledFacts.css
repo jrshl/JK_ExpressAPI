@@ -1,4 +1,4 @@
-/* Background grid */
+/* ===== Background ===== */
 body {
   margin: 0;
   padding: 0;
@@ -7,8 +7,8 @@ body {
   font-family: "Press Start 2P", monospace;
 }
 
-/* Modal */
-.hamburger-btn {
+/* ===== Hamburger button ===== */
+.hamburger {
   position: fixed;
   top: 45px;
   left: 50px;
@@ -25,7 +25,6 @@ body {
   border-radius: 8px;
   z-index: 1000;
 }
-
 .hamburger span {
   display: block;
   width: 20px;
@@ -34,16 +33,16 @@ body {
   border-radius: 4px;
 }
 
+/* ===== Modal ===== */
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  inset: 0;
   background: rgba(0,0,0,0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
-
 .modal-content {
   background: #fff;
   padding: 20px;
@@ -51,17 +50,12 @@ body {
   min-width: 300px;
   text-align: center;
 }
-
-/* Menu buttons */
 .menu-buttons {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-top: 15px;
 }
-
-
-
 .restart-btn { background: #8B4513; }
 .resume-btn { background: #A0522D; }
 .exit-btn   { background: #5D4037; }
@@ -69,31 +63,28 @@ body {
 .resume-btn:hover  { background: #8f4526; }
 .exit-btn:hover    { background: #4e342e; }
 
-
-/* Outer container */
+/* ===== Container ===== */
 .jumbled-facts-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  min-height: 100vh;
-  padding-top: 2rem; /* extra space for the cat */
+  min-height: 90vh;
+  padding-top: 2rem;
 }
 
-/* Cat wrapper */
+/* ===== Guide Cat (KEEPED for tutorial only) ===== */
 .cat-wrapper {
   text-align: center;
   position: relative;
-  margin-bottom: -3.5rem; /* overlaps the box */
+  margin-bottom: -3.5rem;
   z-index: 2;
 }
-
 .cat-image {
   width: 500px;
   height: auto;
 }
 
-/* Main box */
+/* ===== Tutorial Box ===== */
 .jumbled-main-box {
   background: #cdc2af;
   padding: 2rem;
@@ -102,41 +93,31 @@ body {
   width: 90%;
   text-align: center;
   box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-
-  /* stitched/border effect */
   border: 4px solid #431c10;
   outline: 3px dashed #5f4222;
   outline-offset: -20px;
 }
-
-/* Title */
 .jumbled-title {
-  font-size: 2.0rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #4a2c2a;
   margin-bottom: 1rem;
 }
-
-/* Guide box */
 .jumbled-guide-box {
   background: #f8f0e3;
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1.5rem;
 }
-
 .jumbled-subtitle {
   color: #5d4037;
   margin-bottom: 1rem;
 }
-
-/* Nav buttons (Prev, Next, Start) */
 .nav-buttons {
   display: flex;
   justify-content: center;
   gap: 1rem;
 }
-
 .nav-btn {
   padding: 10px 24px;
   border: none;
@@ -146,129 +127,103 @@ body {
   background: #ad744b;
   transition: background 0.2s;
 }
+.nav-btn:hover { background: #7a501d; }
+.nav-btn.start { background: #cc6e26; }
+.nav-btn.start:hover { background: #a8440b; }
 
-.nav-btn:hover {
-  background: #7a501d;
+/* ===== GAME LAYOUT ===== */
+.jumbled-game-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 90%;
+  max-width: 900px;
 }
 
-.nav-btn.start {
-  background: #cc6e26; /* green */
-}
-
-.nav-btn.start:hover {
-  background: #a8440b;
-}
-
-/* Jumbled Words Area */
-.jumbled-words-area {
+/* ===== Game Boxes ===== */
+.jumbled-box {
+  padding: 1rem;
+  border-radius: 10px;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
   justify-content: center;
-  margin: 2rem 0;
-  min-height: 60px;
+  align-items: center;
+  gap: 10px;
+  position: absolute;
+}
+.upper-box {
   background: rgba(248, 240, 227, 0.7);
-  border-radius: 8px;
-  padding: 1rem;
+  border: 4px solid #8a3c09;
+  top: 100px;
+  right: 20px;
+  height: 200px;
+  width: 1010px;
+  background-color: #eadfd6;
 }
-
-/* User Sequence Area */
-.user-sequence-area {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  min-height: 60px;
-  background: rgba(248, 240, 227, 0.9);
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border: 2px solid transparent;
+.lower-box {
+  background-color: #ebd7c7;
+  border: 4px dashed #5f4222;
+  flex-direction: column; /* words on top, buttons below */
+  bottom: 30px;
+  left: 90px;
+  height: 300px;
+  width: 1375px;
 }
-
 .user-sequence-placeholder {
   color: #999;
   font-style: italic;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  text-align: center;
   width: 100%;
-  min-height: 40px;
 }
 
-/* Word Tiles */
+/* ===== Word Tiles ===== */
 .word-tile {
   padding: 8px 16px;
   border-radius: 6px;
   cursor: grab;
-  font-family: inherit;
   font-size: 1rem;
   box-shadow: 0 2px 6px #d9c7b4;
   transition: all 0.2s ease;
 }
+.word-tile.jumbled { background: #ffe0b2; }
+.word-tile.sequence { background: #c8e6c9; }
 
-.word-tile.jumbled {
-  background: #ffe0b2;
-}
-
-.word-tile.sequence {
-  background: #c8e6c9;
-}
-
-/* Drop indicator line */
+/* ===== Drop Lines ===== */
 .drop-line {
   width: 3px;
   height: 40px;
   border-radius: 2px;
 }
+.drop-line.words { background: #2196f3; }
+.drop-line.sequence { background: #4caf50; }
 
-.drop-line.words {
-  background: #2196f3;
-}
-
-.drop-line.sequence {
-  background: #4caf50;
-}
-
-/* Action buttons */
+/* ===== Buttons inside lower box ===== */
 .jumbled-actions {
-  text-align: center;
-  margin-bottom: 1rem;
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
 }
-
 .jumbled-btn {
   padding: 10px 24px;
   border: none;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
-  margin-right: 10px;
 }
+.jumbled-btn.submit { 
+  background: #ffb74d; }
+.jumbled-btn.submit:hover { background: #e09e36; }
+.jumbled-btn.next   { background: #90caf9; }
+.jumbled-btn.next:hover { background: #64b5f6; }
 
-.jumbled-btn.submit {
-  background: #ffb74d;
-}
-
-.jumbled-btn.reset {
-  background: #bdbdbd;
-}
-
-.jumbled-btn.next {
-  background: #90caf9;
-}
-
-/* Result Text */
+/* ===== Result text ===== */
 .result-text {
-  text-align: center;
   font-size: 1.2rem;
+  text-align: center;
 }
-
-.result-text.correct {
-  color: #388e3c;
-}
-
-.result-text.incorrect {
-  color: #d32f2f;
-}
+.result-text.correct { color: #388e3c; }
+.result-text.incorrect { color: #d32f2f; }
 
 

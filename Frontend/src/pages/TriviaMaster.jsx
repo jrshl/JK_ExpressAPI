@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './TriviaMaster.css';
 
 const TOTAL_GAME_TIME = 120;   // 2 minutes
@@ -18,7 +19,6 @@ const AutoResizeText = ({ text, maxFontSize = 22, minFontSize = 12 }) => {
     let newSize = maxFontSize;
     textRef.current.style.fontSize = `${newSize}px`;
 
-    // shrink text until it fits
     while (
       (textRef.current.scrollHeight > boxRef.current.clientHeight ||
         textRef.current.scrollWidth > boxRef.current.clientWidth) &&
@@ -71,6 +71,7 @@ const TriviaMaster = () => {
   const [answerTimeLeft, setAnswerTimeLeft] = useState(ANSWER_TIME);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const navigate = useNavigate();
   const gameTimerRef = useRef(null);
   const answerTimerRef = useRef(null);
 
@@ -91,47 +92,6 @@ const TriviaMaster = () => {
     if (answerTimerRef.current) clearInterval(answerTimerRef.current);
     gameTimerRef.current = null;
     answerTimerRef.current = null;
-  };
-
-  const pauseTimers = () => clearAllTimers();
-
-  const resumeTimers = () => {
-    if (stage === 'showFact' && answerTimeLeft > 0) {
-      answerTimerRef.current = setInterval(() => {
-        setAnswerTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(answerTimerRef.current);
-            showCurtain(currentFact);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    if (stage === 'missingWord' && answerTimeLeft > 0) {
-      answerTimerRef.current = setInterval(() => {
-        setAnswerTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(answerTimerRef.current);
-            handleAnswerTimeout(missingWord, currentFact);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    if (stage !== 'intro' && stage !== 'results' && gameTimeLeft > 0) {
-      gameTimerRef.current = setInterval(() => {
-        setGameTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(gameTimerRef.current);
-            endGame();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
   };
 
   const restartToIntro = () => {
@@ -309,16 +269,45 @@ const TriviaMaster = () => {
 
   return (
     <div className="trivia-wrapper" tabIndex={0} onKeyDown={handleKeyPress}>
-      {/* === HAMBURGER === */}
+      {/* Hamburger button */}
       <button
         className="hamburger"
-        onClick={() => {
-          setIsMenuOpen(true);
-          pauseTimers();
-        }}
+        onClick={() => setIsMenuOpen(true)}
       >
         <span></span><span></span><span></span>
       </button>
+
+      {/* Modal (uniform with JumbledFacts) */}
+      {isMenuOpen && (
+        <div className="modal-overlay" onClick={() => setIsMenuOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>Menu</h2>
+            <div className="menu-buttons">
+              <button
+                className="menu-btn restart-btn"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  startGame();
+                }}
+              >
+                Restart
+              </button>
+              <button
+                className="menu-btn resume-btn"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Resume
+              </button>
+              <button
+                className="menu-btn exit-btn"
+                onClick={() => navigate("/")}
+              >
+                Exit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* === INTRO === */}
       {stage === 'intro' && (
@@ -478,32 +467,6 @@ const TriviaMaster = () => {
             )}
           </div>
         </>
-      )}
-
-      {/* === MODAL === */}
-      {isMenuOpen && (
-        <div className="modal-overlay" onClick={() => setIsMenuOpen(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Menu</h2>
-            <div className="modal-actions">
-              <button
-                className="modal-btn"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  resumeTimers();
-                }}
-              >
-                Resume
-              </button>
-              <button className="modal-btn" onClick={restartToIntro}>
-                Restart
-              </button>
-              <button className="modal-btn danger" onClick={restartToIntro}>
-                Exit
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );

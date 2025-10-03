@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // needed for Exit button
 import "./SpeedTyping.css";
 
 export default function SpeedTyping() {
@@ -14,8 +15,11 @@ export default function SpeedTyping() {
   const [catMovable, setCatMovable] = useState(true);
   const [prevCatPosition, setPrevCatPosition] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // ✅ added missing state
   const timerRef = useRef(null);
+  const navigate = useNavigate();
 
+  // Timer circle setup
   const R = 12;
   const circumference = 2 * Math.PI * R;
   const fraction = maxTime ? timeLeft / maxTime : 0;
@@ -25,7 +29,7 @@ export default function SpeedTyping() {
 
   async function fetchFact() {
     try {
-      const res = await fetch('https://meowfacts.herokuapp.com/');
+      const res = await fetch("https://meowfacts.herokuapp.com/");
       const data = await res.json();
       return data.fact[0];
     } catch {
@@ -95,6 +99,7 @@ export default function SpeedTyping() {
     }
   }
 
+  // Typing logic
   useEffect(() => {
     const limit = Math.min(typed.length, currentFact.length);
     let correctCount = 0;
@@ -116,6 +121,7 @@ export default function SpeedTyping() {
     }
   }, [typed, currentFact]);
 
+  // Key listener
   useEffect(() => {
     function handleKeyDown(e) {
       if (!gameActive) return;
@@ -132,6 +138,43 @@ export default function SpeedTyping() {
 
   return (
     <div className="speed-typing-game">
+      {/* Hamburger button */}
+      <button className="hamburger" onClick={() => setIsMenuOpen(true)}>
+        <span></span><span></span><span></span>
+      </button>
+
+      {/* Pause Menu Modal */}
+      {isMenuOpen && (
+        <div className="modal-overlay" onClick={() => setIsMenuOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>Menu</h2>
+            <div className="menu-buttons">
+              <button
+                className="menu-btn resume-btn"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Resume
+              </button>
+              <button
+                className="menu-btn restart-btn"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  startGame();
+                }}
+              >
+                Restart
+              </button>
+              <button
+                className="menu-btn exit-btn"
+                onClick={() => navigate("/")}
+              >
+                Exit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="background-layer"></div>
       <div className="Container">
 
@@ -154,7 +197,7 @@ export default function SpeedTyping() {
             <ul>
               <li>Choose difficulty</li>
               <li>Press <b>Start Game</b></li>
-              <li>Type directly on keyboard — no input</li>
+              <li>Type directly on keyboard</li>
               <li>Only correct letters move the cat; wrong letters stop it</li>
             </ul>
             <div className="controls">
@@ -168,27 +211,13 @@ export default function SpeedTyping() {
           <>
             <div className="game-area">
               <div className={`track ${gameActive ? "active" : ""}`}>
-                
-                {/* Background layers */}
-
-                <div className="bg-static gif"></div>
-                <div className="bg-layer bg3"></div>
-                <div className="bg-layer bg1"></div>
-                <div className="bg-layer bg2"></div>
-                
-
-                {/* SVG Timer */}
+                {/* Timer circle */}
                 <div className="answer-timer">
-                   <svg
-                      viewBox={`0 0 ${R * 2 + 6} ${R * 2 + 6}`}
-                      style={{ width: "40px", height: "40px" }}
+                  <svg
+                    viewBox={`0 0 ${R * 2 + 6} ${R * 2 + 6}`}
+                    style={{ width: "40px", height: "40px" }}
                   >
-                    <circle
-                      cx={R + 3}
-                      cy={R + 3}
-                      r={R}
-                      className="timer-bg"
-                  />
+                    <circle cx={R + 3} cy={R + 3} r={R} className="timer-bg" />
                     <circle
                       cx={R + 3}
                       cy={R + 3}
@@ -197,17 +226,21 @@ export default function SpeedTyping() {
                       stroke={strokeColor}
                       strokeDasharray={circumference}
                       strokeDashoffset={dashOffset}
-                  />
-                </svg>
+                    />
+                  </svg>
                   <span className="timer-text">{timeLeft}</span>
-              </div>
+                </div>
 
-                {/* Moving layers */}
+                {/* Track layers */}
+                <div className="bg-static gif"></div>
+                <div className="bg-layer bg3"></div>
+                <div className="bg-layer bg1"></div>
+                <div className="bg-layer bg2"></div>
                 <div className="road"></div>
                 <div className="bushes"></div>
                 <div className="foreground-layer"></div>
 
-                {/* Main cat */}
+                {/* Cat */}
                 <img
                   src="images/running_cat.gif"
                   alt="Cat"
@@ -215,13 +248,13 @@ export default function SpeedTyping() {
                   style={{ left: catMovable ? `${progress}%` : `${prevCatPosition}%` }}
                 />
 
-                {/* Progress tracker inside track */}
+                {/* Progress line */}
                 <div className="progress-line">
                   <div
                     className="tracker-cat"
                     style={{ left: catMovable ? `${progress}%` : `${prevCatPosition}%` }}
                   >
-                    😺
+                    
                   </div>
                   <div className="line-end">🏁</div>
                 </div>
@@ -239,7 +272,11 @@ export default function SpeedTyping() {
               {/* Controls */}
               <div className="controls bottom-controls">
                 <label>Difficulty:</label>
-                <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} disabled={gameActive}>
+                <select
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                  disabled={gameActive}
+                >
                   <option value="easy">Easy (45s)</option>
                   <option value="medium">Medium (30s)</option>
                   <option value="hard">Hard (20s)</option>
@@ -249,6 +286,7 @@ export default function SpeedTyping() {
               </div>
             </div>
 
+            {/* End modal */}
             {modalOpen && (
               <div className="modal-overlay">
                 <div className="modal-content">
