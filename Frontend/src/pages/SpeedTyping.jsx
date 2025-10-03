@@ -170,9 +170,12 @@ export default function SpeedTyping() {
               <div className={`track ${gameActive ? "active" : ""}`}>
                 
                 {/* Background layers */}
+
+                <div className="bg-static gif"></div>
                 <div className="bg-layer bg3"></div>
-                <div className="bg-layer bg2"></div>
                 <div className="bg-layer bg1"></div>
+                <div className="bg-layer bg2"></div>
+                
 
                 {/* SVG Timer */}
                 <div className="answer-timer">
