@@ -5,10 +5,11 @@ export default function CatGallery({ onClose }) {
   const [selectedCategory, setSelectedCategory] = useState("console");
   const [selectedCat, setSelectedCat] = useState(null);
   const [showCatDetail, setShowCatDetail] = useState(false);
+  const [screenDisplayCat, setScreenDisplayCat] = useState(null);
   const [collectedCats, _setCollectedCats] = useState({
     1: true,   // Some cats are already collected for demo
     2: true,
-    3: false,
+    3: true,
     4: true,
     5: false,
     6: true,
@@ -51,9 +52,9 @@ export default function CatGallery({ onClose }) {
   };
 
   const categories = [
-    { id: "console", name: "Console", icon: "🎮" },
-    { id: "customs", name: "Customs", icon: "🎨" },
-    { id: "options", name: "Options", icon: "⚙️" }
+    { id: "console", name: "Gamer", icon: "🎮" },
+    { id: "customs", name: "Fancy", icon: "🎨" },
+    { id: "options", name: "Funny", icon: "😹" }
   ];
 
   const getRarityColor = (rarity) => {
@@ -80,6 +81,7 @@ export default function CatGallery({ onClose }) {
 
   const handleCatClick = (cat) => {
     if (collectedCats[cat.id]) {
+      setScreenDisplayCat(cat); // Display cat on screen
       setSelectedCat(cat);
       setShowCatDetail(true);
     }
@@ -95,24 +97,46 @@ export default function CatGallery({ onClose }) {
           {/* Left Side - Catcom with Title and Progress */}
           <div className="left-catcom-section">
             <div className="cat-gallery-header">
-              <div className="cat-gallery-title">
-                Cat Gallery
+              <div className="header-content">
+                <div className="cat-gallery-title">
+                  Cat Gallery
+                </div>
+                <div className="progress-info">
+                  <div className="progress-stats">
+                    <span>Collected: {getCollectedCount()}/{getTotalCount()}</span>
+                    <span>Progress: {getProgressPercentage()}%</span>
+                  </div>
+                </div>
               </div>
-              {/* <div className="progress-info">
-                <div className="progress-stats">
-                  <span>Collected: {getCollectedCount()}/{getTotalCount()}</span>
-                  <span>Progress: {getProgressPercentage()}%</span>
-                </div>
-                <div className="progress-bar">
-                  <div 
-                    className="progress-fill" 
-                    style={{ width: `${getProgressPercentage()}%` }}
-                  ></div>
-                </div>
-              </div> */}
             </div>
             <div className="catcom-container">
+              {/* Computer Screen Background */}
+              <div className="computer-screen">
+                {screenDisplayCat && (
+                  <img 
+                    src={screenDisplayCat.image} 
+                    alt={screenDisplayCat.name} 
+                    className="screen-cat-image" 
+                  />
+                )}
+                {!screenDisplayCat && (
+                  <div className="screen-placeholder">
+                    <span>Click a cat to display it here!</span>
+                  </div>
+                )}
+              </div>
+              {/* Catcom Image Overlay */}
               <img src="/images/catcom.png" alt="Cat Community" className="catcom-image" />
+              {/* Catcom Asset with Pulse Effect */}
+              <img src="/images/catcom.png" alt="Cat Asset" className="catcom-asset" />
+              {/* Sparkle Foreground Effects */}
+              <div className="sparkle-foreground">
+                <img 
+                  src="/images/catcomassets.png" 
+                  alt="sparkles" 
+                  className="sparkle-overlay"
+                />
+              </div>
             </div>
           </div>
 
