@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import StackedCards from "./components/StackedCards";
 import FlipBookModal from "./components/FlipBookModal";
 import CatGallery from "./components/CatGallery";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
@@ -11,11 +12,12 @@ function HomePage() {
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [facts, setFacts] = useState([]);
-  const [showModal, setShowModal] = useState(false);
   const [count, setCount] = useState(1);
   const [showBook, setShowBook] = useState(false);
   const [showCatGallery, setShowCatGallery] = useState(false);
   const [encounteredFacts, setEncounteredFacts] = useState({});
+  const [showStackedCards, setShowStackedCards] = useState(false);
+  const [stackedFacts, setStackedFacts] = useState([]);
   const navigate = useNavigate();
 
   // Generate consistent fact ID from fact content
@@ -42,6 +44,7 @@ function HomePage() {
       const data = await res.json();
       const factList = Array.isArray(data.data) ? data.data : [data.data];
       setFacts(factList);
+
       // Add new facts to encounteredFacts with their generated IDs
       setEncounteredFacts(prev => {
         const newEncounteredFacts = { ...prev };
@@ -53,6 +56,14 @@ function HomePage() {
         });
         return newEncounteredFacts;
       });
+
+      // Prepare facts for StackedCards
+      setStackedFacts(
+        factList.map((fact, i) => ({
+          sub: `Fact #${i + 1}`,
+          content: fact,
+        }))
+      );
 
       // Random stop slice
       const selectedSlice = Math.floor(Math.random() * slices);
@@ -69,13 +80,13 @@ function HomePage() {
 
       setTimeout(() => {
         setSpinning(false);
-        setShowModal(true);
+        setShowStackedCards(true); // Show stacked cards instead of modal
         console.log("Stopped at slice:", selectedSlice + 1);
       }, 3000);
     } catch {
       setFacts(["😿 Error loading facts."]);
       setSpinning(false);
-      setShowModal(true);
+      setShowStackedCards(true); // Show stacked cards even on error
     }
   }
 
@@ -128,7 +139,7 @@ function HomePage() {
               </div>
             </div>
             {/* ARROW */}
-            {!showModal && <div className="arrow"></div>}
+            {!showStackedCards && <div className="arrow"></div>}
           </div>
         </div>
         {/* RIGHT SIDE GAMES */}
@@ -143,8 +154,17 @@ function HomePage() {
           </div>
         </div>
       </div>
+      
+      {/* STACKED CARDS FACTS */}
+      {showStackedCards && (
+        <StackedCards
+          cards={stackedFacts}
+          onClose={() => setShowStackedCards(false)}
+        />
+      )}
+
       {/* FACT MODAL */}
-      {showModal && (
+      {/* {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3>🐱 Cat Facts</h3>
@@ -164,11 +184,13 @@ function HomePage() {
             </button>
           </div>
         </div>
-      )}
+      )} */}
+
       {/* FACT LIBRARY BOOK MODAL */}
       {showBook && (
         <FlipBookModal encounteredFacts={encounteredFacts} onClose={() => setShowBook(false)} />
       )}
+
       {/* CAT GALLERY MODAL */}
       {showCatGallery && (
         <CatGallery onClose={() => setShowCatGallery(false)} />
