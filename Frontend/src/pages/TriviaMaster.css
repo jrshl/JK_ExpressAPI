@@ -3,12 +3,12 @@
 =========================== */
 .trivia-wrapper {
   position: relative;
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: url('/images/homeBG.png');
-  background-size: 70%;
+  background: url('/images/homeBG.png') repeat center center fixed;
+  background-size: cover;
   flex-direction: column;
   padding: 20px;
 }
@@ -291,7 +291,7 @@
 
 /* Cat behind the box */
 .game-cat-wrapper {
-    position: relative;
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -299,7 +299,7 @@
 
 .game-cat {
    position: absolute;
-  top: -250px;        /* adjust para murag nag bitay */
+  top: -25px;        /* adjust para murag nag bitay */
   left: 50%;
   transform: translateX(-50%);
   width: 700px;       /* mas dako kaysa box width */
@@ -322,6 +322,7 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
+  top: 250px;
 }
 
 /* Fact text auto-shrink */

@@ -421,7 +421,7 @@ const TriviaMaster = () => {
                     strokeDashoffset={dashOffset}
                   />
                 </svg>
-                <span className="timer-text">{answerTimeLeft}s</span>
+                <span className="timer-text">{answerTimeLeft}</span>
               </div>
             )}
 

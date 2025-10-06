@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AnswerReveal from "../components/AnswerReveal";
 import "./JumbledFacts.css";
@@ -24,9 +24,19 @@ export default function JumbledFacts() {
   const [dropPosition, setDropPosition] = useState(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // 🐱 Cat image state
+  const [catImage, setCatImage] = useState("/images/jumbledGuide.png");
+
+  // 🔥 Timer states
+  const TOTAL_TIME = 60; // 60 seconds per fact
+  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
+  const timerRef = useRef(null);
+  const isPausedRef = useRef(false);
+
   const navigate = useNavigate();
+  const wordsAreaRef = useRef(null);
 
   const guides = [
     "Drag the words below into the answer area to form the correct sentence!",
@@ -43,6 +53,8 @@ export default function JumbledFacts() {
   function handleStartGame() {
     setGameStarted(true);
     fetchFact();
+    resetTimer();
+    setCatImage("/images/jumbledGuide.png"); // reset default cat
   }
 
   async function fetchFact() {
@@ -55,6 +67,8 @@ export default function JumbledFacts() {
       setUserSequence([]);
       setResult("");
       setShowAnswer(false);
+      setCatImage("/images/jumbledGuide.png"); // reset default cat
+      resetTimer();
     } catch {
       const fallback = "Cats are mysterious creatures.";
       setFact(fallback);
@@ -62,12 +76,62 @@ export default function JumbledFacts() {
       setUserSequence([]);
       setResult("");
       setShowAnswer(false);
+      setCatImage("/images/jumbledGuide.png"); // reset default cat
+      resetTimer();
     }
   }
 
+  // Reset + start timer
+  function resetTimer() {
+    clearInterval(timerRef.current);
+    setTimeLeft(TOTAL_TIME);
+    isPausedRef.current = false;
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (isPausedRef.current) return prev; // pause guard
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          setResult("⏰ Time's up!");
+          setCatImage("/images/jumbledWrong.png"); // time up → sad cat
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }
+
   useEffect(() => {
-    if (gameStarted) fetchFact();
-  }, [gameStarted]);
+    return () => clearInterval(timerRef.current);
+  }, []);
+
+  // Pause/Resume logic
+  function handlePause() {
+    isPausedRef.current = true;
+    setIsMenuOpen(true);
+  }
+  function handleResume() {
+    isPausedRef.current = false;
+    setIsMenuOpen(false);
+  }
+
+  // === Dynamic Font Resize ===
+  useEffect(() => {
+    if (!wordsAreaRef.current) return;
+    const container = wordsAreaRef.current;
+    let fontSize = 18; // base size
+    const resize = () => {
+      fontSize = 18;
+      container.style.fontSize = fontSize + "px";
+      while (container.scrollHeight > container.clientHeight && fontSize > 10) {
+        fontSize -= 1;
+        container.style.fontSize = fontSize + "px";
+      }
+    };
+    resize();
+    const observer = new ResizeObserver(resize);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [words]);
 
   // === Drag & Drop ===
   function handleDragStart(area, idx) {
@@ -156,37 +220,38 @@ export default function JumbledFacts() {
   // === Game actions ===
   function handleSubmit() {
     if (userSequence.join(" ") === fact) {
-      setResult("✅ Correct!");
+      setResult("Correct!");
+      setCatImage("/images/jumbledRight.png"); // correct → happy cat
     } else {
-      setResult("❌ Try again!");
+      setResult("Try again!");
       setShowAnswer(true);
+      setCatImage("/images/jumbledWrong.png"); // wrong → sad cat
     }
-  }
-  function handleReset() {
-    setWords(shuffle(fact.split(" ")));
-    setUserSequence([]);
-    setResult("");
-    setShowAnswer(false);
   }
   function handleNextFact() {
     fetchFact();
   }
 
+  // Timer circle math
+  const circumference = 2 * Math.PI * 16;
+  const progressPct = (timeLeft / TOTAL_TIME) * 100;
+  const dashOffset = circumference - (progressPct / 100) * circumference;
+
   return (
     <div className="jumbled-facts-container">
       {/* Hamburger */}
-      <button className="hamburger" onClick={() => setIsMenuOpen(true)}>
+      <button className="hamburger" onClick={handlePause}>
         <span></span><span></span><span></span>
       </button>
 
       {/* Modal */}
       {isMenuOpen && (
-        <div className="modal-overlay" onClick={() => setIsMenuOpen(false)}>
+        <div className="modal-overlay" onClick={handleResume}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Menu</h2>
             <div className="menu-buttons">
-              <button className="menu-btn resume-btn" onClick={() => setIsMenuOpen(false)}>Resume</button>
-              <button className="menu-btn restart-btn" onClick={() => { setIsMenuOpen(false); handleStartGame(); }}>Restart</button>
+              <button className="menu-btn resume-btn" onClick={handleResume}>Resume</button>
+              <button className="menu-btn restart-btn" onClick={() => { handleStartGame(); setIsMenuOpen(false); }}>Restart</button>
               <button className="menu-btn exit-btn" onClick={() => navigate("/")}>Exit</button>
             </div>
           </div>
@@ -196,8 +261,7 @@ export default function JumbledFacts() {
       {!gameStarted ? (
         /* ===== GUIDE SCREEN ===== */
         <>
-
-        <div className="cat-wrapper">
+          <div className="cat-wrapper">
             <img src="/images/jumbledGuide.png" alt="Cat" className="cat-image" />
           </div>
           <div className="jumbled-main-box">
@@ -215,74 +279,103 @@ export default function JumbledFacts() {
       ) : (
         /* ===== GAME SCREEN ===== */
         <div className="jumbled-game-layout">
-          <h1 className="jumbled-title">Arrange the Cat Fact!</h1>
+          <div className="jumbled-game-content">
+            {/* Cat image left side */}
+            <div className="cat-game-wrapper">
+              <img src={catImage} alt="Cat" className="cat-game-image" />
+            </div>
 
-          {/* Upper box (top right) */}
-          <div
-            className="jumbled-box upper-box"
-            onDragOver={(e) => { e.preventDefault(); setDropArea("words"); }}
-            onDrop={(e) => handleContainerDrop(e, "words")}
-            onDragLeave={handleDragLeave}
-          >
-            {words.map((word, idx) => (
-              <div key={`word-${idx}-${word}`} className="word-wrapper">
-                {dropTargetIdx === idx && dropArea === "words" && dropPosition === "before" && <div className="drop-line words" />}
-                <span
-                  className="word-tile jumbled"
-                  draggable
-                  onDragStart={() => handleDragStart("words", idx)}
-                  onDragOver={(e) => handleDragOver(e, "words", idx)}
-                  onDrop={(e) => handleDrop(e, "words", idx)}
-                >
-                  {word}
-                </span>
-                {dropTargetIdx === idx && dropArea === "words" && dropPosition === "after" && <div className="drop-line words" />}
+            {/* Main game area */}
+            <div className="game-area">
+
+              {/* Upper box */}
+              <div
+                className="jumbled-box upper-box"
+                onDragOver={(e) => { e.preventDefault(); setDropArea("words"); }}
+                onDrop={(e) => handleContainerDrop(e, "words")}
+                onDragLeave={handleDragLeave}
+              >
+                <div className="upper-box-text">
+                  Arrange the words below into a correct sentence:
+                </div>
+
+                {/* TIMER inside upper box */}
+                <div className="answer-timer">
+                  <svg viewBox="0 0 36 36" className="answer-timer-ring">
+                    <circle className="ring-track" cx="18" cy="18" r="16" />
+                    <circle
+                      className="ring-progress"
+                      cx="18"
+                      cy="18"
+                      r="16"
+                      strokeDasharray={circumference}
+                      strokeDashoffset={dashOffset}
+                    />
+                  </svg>
+                  <span className="timer-text">{timeLeft}</span>
+                </div>
+
+                <div className="words-area" ref={wordsAreaRef}>
+                  {words.map((word, idx) => (
+                    <div key={`word-${idx}-${word}`} className="word-wrapper">
+                      {dropTargetIdx === idx && dropArea === "words" && dropPosition === "before" && <div className="drop-line words" />}
+                      <span
+                        className="word-tile jumbled"
+                        draggable
+                        onDragStart={() => handleDragStart("words", idx)}
+                        onDragOver={(e) => handleDragOver(e, "words", idx)}
+                        onDrop={(e) => handleDrop(e, "words", idx)}
+                      >
+                        {word}
+                      </span>
+                      {dropTargetIdx === idx && dropArea === "words" && dropPosition === "after" && <div className="drop-line words" />}
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
 
-          {/* Lower box (bottom left) */}
-          <div
-            className="jumbled-box lower-box"
-            onDragOver={(e) => { e.preventDefault(); setDropArea("sequence"); }}
-            onDrop={(e) => handleContainerDrop(e, "sequence")}
-            onDragLeave={handleDragLeave}
-          >
-            {userSequence.length === 0 && (
-              <div className="user-sequence-placeholder">Drop words here to build your sentence</div>
-            )}
-            {userSequence.map((word, idx) => (
-              <div key={`seq-${idx}-${word}`} className="word-wrapper">
-                {dropTargetIdx === idx && dropArea === "sequence" && dropPosition === "before" && <div className="drop-line sequence" />}
-                <span
-                  className="word-tile sequence"
-                  draggable
-                  onDragStart={() => handleDragStart("sequence", idx)}
-                  onDragOver={(e) => handleDragOver(e, "sequence", idx)}
-                  onDrop={(e) => handleDrop(e, "sequence", idx)}
-                >
-                  {word}
-                </span>
-                {dropTargetIdx === idx && dropArea === "sequence" && dropPosition === "after" && <div className="drop-line sequence" />}
+              {/* Lower box */}
+              <div
+                className="jumbled-box lower-box"
+                onDragOver={(e) => { e.preventDefault(); setDropArea("sequence"); }}
+                onDrop={(e) => handleContainerDrop(e, "sequence")}
+                onDragLeave={handleDragLeave}
+              >
+                {userSequence.map((word, idx) => (
+                  <span
+                    key={`seq-${idx}-${word}`}
+                    className="word-tile sequence"
+                    draggable
+                    onDragStart={() => handleDragStart("sequence", idx)}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      if (!dragSource) return;
+                      if (dragSource.area === "sequence" && dragSource.idx !== idx) {
+                        const newSequence = [...userSequence];
+                        const [moved] = newSequence.splice(dragSource.idx, 1);
+                        newSequence.splice(idx, 0, moved);
+                        setUserSequence(newSequence);
+                        setDragSource({ area: "sequence", idx });
+                      }
+                    }}
+                  >
+                    {word}
+                  </span>
+                ))}
+                <div className="jumbled-actions">
+                  <button onClick={handleSubmit} className="jumbled-btn submit">Submit</button>
+                  <button onClick={handleNextFact} className="jumbled-btn next">Next Fact</button>
+                </div>
               </div>
-            ))}
 
-            {/* Action buttons inside lower box */}
-            <div className="jumbled-actions">
-              <button onClick={handleSubmit} className="jumbled-btn submit">Submit</button>
-              <button onClick={handleNextFact} className="jumbled-btn next">Next Fact</button>
+              {result && (
+                <div className={`result-text ${result.includes("Correct") ? "correct" : "incorrect"}`}>
+                  {result}
+                </div>
+              )}
+              {showAnswer && <AnswerReveal correctAnswer={fact} onClose={() => setShowAnswer(false)} />}
             </div>
           </div>
-
-          {/* Reset stays outside lower box */}
-          <button onClick={handleReset} className="jumbled-btn reset">Reset</button>
-
-          {result && (
-            <div className={`result-text ${result.includes("Correct") ? "correct" : "incorrect"}`}>
-              {result}
-            </div>
-          )}
-          {showAnswer && <AnswerReveal correctAnswer={fact} onClose={() => setShowAnswer(false)} />}
         </div>
       )}
     </div>

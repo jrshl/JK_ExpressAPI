@@ -13,7 +13,7 @@ body {
   background-position: top left;
   color: #4a2c2a;
   overflow-x: hidden;
-  min-height: 100vh;
+  height: 100px;
 }
 
 /* =========================
