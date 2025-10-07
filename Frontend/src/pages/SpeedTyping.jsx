@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // needed for Exit button
+import { useNavigate } from "react-router-dom";
 import "./SpeedTyping.css";
 
 export default function SpeedTyping() {
@@ -15,7 +15,7 @@ export default function SpeedTyping() {
   const [catMovable, setCatMovable] = useState(true);
   const [prevCatPosition, setPrevCatPosition] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // ✅ added missing state
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const timerRef = useRef(null);
   const navigate = useNavigate();
 
@@ -31,7 +31,7 @@ export default function SpeedTyping() {
     try {
       const res = await fetch("https://meowfacts.herokuapp.com/");
       const data = await res.json();
-      return data.fact[0];
+      return data.data ? data.data[0] : data.fact[0];
     } catch {
       return "Cats are amazing creatures!";
     }
@@ -46,12 +46,24 @@ export default function SpeedTyping() {
     }
   }
 
+  // 🔥 Instant fetch: preloads next fact ahead of time
+  const nextFactRef = useRef(null);
+  async function preloadNextFact() {
+    nextFactRef.current = await fetchFact();
+  }
+  useEffect(() => { preloadNextFact(); }, []);
+
   async function startGame() {
     setStep(2);
     const newTimeLeft = getDifficultyTime(difficulty);
-    const fact = await fetchFact();
 
+    // Use preloaded fact immediately for instant start
+    const fact = nextFactRef.current || (await fetchFact());
     setCurrentFact(fact);
+
+    // Preload next fact again right away for next round
+    preloadNextFact();
+
     setTyped("");
     setProgress(0);
     setResult("");
@@ -149,156 +161,141 @@ export default function SpeedTyping() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Menu</h2>
             <div className="menu-buttons">
-              <button
-                className="menu-btn resume-btn"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Resume
-              </button>
-              <button
-                className="menu-btn restart-btn"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  startGame();
-                }}
-              >
-                Restart
-              </button>
-              <button
-                className="menu-btn exit-btn"
-                onClick={() => navigate("/")}
-              >
-                Exit
-              </button>
+              <button className="menu-btn resume-btn" onClick={() => setIsMenuOpen(false)}>Resume</button>
+              <button className="menu-btn restart-btn" onClick={() => { setIsMenuOpen(false); startGame(); }}>Restart</button>
+              <button className="menu-btn exit-btn" onClick={() => navigate("/")}>Exit</button>
             </div>
           </div>
         </div>
       )}
 
       <div className="background-layer"></div>
-      <div className="Container">
 
-        {step === 0 && (
-          <>
-            <h1>Cat Speed Typing Adventure</h1>
-            <p className="instructions">
-              Type the cat fact as fast as you can! The faster you type correctly, the further the cat runs toward the goal 🏁
-            </p>
-            <div className="controls">
-              <button onClick={() => setStep(1)}>Next</button>
-              <button className="start-btn" onClick={startGame}>Start Game</button>
-            </div>
-          </>
-        )}
-
-        {step === 1 && (
-          <>
-            <h2>How to Play</h2>
-            <ul>
-              <li>Choose difficulty</li>
-              <li>Press <b>Start Game</b></li>
-              <li>Type directly on keyboard</li>
-              <li>Only correct letters move the cat; wrong letters stop it</li>
-            </ul>
-            <div className="controls">
-              <button onClick={() => setStep(0)}>Back</button>
-              <button className="start-btn" onClick={startGame}>Start Game</button>
-            </div>
-          </>
-        )}
-
-        {step === 2 && (
-          <>
-            <div className="game-area">
-              <div className={`track ${gameActive ? "active" : ""}`}>
-                {/* Timer circle */}
-                <div className="answer-timer">
-                  <svg
-                    viewBox={`0 0 ${R * 2 + 6} ${R * 2 + 6}`}
-                    style={{ width: "40px", height: "40px" }}
-                  >
-                    <circle cx={R + 3} cy={R + 3} r={R} className="timer-bg" />
-                    <circle
-                      cx={R + 3}
-                      cy={R + 3}
-                      r={R}
-                      className="timer-progress"
-                      stroke={strokeColor}
-                      strokeDasharray={circumference}
-                      strokeDashoffset={dashOffset}
-                    />
-                  </svg>
-                  <span className="timer-text">{timeLeft}</span>
-                </div>
-
-                {/* Track layers */}
-                <div className="bg-static gif"></div>
-                <div className="bg-layer bg3"></div>
-                <div className="bg-layer bg1"></div>
-                <div className="bg-layer bg2"></div>
-                <div className="road"></div>
-                <div className="bushes"></div>
-                <div className="foreground-layer"></div>
-
-                {/* Cat */}
-                <img
-                  src="images/running_cat.gif"
-                  alt="Cat"
-                  className="cat"
-                  style={{ left: catMovable ? `${progress}%` : `${prevCatPosition}%` }}
-                />
-
-                {/* Progress line */}
-                <div className="progress-line">
-                  <div
-                    className="tracker-cat"
-                    style={{ left: catMovable ? `${progress}%` : `${prevCatPosition}%` }}
-                  >
-                    
-                  </div>
-                  <div className="line-end">🏁</div>
-                </div>
+      {/* 🐾 GUIDE CONTAINER (Step 0 & 1) */}
+      {(step === 0 || step === 1) && (
+        <div className="GuideContainer">
+          {step === 0 && (
+            <>
+              <h1>Cat Speed Typing Adventure</h1>
+              <p className="instructions">
+                Type the cat fact as fast as you can! The faster you type correctly,
+                the further the cat runs toward the goal 🏁
+              </p>
+              <div className="controls">
+                <button onClick={() => setStep(1)}>Next</button>
+                <button className="start-btn" onClick={startGame}>Start Game</button>
               </div>
+            </>
+          )}
 
-              {/* Fact box */}
-              <div className="fact-box">
-                {currentFact.split("").map((char, idx) => {
-                  let cls = "untyped-char";
-                  if (idx < typed.length) cls = typed[idx] === char ? "typed-char" : "wrong-char";
-                  return <span key={idx} className={cls}>{char}</span>;
-                })}
+          {step === 1 && (
+            <>
+              <h2>How to Play</h2>
+              <ul>
+                <li>Choose difficulty</li>
+                <li>Press <b>Start Game</b></li>
+                <li>Type directly on keyboard</li>
+                <li>Only correct letters move the cat; wrong letters stop it</li>
+              </ul>
+              <div className="controls">
+                <button onClick={() => setStep(0)}>Back</button>
+                <button className="start-btn" onClick={startGame}>Start Game</button>
               </div>
+            </>
+          )}
+        </div>
+      )}
 
-              {/* Controls */}
-              <div className="controls bottom-controls">
-                <label>Difficulty:</label>
-                <select
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value)}
-                  disabled={gameActive}
+      {/* 🐱 GAME CONTAINER (Step 2) */}
+      {step === 2 && (
+        <div className="GameContainer">
+          <div className="game-area">
+            <div className={`track ${gameActive ? "active" : ""}`}>
+              {/* Timer circle */}
+              <div className="answer-timer">
+                <svg
+                  viewBox={`0 0 ${R * 2 + 6} ${R * 2 + 6}`}
+                  style={{ width: "40px", height: "40px" }}
                 >
-                  <option value="easy">Easy (45s)</option>
-                  <option value="medium">Medium (30s)</option>
-                  <option value="hard">Hard (20s)</option>
-                </select>
-                <button className="start-btn" onClick={startGame} disabled={gameActive}>Restart Game</button>
-                <button className="cancel-btn" onClick={cancelGame} disabled={!gameActive}>Cancel Game</button>
+                  <circle cx={R + 3} cy={R + 3} r={R} className="timer-bg" />
+                  <circle
+                    cx={R + 3}
+                    cy={R + 3}
+                    r={R}
+                    className="timer-progress"
+                    stroke={strokeColor}
+                    strokeDasharray={circumference}
+                    strokeDashoffset={dashOffset}
+                  />
+                </svg>
+                <span className="timer-text">{timeLeft}</span>
+              </div>
+
+              {/* Track layers */}
+              <div className="bg-static gif"></div>
+              <div className="bg-layer bg3"></div>
+              <div className="bg-layer bg1"></div>
+              <div className="bg-layer bg2"></div>
+              <div className="road"></div>
+              <div className="bushes"></div>
+              <div className="foreground-layer"></div>
+
+              {/* Cat */}
+              <img
+                src="images/running_cat.gif"
+                alt="Cat"
+                className="cat"
+                style={{ left: catMovable ? `${progress}%` : `${prevCatPosition}%` }}
+              />
+
+              {/* Progress line */}
+              <div className="progress-line">
+                <div
+                  className="tracker-cat"
+                  style={{ left: catMovable ? `${progress}%` : `${prevCatPosition}%` }}
+                ></div>
+                <div className="line-end">🏁</div>
               </div>
             </div>
 
-            {/* End modal */}
-            {modalOpen && (
-              <div className="modal-overlay">
-                <div className="modal-content">
-                  <h2>{result.includes("Congratulations") ? "You Won!" : "You Lost!"}</h2>
-                  <p>{currentFact}</p>
-                  <button className="start-btn" onClick={startGame}>Try Again</button>
-                </div>
+            {/* Fact box */}
+            <div className="fact-box">
+              {currentFact.split("").map((char, idx) => {
+                let cls = "untyped-char";
+                if (idx < typed.length) cls = typed[idx] === char ? "typed-char" : "wrong-char";
+                return <span key={idx} className={cls}>{char}</span>;
+              })}
+            </div>
+
+            {/* Controls */}
+            <div className="controls bottom-controls">
+              <label>Difficulty:</label>
+              <select
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value)}
+                disabled={gameActive}
+              >
+                <option value="easy">Easy (45s)</option>
+                <option value="medium">Medium (30s)</option>
+                <option value="hard">Hard (20s)</option>
+              </select>
+              <button className="start-btn" onClick={startGame} disabled={gameActive}>Restart Game</button>
+              <button className="cancel-btn" onClick={cancelGame} disabled={!gameActive}>Cancel Game</button>
+            </div>
+          </div>
+
+          {/* End modal */}
+          {modalOpen && (
+            <div className="modal-overlay">
+              <div className="modal-content">
+                <h2>{result.includes("Congratulations") ? "You Won!" : "You Lost!"}</h2>
+                <p>{currentFact}</p>
+                <button className="start-btn" onClick={startGame}>Try Again</button>
               </div>
-            )}
-          </>
-        )}
-      </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

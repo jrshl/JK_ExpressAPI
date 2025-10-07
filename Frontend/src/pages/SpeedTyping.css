@@ -1,3 +1,6 @@
+/* ===========================
+   SPEED TYPING GAME BASE
+=========================== */
 .speed-typing-game {
   position: relative;
   width: 100%;
@@ -14,31 +17,99 @@
   z-index: 0;
 }
 
-.Container {
+/* ===========================
+   GUIDE PAGE CONTAINER
+=========================== */
+.GuideContainer {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 30px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 900px;
+  text-align: center;
+  height: auto;
+  border: 4px solid #301401;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.GuideContainer h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: #2c1608;
+  margin-top: 30px;
+}
+
+.GuideContainer h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #3c1b0a;
+}
+
+.GuideContainer .instructions {
+  font-size: 1rem;
+  color: #333;
+  margin: 20px auto;
+  text-align: center;
+  max-width: 80%;
+  line-height: 1.6;
+}
+
+.GuideContainer ul {
+  margin: 0 auto 20px auto;
+  display: inline-block;
+  text-align: left;
+  padding-left: 20px;
+  line-height: 1.5;
+  color: #2a1b0b;
+}
+
+/* Add box around guide steps */
+.guide-box {
+  background: rgba(255, 245, 235, 0.95);
+  border: 3px solid #5e3b1f;
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px auto;
+  width: 85%;
+  text-align: center;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* ===========================
+   GAME PAGE CONTAINER
+=========================== */
+.GameContainer {
   position: relative;
   z-index: 2;
   background: rgba(177, 155, 144, 0.92);
   padding: 10px;
   border-radius: 15px;
-  width: 200%;
+  width: 90%;
   max-width: 900px;
   text-align: center;
   height: 600px;
   border: 5px solid #301401;
 }
 
-.Container h1 { 
+.GameContainer h1 { 
   font-size: 2rem; 
   margin-bottom: 20px; 
   font-weight: bold; 
   color: #333; 
   margin-top: 100px; 
 }
-.Container h2 { 
+
+.GameContainer h2 { 
   text-align: center; 
   margin-bottom: 15px; 
 }
 
+/* ===========================
+   GAME AREA
+=========================== */
 .instructions {
   font-size: 1rem;
   color: #555;
@@ -46,14 +117,6 @@
   text-align: center;
   max-width: 80%;
   line-height: 1.6;
-}
-
-.Container ul {
-  margin: 0 auto 20px auto;
-  display: inline-block;
-  text-align: left;
-  padding-left: 20px;
-  line-height: 1.5;
 }
 
 .controls {
@@ -96,8 +159,26 @@
   display: flex; 
   flex-direction: column; 
   align-items: center; 
-  gap: 15px; }
+  gap: 15px; 
+}
 
+/* Add box for game area */
+.game-box {
+  background: rgba(255, 255, 255, 0.85);
+  border: 3px solid #5e3b1f;
+  border-radius: 12px;
+  padding: 25px;
+  margin: 15px 0;
+  width: 85%;
+  text-align: center;
+  color: #2a1b0b;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2),
+              0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* ===========================
+   TRACK & BACKGROUND
+=========================== */
 .track {
   position: relative;
   width: 100%;
@@ -108,7 +189,6 @@
   overflow: hidden;
 }
 
-/* Background layers behind everything */
 .bg-layer {
   position: absolute;
   inset: 0;
@@ -117,18 +197,20 @@
   background-size: cover;
   background-repeat: repeat-x;
   animation-play-state: paused;
-  top: -80%; 
+  top: -80%;
 }
+
 .track.active .bg-layer { 
   animation-play-state: running; 
 }
+
 .bg-static {
   position: absolute;
   inset: 0;
   width: 200%;
   height: 180%;
   background-size: cover;
-  top: -80%; 
+  top: -80%;
 }
 
 .gif { 
@@ -165,7 +247,9 @@
   100% { transform: translateX(-20%); } 
 }
 
-/* Road, bushes, foreground */
+/* ===========================
+   ROAD & FOREGROUND
+=========================== */
 .road { 
   position: absolute; 
   bottom: 0; 
@@ -220,7 +304,9 @@
   100% { transform: translateX(-50%); } 
 }
 
-/* Cat */
+/* ===========================
+   CAT, FINISH, FACT BOX
+=========================== */
 .cat { 
   position: absolute; 
   bottom: 20px; 
@@ -230,7 +316,6 @@
   z-index: 4; 
 }
 
-/* Finish line */
 .finish-line { 
   position: absolute; 
   right: 15px; 
@@ -239,7 +324,6 @@
   z-index: 5; 
 }
 
-/* Fact box */
 .fact-box { 
   width: 100%; 
   max-width: 700px; 
@@ -254,22 +338,16 @@
   word-wrap: break-word; 
 }
 
-.typed-char { 
-  color: black; 
-  font-weight: bold; 
-}
-.wrong-char { 
-  color: red; 
-  font-weight: bold; 
-}
-.untyped-char { 
-  color: #aaa; 
-}
+.typed-char { color: black; font-weight: bold; }
+.wrong-char { color: red; font-weight: bold; }
+.untyped-char { color: #aaa; }
 
-/* Progress tracker inside track */
+/* ===========================
+   PROGRESS LINE
+=========================== */
 .progress-line {
   position: absolute;
-  top: 20px; /* adjust vertical position */
+  top: 20px;
   left: 20%;
   width: 60%;
   height: 15px;
@@ -304,6 +382,9 @@
   top: -14px;
 }
 
+/* ===========================
+   TIMER
+=========================== */
 .answer-timer {
   position: absolute;
   right: 10px;
@@ -340,9 +421,17 @@
   position: relative;
 }
 
-/* === Responsive Design for SpeedTyping === */
 
-/* Small phones (portrait) */
+
+.modal-content {
+  position: relative;
+  z-index: 30;
+  width: 50%;
+}
+
+/* ===========================
+   RESPONSIVE DESIGN
+=========================== */
 @media (max-width: 480px) {
   .speed-typing-wrapper {
     width: 100%;
@@ -369,7 +458,6 @@
   }
 }
 
-/* Tablets */
 @media (min-width: 481px) and (max-width: 768px) {
   .speed-typing-wrapper {
     padding: 15px;
@@ -392,7 +480,6 @@
   }
 }
 
-/* Small laptops */
 @media (min-width: 769px) and (max-width: 1366px) {
   .speed-typing-wrapper {
     padding: 20px;
@@ -415,7 +502,6 @@
   }
 }
 
-/* Large screens (1920x1080 and above) */
 @media (min-width: 1367px) {
   .speed-typing-wrapper {
     max-width: 1600px;
@@ -439,5 +525,3 @@
     height: 180px;
   }
 }
-
-

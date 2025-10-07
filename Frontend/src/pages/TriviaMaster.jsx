@@ -2,12 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TriviaMaster.css';
 
-const TOTAL_GAME_TIME = 120;   // 2 minutes
-const FACT_DISPLAY_TIME = 30;  // show fact for 30s
-const CURTAIN_TIME = 5;        // hide for 5s
-const ANSWER_TIME = 30;        // 30s answer time
+const FACT_DISPLAY_TIME = 10;
+const CURTAIN_TIME = 5;
+const ANSWER_TIME = 10;
 
-// 🔑 Auto Resize Text Component
 const AutoResizeText = ({ text, maxFontSize = 22, minFontSize = 12 }) => {
   const boxRef = useRef(null);
   const textRef = useRef(null);
@@ -15,7 +13,6 @@ const AutoResizeText = ({ text, maxFontSize = 22, minFontSize = 12 }) => {
 
   useEffect(() => {
     if (!boxRef.current || !textRef.current) return;
-
     let newSize = maxFontSize;
     textRef.current.style.fontSize = `${newSize}px`;
 
@@ -27,7 +24,6 @@ const AutoResizeText = ({ text, maxFontSize = 22, minFontSize = 12 }) => {
       newSize -= 1;
       textRef.current.style.fontSize = `${newSize}px`;
     }
-
     setFontSize(newSize);
   }, [text, maxFontSize, minFontSize]);
 
@@ -41,7 +37,7 @@ const AutoResizeText = ({ text, maxFontSize = 22, minFontSize = 12 }) => {
         justifyContent: "center",
         alignItems: "center",
         overflow: "hidden",
-        textAlign: "center",
+        textAlign: "center"
       }}
     >
       <p
@@ -51,11 +47,10 @@ const AutoResizeText = ({ text, maxFontSize = 22, minFontSize = 12 }) => {
           fontWeight: "bold",
           lineHeight: 1.4,
           margin: 0,
-          wordBreak: "break-word",
+          wordBreak: "break-word"
         }}
-      >
-        {text}
-      </p>
+        dangerouslySetInnerHTML={{ __html: text }}
+      ></p>
     </div>
   );
 };
@@ -67,13 +62,15 @@ const TriviaMaster = () => {
   const [missingWord, setMissingWord] = useState('');
   const [userAnswer, setUserAnswer] = useState('');
   const [gameHistory, setGameHistory] = useState([]);
-  const [gameTimeLeft, setGameTimeLeft] = useState(TOTAL_GAME_TIME);
   const [answerTimeLeft, setAnswerTimeLeft] = useState(ANSWER_TIME);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const navigate = useNavigate();
-  const gameTimerRef = useRef(null);
+  const isPausedRef = useRef(isPaused);
   const answerTimerRef = useRef(null);
+  const navigate = useNavigate();
+
+  useEffect(() => { isPausedRef.current = isPaused; }, [isPaused]);
 
   const sleep = (s) => new Promise((resolve) => setTimeout(resolve, s * 1000));
 
@@ -88,9 +85,7 @@ const TriviaMaster = () => {
   };
 
   const clearAllTimers = () => {
-    if (gameTimerRef.current) clearInterval(gameTimerRef.current);
     if (answerTimerRef.current) clearInterval(answerTimerRef.current);
-    gameTimerRef.current = null;
     answerTimerRef.current = null;
   };
 
@@ -102,9 +97,9 @@ const TriviaMaster = () => {
     setCurrentFact('');
     setMissingWord('');
     setUserAnswer('');
-    setGameTimeLeft(TOTAL_GAME_TIME);
     setAnswerTimeLeft(ANSWER_TIME);
     setIsMenuOpen(false);
+    setIsPaused(false);
   };
 
   const startGame = async () => {
@@ -113,51 +108,49 @@ const TriviaMaster = () => {
     setCurrentFact('');
     setMissingWord('');
     setUserAnswer('');
-    setGameTimeLeft(TOTAL_GAME_TIME);
-
     setStage('showFact');
-
-    gameTimerRef.current = setInterval(() => {
-      setGameTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(gameTimerRef.current);
-          endGame();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
     await nextFact();
   };
 
-  const nextFact = async () => {
-    if (gameTimeLeft <= 0) return endGame();
+  const startAnswerTimer = (duration, onTimeout) => {
+    setAnswerTimeLeft(duration);
+    clearAllTimers();
+    answerTimerRef.current = setInterval(() => {
+      if (!isPausedRef.current) {
+        setAnswerTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(answerTimerRef.current);
+            onTimeout();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }
+    }, 1000);
+  };
 
+  const nextFact = async () => {
+    // Cancel ongoing timers
+    clearAllTimers();
+
+    setCurrentFact('');
+    setMissingWord('');
+    setUserAnswer('');
     setStage('showFact');
+
     const fact = await fetchFact();
     setCurrentFact(fact);
-    setUserAnswer('');
-    setMissingWord('');
 
-    setAnswerTimeLeft(FACT_DISPLAY_TIME);
-    if (answerTimerRef.current) clearInterval(answerTimerRef.current);
-    answerTimerRef.current = setInterval(() => {
-      setAnswerTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(answerTimerRef.current);
-          showCurtain(fact);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    startAnswerTimer(FACT_DISPLAY_TIME, () => showCurtain(fact));
   };
 
   const showCurtain = async (fact) => {
     setStage('curtain');
-    await sleep(CURTAIN_TIME);
-    if (gameTimeLeft <= 0) return endGame();
+
+    for (let i = 0; i < CURTAIN_TIME; i++) {
+      if (answerTimerRef.current === null) return; // exit if cancelled
+      await sleep(1);
+    }
 
     const words = fact.split(' ');
     let wordToHide = '';
@@ -170,19 +163,8 @@ const TriviaMaster = () => {
     setMissingWord(wordToHide);
     setCurrentFact(words.join(' '));
     setStage('missingWord');
-    setAnswerTimeLeft(ANSWER_TIME);
 
-    if (answerTimerRef.current) clearInterval(answerTimerRef.current);
-    answerTimerRef.current = setInterval(() => {
-      setAnswerTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(answerTimerRef.current);
-          handleAnswerTimeout(wordToHide, fact);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    startAnswerTimer(ANSWER_TIME, () => handleAnswerTimeout(wordToHide, fact));
   };
 
   const handleAnswerTimeout = (correctWord, fullFact) => {
@@ -190,12 +172,7 @@ const TriviaMaster = () => {
       ...prev,
       { fact: fullFact, correctWord, userAnswer: '', isCorrect: false },
     ]);
-
     setStage('factResult');
-    setTimeout(() => {
-      if (gameTimeLeft > 0) nextFact();
-      else endGame();
-    }, 3000);
   };
 
   const submitAnswer = () => {
@@ -219,18 +196,8 @@ const TriviaMaster = () => {
       },
     ]);
 
-    if (answerTimerRef.current) clearInterval(answerTimerRef.current);
-
-    setStage('factResult');
-    setTimeout(() => {
-      if (gameTimeLeft > 0) nextFact();
-      else endGame();
-    }, 3000);
-  };
-
-  const endGame = () => {
     clearAllTimers();
-    setStage('results');
+    setStage('factResult');
   };
 
   const handleKeyPress = (e) => {
@@ -245,9 +212,7 @@ const TriviaMaster = () => {
     }
   };
 
-  useEffect(() => {
-    return () => clearAllTimers();
-  }, []);
+  useEffect(() => { return () => clearAllTimers(); }, []);
 
   const circumference = 2 * Math.PI * 16;
   const progressPct =
@@ -260,7 +225,7 @@ const TriviaMaster = () => {
     {
       type: 'text',
       content:
-        "You'll see a cat fact for 30 seconds 🐾. After that, the screen will hide briefly, and then one word will be missing. Fill it in!",
+        "You'll see a cat fact for 15 seconds 🐾. After that, the screen will hide briefly, and then one word will be missing. Fill it in!",
     },
     { type: 'image', src: '/images/guide1.png' },
     { type: 'image', src: '/images/tutorial2.png' },
@@ -269,39 +234,31 @@ const TriviaMaster = () => {
 
   return (
     <div className="trivia-wrapper" tabIndex={0} onKeyDown={handleKeyPress}>
-      {/* Hamburger button */}
       <button
         className="hamburger"
-        onClick={() => setIsMenuOpen(true)}
+        onClick={() => { setIsMenuOpen(true); setIsPaused(true); }}
       >
         <span></span><span></span><span></span>
       </button>
 
-      {/* Modal (uniform with JumbledFacts) */}
       {isMenuOpen && (
-        <div className="modal-overlay" onClick={() => setIsMenuOpen(false)}>
+        <div className="modal-overlay" onClick={() => { setIsMenuOpen(false); setIsPaused(false); }}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Menu</h2>
             <div className="menu-buttons">
               <button
-                className="menu-btn restart-btn"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  startGame();
-                }}
-              >
-                Restart
-              </button>
-              <button
                 className="menu-btn resume-btn"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => { setIsMenuOpen(false); setIsPaused(false); }}
               >
                 Resume
               </button>
               <button
-                className="menu-btn exit-btn"
-                onClick={() => navigate("/")}
+                className="menu-btn restart-btn"
+                onClick={() => { setIsMenuOpen(false); restartToIntro(); }}
               >
+                Restart
+              </button>
+              <button className="menu-btn exit-btn" onClick={() => navigate("/")}>
                 Exit
               </button>
             </div>
@@ -309,7 +266,7 @@ const TriviaMaster = () => {
         </div>
       )}
 
-      {/* === INTRO === */}
+      {/* INTRO SCREEN */}
       {stage === 'intro' && (
         <div className="intro-screen">
           <div className="intro-header">
@@ -325,37 +282,20 @@ const TriviaMaster = () => {
             <div className="intro-box-wrapper">
               <div className="intro-bigbox">
                 <div className="intro-smallbox">
-                  {introSteps[introStep].type === 'text' && (
+                  {introSteps[introStep].type === 'text' ? (
                     <p>{introSteps[introStep].content}</p>
-                  )}
-                  {introSteps[introStep].type === 'image' && (
-                    <img
-                      src={introSteps[introStep].src}
-                      alt={`Step ${introStep + 1}`}
-                      className="intro-image"
-                    />
+                  ) : (
+                    <img src={introSteps[introStep].src} alt={`Step ${introStep + 1}`} className="intro-image" />
                   )}
                 </div>
                 <div className="intro-controls">
                   {introStep > 0 && (
-                    <button
-                      className="prev-btn"
-                      onClick={() => setIntroStep((s) => s - 1)}
-                    >
-                      Previous
-                    </button>
+                    <button className="prev-btn" onClick={() => setIntroStep((s) => s - 1)}>Previous</button>
                   )}
                   {introStep < introSteps.length - 1 ? (
-                    <button
-                      className="next-btn"
-                      onClick={() => setIntroStep((s) => s + 1)}
-                    >
-                      Next
-                    </button>
+                    <button className="next-btn" onClick={() => setIntroStep((s) => s + 1)}>Next</button>
                   ) : (
-                    <button className="start-btn" onClick={startGame}>
-                      Start Game
-                    </button>
+                    <button className="start-btn" onClick={startGame}>Start Game</button>
                   )}
                 </div>
               </div>
@@ -364,45 +304,8 @@ const TriviaMaster = () => {
         </div>
       )}
 
-      {/* === RESULTS SCREEN === */}
-      {stage === 'results' && (
-        <div className="results-screen">
-          <h3>Results</h3>
-          <div className="results-grid">
-            <div>
-              <h4>✅ Correct</h4>
-              {gameHistory
-                .filter((f) => f.isCorrect)
-                .map((f, idx) => (
-                  <p key={idx} className="result-item">{f.fact}</p>
-                ))}
-            </div>
-            <div>
-              <h4>❌ Wrong</h4>
-              {gameHistory
-                .filter((f) => !f.isCorrect)
-                .map((f, idx) => (
-                  <p key={idx} className="result-item">
-                    {f.fact} <br />
-                    Your answer: {f.userAnswer || '(No answer)'} <br />
-                    Correct: {f.correctWord}
-                  </p>
-                ))}
-            </div>
-          </div>
-          <div className="results-actions">
-            <button className="start-btn" onClick={restartToIntro}>
-              Back to Guide
-            </button>
-            <button className="start-btn" onClick={startGame}>
-              Start New Game
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* === GAME === */}
-      {stage !== 'intro' && stage !== 'results' && (
+      {/* GAME AREA */}
+      {stage !== 'intro' && (
         <>
           <div className="game-cat-wrapper">
             <img src="/images/tmCat.png" alt="Game Cat" className="game-cat" />
@@ -414,9 +317,7 @@ const TriviaMaster = () => {
                   <circle className="ring-track" cx="18" cy="18" r="16" />
                   <circle
                     className="ring-progress"
-                    cx="18"
-                    cy="18"
-                    r="16"
+                    cx="18" cy="18" r="16"
                     strokeDasharray={circumference}
                     strokeDashoffset={dashOffset}
                   />
@@ -425,22 +326,16 @@ const TriviaMaster = () => {
               </div>
             )}
 
-            {stage === 'showFact' && (
-              <AutoResizeText text={currentFact} />
-            )}
+            {stage === 'showFact' && <AutoResizeText text={currentFact} />}
 
-            {stage === 'curtain' && (
-              <div className="curtain">Please Wait...</div>
-            )}
+            {stage === 'curtain' && <div className="curtain">Please Wait...</div>}
 
             {stage === 'missingWord' && (
               <div className="trivia-game-area">
                 <AutoResizeText
                   text={currentFact.replace(
                     '_'.repeat(missingWord.length),
-                    [...missingWord]
-                      .map((_, i) => userAnswer[i] || '_')
-                      .join('')
+                    [...missingWord].map((_, i) => userAnswer[i] || '_').join('')
                   )}
                 />
                 <button
@@ -454,15 +349,47 @@ const TriviaMaster = () => {
             )}
 
             {stage === 'factResult' && (
-              <div className="fact-result">
-                <p>{gameHistory.at(-1).fact}</p>
+              <div className="fact-result-modal">
                 {gameHistory.at(-1).isCorrect ? (
-                  <p className="correct">✅ Correct!</p>
+                  <div className="correct-word-display">
+                    <AutoResizeText
+                      text="CORRECT!"
+                      maxFontSize={14}
+                      minFontSize={6}
+                    />
+                  </div>
                 ) : (
-                  <p className="wrong">
-                    ❌ Wrong! Correct answer: {gameHistory.at(-1).correctWord}
-                  </p>
+                  <div className="wrong-word-display">
+                    <AutoResizeText
+                      text={`Try Again!`}
+                      maxFontSize={14}
+                      minFontSize={6}
+                    />
+                  </div>
                 )}
+
+                <div className="correct-fact-display">
+                  <AutoResizeText
+                    text={gameHistory.at(-1).fact.replace(
+                      gameHistory.at(-1).correctWord,
+                      gameHistory.at(-1).isCorrect
+                        ? `<span class="green-word">${gameHistory.at(-1).userAnswer}</span>`
+                        : `<u>${gameHistory.at(-1).correctWord}</u>`
+                    )}
+                    maxFontSize={14}
+                    minFontSize={6}
+                  />
+                </div>
+
+                <button
+                  className="next-fact-btn"
+                  onClick={() => {
+                    clearAllTimers(); // cancel timers & delays
+                    nextFact();       // fetch next fact instantly
+                  }}
+                >
+                  Next Fact
+                </button>
               </div>
             )}
           </div>

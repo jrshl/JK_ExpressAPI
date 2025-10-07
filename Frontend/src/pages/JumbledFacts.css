@@ -326,3 +326,127 @@ body {
 }
 
 
+/* ...existing code... */
+
+/* ===== Responsive overrides (non-destructive) ===== */
+
+/* Keep layout stable on wide screens but reduce extreme fixed sizes */
+@media (max-width: 1400px) {
+  .jumbled-main-box { max-width: 100%; width: 95%; }
+  .cat-game-image { max-width: 420px; }
+  .upper-box { height: auto; }
+  .lower-box { height: auto; }
+}
+
+/* Desktop / large tablet: make absolutely positioned boxes flow and fit */
+@media (max-width: 1200px) {
+  /* Let boxed elements flow instead of relying on huge fixed absolute positions */
+  .jumbled-box { position: relative; left: auto; top: auto; right: auto; bottom: auto; width: 100%; }
+  .upper-box {
+    position: relative;
+    width: 100%;
+    height: auto;
+    top: auto;
+    right: auto;
+    padding: 1rem;
+    background: rgba(248,240,227,0.95);
+  }
+  .upper-box-text { width: 100%; font-size: 0.95rem; margin-top: 0; }
+  .words-area { height: auto; max-height: 260px; overflow-y: auto; }
+
+  .lower-box {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    width: 100%;
+    min-height: 160px;
+    height: auto;
+    padding: 1rem;
+    margin-top: 0.6rem;
+  }
+
+  /* Make cat image scale down */
+  .cat-game-wrapper { position: relative; width: 280px; max-width: 35%; min-width: 160px; margin: 0 auto; }
+  .cat-game-image { width: 100%; max-width: 360px; }
+
+  /* Keep actions visible but not overlapping content */
+  .jumbled-actions { position: absolute; bottom: 12px; right: 12px; }
+}
+
+/* Tablet and smaller: stack content vertically, make words and tiles readable */
+@media (max-width: 900px) {
+  .jumbled-game-layout,
+  .jumbled-game-content { flex-direction: column; align-items: center; gap: 1rem; width: 100%; }
+
+  /* flow boxes vertically */
+  .upper-box, .lower-box { width: 100%; box-sizing: border-box; }
+
+  /* cat becomes part of flow and smaller */
+  .cat-game-wrapper {
+    position: relative;
+    order: 0;
+    width: 220px;
+    max-width: 70%;
+    margin-top: 0;
+  }
+  .cat-game-image { max-width: 220px; }
+
+  /* ensure the game area takes full width */
+  .game-area { width: 100%; order: 1; padding: 0 0.5rem; }
+
+  /* words area scroll and resize */
+  .words-area { max-height: 180px; gap: 9px; padding: 0.4rem; }
+
+  /* action buttons flow under content instead of overlapping */
+  .jumbled-actions {
+    position: static;
+    margin-top: 0.6rem;
+    justify-content: center;
+    align-self: center;
+    gap: 0.6rem;
+  }
+
+  /* timer smaller and placed inside the flow / non-overlapping */
+  .answer-timer { position: absolute; top: 8px; right: 10px; width: 34px; height: 34px; }
+  .timer-text { font-size: 0.78rem; }
+}
+
+/* Small phones: prioritize content, hide decorative large cat and reduce paddings */
+@media (max-width: 600px) {
+  body { font-size: 13px; }
+
+  .jumbled-main-box { padding: 1rem; outline-offset: -12px; }
+  .jumbled-title { font-size: 1.1rem; }
+
+  /* hide tutorial portrait cat graphic to give room */
+  .cat-wrapper { display: none; }
+  .cat-game-wrapper { display: none; }
+
+  .upper-box-text { font-size: 0.85rem; }
+  .words-area { max-height: 150px; }
+
+  .word-tile { padding: 6px 10px; font-size: 11px; white-space: normal; }
+
+  .jumbled-actions { position: static; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+
+  /* timer minimized but still available */
+  .answer-timer { width: 30px; height: 30px; top: 6px; right: 8px; }
+  .timer-text { font-size: 0.72rem; }
+}
+
+/* Very small phones: tighter layout, single-column focus */
+@media (max-width: 420px) {
+  body { font-size: 12px; }
+  .jumbled-main-box { padding: 0.8rem; border-radius: 10px; outline-offset: -8px; }
+  .upper-box-text { font-size: 0.78rem; }
+  .words-area { gap: 6px; max-height: 130px; }
+  .word-tile { padding: 5px 8px; font-size: 10px; }
+  .answer-timer { display: none; }
+  .jumbled-actions { padding-bottom: 6px; justify-content: center; }
+}
+
+/* Accessibility: visible focus for keyboard users */
+.word-tile:focus { outline: 3px solid rgba(66,133,244,0.25); outline-offset: 2px; }
+.jumbled-btn:focus { outline: 3px solid rgba(66,133,244,0.24); outline-offset: 2px; }
+
+/* End responsive overrides */

@@ -296,7 +296,7 @@ export default function JumbledFacts() {
                 onDragLeave={handleDragLeave}
               >
                 <div className="upper-box-text">
-                  Arrange the words below into a correct sentence:
+                  Drag the words below into the answer area to form the correct sentence!
                 </div>
 
                 {/* TIMER inside upper box */}
