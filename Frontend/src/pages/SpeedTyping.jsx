@@ -180,6 +180,7 @@ export default function SpeedTyping() {
   }
 
   // Typing logic
+  // Typing logic
   useEffect(() => {
     if (!gameActive || isPaused) return;
     const limit = Math.min(typed.length, currentFact.length);
