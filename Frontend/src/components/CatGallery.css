@@ -1,4 +1,4 @@
-/* Cat Gallery Modal Styles */
+/* Cat Gallery Modal */
 .cat-gallery-overlay {
   position: fixed;
   top: 0;
@@ -165,7 +165,6 @@
   object-fit: cover;
   border-radius: 6px;
   filter: brightness(1.3) contrast(1.3) saturate(1.2);
-  /* transform: scaleX(-1);Match the flipped orientation of catcom */
 }
 
 .screen-placeholder {

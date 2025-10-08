@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./StackedCards.css";
 
 export default function StackedCards({ cards, onClose, onStoreComplete }) {
-  // compute id from fact text (same algorithm as App)
+  // compute id from fact text
   function generateFactId(fact) {
     let hash = 0;
     for (let i = 0; i < fact.length; i++) {
@@ -18,10 +18,8 @@ export default function StackedCards({ cards, onClose, onStoreComplete }) {
 
   const handleClick = () => {
     if (currentIndex < cards.length - 1) {
-      // Still have cards to read
       setCurrentIndex(currentIndex + 1);
     } else if (currentIndex === cards.length - 1 && !isBundling && !isStoring) {
-      // Just finished reading the last card, now start bundling
       setIsBundling(true);
       
       // After bundling animation, start storing animation
@@ -31,7 +29,6 @@ export default function StackedCards({ cards, onClose, onStoreComplete }) {
         
         // Close modal after storing animation completes
         setTimeout(() => {
-          // notify parent which ids were stored (useful to mark as new in library)
           if (onStoreComplete) {
             try {
               const ids = cards.map(c => generateFactId(c.content));
@@ -43,25 +40,22 @@ export default function StackedCards({ cards, onClose, onStoreComplete }) {
           if (onClose) {
             onClose();
           }
-        }, 1200); // Wait for storing animation to complete
-      }, 800); // Wait for bundling animation to complete
+        }, 1200); 
+      }, 800); 
     }
   };
 
   const handleOverlayClick = () => {
-    // If we're storing, allow closing
     if (isStoring && onClose) {
       onClose();
       return;
     }
     
-    // Otherwise, handle the card progression (anywhere on screen)
     if (!isBundling && !isStoring) {
       handleClick();
     }
   };
 
-  // Calculate font size based on content length
   const getFontSize = (text) => {
     const length = text.length;
     if (length < 50) return "12px";
@@ -84,35 +78,29 @@ export default function StackedCards({ cards, onClose, onStoreComplete }) {
       let style = {};
       
       if (isStoring || isBundling) {
-        // Let CSS handle the bundling/storing animation
         style = { zIndex: cards.length - i };
       } else if (i < currentIndex) {
-        // Card has been read - animate away
         style = { 
           transform: "translate(-50%, -50%) translateY(-120vh) rotate(-48deg)", 
           zIndex: cards.length - i 
         };
       } else if (i === currentIndex) {
-        // This is the current card being read - make it straight
         style = { 
           transform: "translate(-50%, -50%) rotate(0deg)", 
           zIndex: cards.length - i 
         };
       } else if (i <= currentIndex + 2) {
-        // Cards in visible stack (max 3 cards)
         style = { 
           transform: `translate(-50%, -50%) rotate(${angle}deg)`, 
           zIndex: cards.length - i 
         };
       } else {
-        // Cards 4+ follow the 3rd card's position (hidden behind)
         style = { 
           transform: "translate(-50%, -50%) rotate(-20deg)", 
           zIndex: cards.length - i 
         };
       }
       
-      // Dynamic font size for content
       const contentStyle = {
         fontSize: getFontSize(card.content)
       };

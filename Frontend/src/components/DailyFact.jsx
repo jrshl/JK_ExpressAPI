@@ -23,7 +23,6 @@ export default function DailyFact({ weeklyMap, todayKey, addEncounteredFact, onS
       const id = generateFactId(f);
       setFact(f);
       setFactId(id);
-      // ensure library contains it (idempotent)
       if (addEncounteredFact) addEncounteredFact(id, f);
     }
   }, [weeklyMap, todayKey, addEncounteredFact]);
@@ -34,12 +33,9 @@ export default function DailyFact({ weeklyMap, todayKey, addEncounteredFact, onS
     e.stopPropagation();
     if (isStoring) return;
     setIsStoring(true);
-    // animate then close
     setTimeout(() => {
       setIsStoring(false);
-      // Ensure the fact is marked as encountered (idempotent)
       if (addEncounteredFact) addEncounteredFact(factId, fact);
-      // Notify parent to mark as library-new after animation
       if (onStoreComplete) onStoreComplete([factId]);
       if (onClose) onClose();
     }, 1000);

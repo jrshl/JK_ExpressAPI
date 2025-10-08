@@ -1,4 +1,4 @@
-/* Modal overlay for stacked cards - retro theme with bounce animation */
+/* Modal overlay for stacked cards */
 .stack-modal-overlay {
   position: fixed;
   top: 0;
@@ -57,7 +57,7 @@
   animation: modalBounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-/* Card styles - retro pixel art theme with fluid animations */
+/* Card styles */
 .card {
   width: 450px;
   height: 300px;
@@ -78,14 +78,13 @@
   font-family: "Press Start 2P", monospace;
 }
 
-/* Active card that's being read */
+/* Active card */
 .card.active {
   transform: translate(-50%, -50%) rotate(0deg) !important;
   z-index: 1000;
   box-shadow: 0 12px #6e4b2d, inset 0 3px #f7d9b6;
 }
 
-/* Retro cat fact card backgrounds */
 .card:nth-child(1) { background: #d9b89c; }
 .card:nth-child(2) { background: #f7d9b6; }
 .card:nth-child(3) { background: #e6c3a5; }
@@ -93,7 +92,7 @@
 .card:nth-child(5) { background: #c4a07a; }
 .card:nth-child(6) { background: #b8946e; }
 
-/* Card content - retro style */
+/* Card content */
 .sub {
   font-family: "Press Start 2P", monospace;
   font-size: 12px;
@@ -274,7 +273,7 @@
   display: none;
 }
 
-/* First phase: Bundle cards together in center - more fluid */
+/* First phase */
 .card.bundling {
   transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease-out;
   transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
@@ -307,7 +306,7 @@
   transition-delay: 0.3s;
 }
 
-/* Second phase: Animate bundled cards toward Fact Library button - smoother */
+/* Second phase */
 .card.storing {
   transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 1s ease-out;
   transform: translate(-50%, -50%) translate(-45vw, -35vh) scale(0.05) rotate(0deg);
@@ -315,7 +314,7 @@
   pointer-events: none;
 }
 
-/* Done message - retro style */
+/* Done message */
 .done-message {
   font-size: 16px;
   color: #f7d9b6;
@@ -325,7 +324,7 @@
   text-shadow: 2px 2px #4a2c2a;
 }
 
-/* Instruction text at bottom - lowered position */
+/* Bottom text */
 .instruction-text {
   position: absolute;
   bottom: -80px;

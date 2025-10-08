@@ -92,7 +92,6 @@
 }
 
 /* storing animation: card shrinks and moves toward Fact Library button approx position */
-/* adjust translate values if your .fact-collection position differs */
 .daily-card.storing {
   animation: storeToLibrary 1s cubic-bezier(0.22,1,0.36,1) forwards;
   pointer-events: none;
@@ -113,7 +112,6 @@
   }
 }
 
-/* small responsive tweak */
 @media (max-width: 640px) {
   .daily-card { width: 92%; padding: 16px; }
   .daily-number { padding: 6px 12px; font-size: 11px; }

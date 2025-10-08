@@ -7,7 +7,7 @@ export default function CatGallery({ onClose }) {
   const [showCatDetail, setShowCatDetail] = useState(false);
   const [screenDisplayCat, setScreenDisplayCat] = useState(null);
   const [collectedCats, _setCollectedCats] = useState({
-    1: true,   // Some cats are already collected for demo
+    1: true,   
     2: true,
     3: true,
     4: true,
@@ -25,7 +25,6 @@ export default function CatGallery({ onClose }) {
     16: false
   });
 
-  // Cat stickers data - using available images and placeholder data
   const catStickers = {
     console: [
       { id: 1, name: "Home Cat", image: "/images/homeCat.png", rarity: "common" },
@@ -81,7 +80,7 @@ export default function CatGallery({ onClose }) {
 
   const handleCatClick = (cat) => {
     if (collectedCats[cat.id]) {
-      setScreenDisplayCat(cat); // Display cat on screen
+      setScreenDisplayCat(cat); 
       setSelectedCat(cat);
       setShowCatDetail(true);
     }
@@ -94,7 +93,6 @@ export default function CatGallery({ onClose }) {
         <button className="cat-gallery-close" onClick={onClose}>×</button>
         
         <div className="cat-gallery-content">
-          {/* Left Side - Catcom with Title and Progress */}
           <div className="left-catcom-section">
             <div className="cat-gallery-header">
               <div className="header-content">
@@ -125,11 +123,8 @@ export default function CatGallery({ onClose }) {
                   </div>
                 )}
               </div>
-              {/* Catcom Image Overlay */}
-              <img src="/images/catcom.png" alt="Cat Community" className="catcom-image" />
-              {/* Catcom Asset with Pulse Effect */}
-              <img src="/images/catcom.png" alt="Cat Asset" className="catcom-asset" />
-              {/* Sparkle Foreground Effects */}
+                <img src="/images/catcom.png" alt="Cat Community" className="catcom-image" />
+                <img src="/images/catcom.png" alt="Cat Asset" className="catcom-asset" />
               <div className="sparkle-foreground">
                 <img 
                   src="/images/catcomassets.png" 
@@ -140,7 +135,7 @@ export default function CatGallery({ onClose }) {
             </div>
           </div>
 
-          {/* Right Side - Grid Container with Bookmark Tabs */}
+          {/* Grid Container with Bookmark Tabs */}
           <div className="right-grid-section">
             {/* Category Bookmark Tabs */}
             <div className="category-bookmarks">

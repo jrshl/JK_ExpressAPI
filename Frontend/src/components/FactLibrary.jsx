@@ -1,9 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import './FactLibrary.css';
 
-// FactLibrary now supports a dynamic number of pages (default maxPages = 20).
-// It injects small dynamic CSS rules per-instance to handle the flip transforms
-// and z-index ordering for any number of pages.
 export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [], onClose, onMarkViewed, maxPages = 20 }) {
   // unique id suffix so multiple instances won't clash with identical IDs
   const uidRef = useRef(Math.random().toString(36).slice(2, 9));
@@ -35,13 +32,11 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
   useEffect(() => {
     Object.values(pageSelectedFacts).forEach(factNumber => {
       if (factNumber && libraryNewIds.includes(factNumber) && onMarkViewed) {
-        // Small delay to allow the page flip animation to complete before marking as viewed
         setTimeout(() => onMarkViewed(factNumber), 800);
       }
     });
   }, [pageSelectedFacts, libraryNewIds, onMarkViewed]);
 
-  // keep pageChecks size in sync if maxPages changes
   useEffect(() => {
     setPageChecks(prev => {
       const next = Array(pagesCount).fill(false);
@@ -51,21 +46,18 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
     setUnflipping(() => Array(pagesCount).fill(false));
   }, [pagesCount]);
 
-  // Opening sequence: pop/bounce + slide for 300ms, then open cover, then flip to page 2 after cover is visible
   useEffect(() => {
     let tCoverStart, tFlip, tEnd;
     if (isOpening) {
-      const openingDelay = 300; // pop/slide duration
-      const coverMs = 300; // fast cover duration (kept in CSS var when data-fast=true)
-      const flipMs = 500;  // fast flip duration (matches current CSS var when data-fast=true)
-      const visibleBuffer = 50; // small buffer to ensure pages are visible
+      const openingDelay = 300; 
+      const coverMs = 300; 
+      const flipMs = 500;  
+      const visibleBuffer = 50; 
 
-      // 1) Start opening the cover after the opening animation
       tCoverStart = setTimeout(() => {
         setCoverChecked(true);
       }, openingDelay);
 
-      // 2) After cover fully opens + buffer, flip page 1 so the flip is visible
       tFlip = setTimeout(() => {
         setPageChecks(prev => {
           if (prev[0]) return prev;
@@ -73,7 +65,7 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
           copy[0] = true;
           return copy;
         });
-        // 3) End opening mode after the flip completes to exit fast timings
+
         tEnd = setTimeout(() => setIsOpening(false), flipMs);
       }, openingDelay + coverMs + visibleBuffer);
     }
@@ -84,48 +76,41 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
     };
   }, [isOpening]);
 
-  // Animated close: sequentially unflip pages (right to left), then close the cover
   const handleCloseAnimated = async () => {
     if (isClosing) return;
     setIsClosing(true);
     try {
-    // use fast duration during closing
-    const flipMs = 50;
-    const coverMs = 300;
-    const fadeMs = 300;
-      // snapshot flipped indices and unflip from last flipped to first
+      const flipMs = 50;
+      const coverMs = 300;
+      const fadeMs = 300;
       const flippedIndices = pageChecks
         .map((v, i) => (v ? i : -1))
         .filter(i => i !== -1)
         .reverse();
       
-      // Optimization: if user is beyond page 7, only show 5 pages closing to reduce animation time
+      // if user is beyond page 7, only show 5 pages closing
       const shouldOptimize = flippedIndices.length > 7;
       const pagesToAnimate = shouldOptimize ? flippedIndices.slice(0, 5) : flippedIndices;
       
-      // Animate the selected pages
       for (const idx of pagesToAnimate) {
-        // mark page as unflipping to apply reverse animation
         setUnflipping(prev => {
           const copy = [...prev];
           copy[idx] = true;
           return copy;
         });
         await new Promise(res => setTimeout(res, flipMs));
-        // after animation, set flipped to false and clear unflipping
-        setPageChecks(prev => {
-          const copy = [...prev];
-          copy[idx] = false;
-          return copy;
+          setPageChecks(prev => {
+            const copy = [...prev];
+            copy[idx] = false;
+            return copy;
         });
-        setUnflipping(prev => {
-          const copy = [...prev];
-          copy[idx] = false;
-          return copy;
+          setUnflipping(prev => {
+            const copy = [...prev];
+            copy[idx] = false;
+            return copy;
         });
       }
-      
-      // If we optimized, instantly close remaining pages without animation
+
       if (shouldOptimize && flippedIndices.length > 5) {
         const remainingPages = flippedIndices.slice(5);
         setPageChecks(prev => {
@@ -143,13 +128,10 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
           return copy;
         });
       }
-      
-      // small pause, then close cover
+
       await new Promise(res => setTimeout(res, 50));
       setCoverChecked(false);
-      // wait for cover close animation (fast)
       await new Promise(res => setTimeout(res, coverMs));
-      // zoom-out fade
       setFadingOut(true);
       await new Promise(res => setTimeout(res, fadeMs));
     } finally {
@@ -167,19 +149,16 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
     });
   };
 
-  // determine the current front page index (first unflipped page)
   const currentIndex = useMemo(() => {
     const idx = pageChecks.findIndex(c => !c);
     return idx === -1 ? -1 : idx;
   }, [pageChecks]);
 
-  // the most recently flipped page (if any)
   const lastFlippedIndex = useMemo(() => {
-    if (currentIndex === -1) return pagesCount - 1; // all flipped
-    return currentIndex - 1; // -1 if none flipped yet
+    if (currentIndex === -1) return pagesCount - 1; 
+    return currentIndex - 1;
   }, [currentIndex, pagesCount]);
 
-  // navigation helpers
   const handleNext = (i) => {
     if (i < 0 || i >= pagesCount - 1) return;
     // only allow next on the current front page
@@ -194,25 +173,17 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
     handlePageChange(i, false);
   };
 
-  // dynamic CSS for page z-index and flip transform rules (cover/fade handled in stylesheet)
   const dynamicStyles = useMemo(() => {
     let s = '';
-    // nothing for cover here; handled by static CSS using data-cover attribute
 
     for (let i = 0; i < pagesCount; i++) {
       const pageId = `page-${uid}-${i + 1}`;
-      // default z-index: higher pages (toward the front) get higher z
       const z = pagesCount - i;
-      // base state: normal stacking and transform transition (duration via CSS var)
-      s += `#${pageId} { z-index: ${z}; transition: transform var(--flip-duration, 1s); will-change: transform; }\n`;
-      // keyframes: keep high z-index during flip, then drop behind at the end
-      s += `@keyframes flipZ-${uid}-${i + 1} { 0% { z-index: ${pagesCount + 3}; } 99% { z-index: ${pagesCount + 3}; } 100% { z-index: 0; } }\n`;
-      // when flipped, rotate; animation manages z-index to stay on top during flip then drop behind
-  s += `.book #${pageId}[data-flipped="true"] { transform: rotateY(-180deg); animation: flipZ-${uid}-${i + 1} var(--flip-duration, 1s) forwards; }\n`;
-      // reverse animation: keep high z during reverse then restore base z
-      s += `@keyframes flipBackZ-${uid}-${i + 1} { 0% { z-index: ${pagesCount + 3}; } 99% { z-index: ${pagesCount + 3}; } 100% { z-index: ${z}; } }\n`;
-      // when unflipping, override rotation to 0 and animate z accordingly (placed after flipped rule to override)
-  s += `.book #${pageId}[data-unflipping="true"] { transform: rotateY(0deg); animation: flipBackZ-${uid}-${i + 1} var(--flip-duration, 1s) forwards; }\n`;
+        s += `#${pageId} { z-index: ${z}; transition: transform var(--flip-duration, 1s); will-change: transform; }\n`;
+        s += `@keyframes flipZ-${uid}-${i + 1} { 0% { z-index: ${pagesCount + 3}; } 99% { z-index: ${pagesCount + 3}; } 100% { z-index: 0; } }\n`;
+        s += `.book #${pageId}[data-flipped="true"] { transform: rotateY(-180deg); animation: flipZ-${uid}-${i + 1} var(--flip-duration, 1s) forwards; }\n`;
+        s += `@keyframes flipBackZ-${uid}-${i + 1} { 0% { z-index: ${pagesCount + 3}; } 99% { z-index: ${pagesCount + 3}; } 100% { z-index: ${z}; } }\n`;
+        s += `.book #${pageId}[data-unflipping="true"] { transform: rotateY(0deg); animation: flipBackZ-${uid}-${i + 1} var(--flip-duration, 1s) forwards; }\n`;
     }
 
     return s;
@@ -232,13 +203,11 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
         />
 
         <div className="book-container">
-          {/* Navigation arrows - only show when book is opened and opening animation is done */}
           {coverChecked && !isOpening && (
             <>
               <button 
                 className="nav-arrow nav-arrow-left"
                 onClick={() => {
-                  // Prevent going back to page 1 (index 0) - only allow from page 3+ (index 2+)
                   if (lastFlippedIndex >= 1) handlePrev(lastFlippedIndex);
                 }}
                 disabled={lastFlippedIndex < 1}
@@ -260,7 +229,6 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
             </>
           )}
 
-          {/* Page Counter - only show when book is opened */}
           {coverChecked && !isOpening && (
             <div className="page-counter">
               Page {lastFlippedIndex + 2}/27
@@ -301,20 +269,19 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
               >
                 <div className="front-page">
                   {i === 0 ? (
-                    // Page 1: Welcome/Intro page
                     <div className="intro-page">
                       <h2 className="intro-title">Cat Facts Library</h2>
                       <p className="intro-text">Welcome to your collection of fascinating cat facts!</p>
                       <p className="intro-subtitle">Explore amazing feline knowledge.</p>
                     </div>
                   ) : (
-                    // Page 2+: Fact grid pages
+
                     <>
                       <h3 className="page-title">Page {i + 1}</h3>
                       <div className="fact-grid-container">
                         <div className="fact-grid">
                         {Array.from({ length: 9 }).map((_, cardIndex) => {
-                          const factNumber = ((i - 1) * 9) + cardIndex + 1; // page 2 : start of numbering
+                          const factNumber = ((i - 1) * 9) + cardIndex + 1; 
                           const isEncountered = encounteredFacts[factNumber] || facts[factNumber - 1];
                           const isSelected = pageSelectedFacts[i] === factNumber;
                           const isClickable = !!isEncountered;
@@ -330,11 +297,8 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
                               onClick={isClickable && !isSelected ? (e) => {
                                 e.stopPropagation();
                                 setPageSelectedFacts(prev => {
-                                  // Only allow selection if not already selected
-                                  // This prevents re-clicking the same active tile
                                   return { ...prev, [i]: factNumber };
                                 });
-                                // Mark the fact as viewed when clicked
                                 if (isNew && onMarkViewed) {
                                   onMarkViewed(factNumber);
                                 }
@@ -354,6 +318,7 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
                           );
                         })}
                         </div>
+
                         {/* Paw notification overlay grid */}
                         <div className="paw-overlay-grid">
                           {Array.from({ length: 9 }).map((_, cardIndex) => {
@@ -377,8 +342,6 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
                 <div className="back-page">
                   <div className="back-content">
                     {(() => {
-                      // Show facts selected from the next page (right side front)  
-                      // Back page of index i shows facts selected from front page of index i+1
                       const selectedFactNumber = pageSelectedFacts[i + 1];
                       const hasSelectedFact = selectedFactNumber !== undefined && selectedFactNumber !== null;
                       
@@ -409,7 +372,8 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
                               </p>
                             </div>
                           </div>
-                          {/* Cat overlay - positioned absolutely to not interfere with content */}
+
+                          {/* Cat overlay */}
                           <div className="cat-overlay">
                             <img src="/images/catfact.png" alt="Cat reading" className="cat-reading-overlay" />
                           </div>
