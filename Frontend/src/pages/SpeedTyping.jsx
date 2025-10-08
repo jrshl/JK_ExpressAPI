@@ -46,7 +46,7 @@ export default function SpeedTyping() {
     }
   }
 
-  // 🔥 Instant fetch: preloads next fact ahead of time
+  // Preload next fact instantly
   const nextFactRef = useRef(null);
   async function preloadNextFact() {
     nextFactRef.current = await fetchFact();
@@ -56,12 +56,8 @@ export default function SpeedTyping() {
   async function startGame() {
     setStep(2);
     const newTimeLeft = getDifficultyTime(difficulty);
-
-    // Use preloaded fact immediately for instant start
     const fact = nextFactRef.current || (await fetchFact());
     setCurrentFact(fact);
-
-    // Preload next fact again right away for next round
     preloadNextFact();
 
     setTyped("");
@@ -158,7 +154,7 @@ export default function SpeedTyping() {
       {/* Pause Menu Modal */}
       {isMenuOpen && (
         <div className="modal-overlay" onClick={() => setIsMenuOpen(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="menu-modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Menu</h2>
             <div className="menu-buttons">
               <button className="menu-btn resume-btn" onClick={() => setIsMenuOpen(false)}>Resume</button>
@@ -171,7 +167,7 @@ export default function SpeedTyping() {
 
       <div className="background-layer"></div>
 
-      {/* 🐾 GUIDE CONTAINER (Step 0 & 1) */}
+      {/* GUIDE SCREENS */}
       {(step === 0 || step === 1) && (
         <div className="GuideContainer">
           {step === 0 && (
@@ -179,7 +175,7 @@ export default function SpeedTyping() {
               <h1>Cat Speed Typing Adventure</h1>
               <p className="instructions">
                 Type the cat fact as fast as you can! The faster you type correctly,
-                the further the cat runs toward the goal 🏁
+                the further the cat runs toward the goal
               </p>
               <div className="controls">
                 <button onClick={() => setStep(1)}>Next</button>
@@ -206,17 +202,14 @@ export default function SpeedTyping() {
         </div>
       )}
 
-      {/* 🐱 GAME CONTAINER (Step 2) */}
+      {/* GAME SCREEN */}
       {step === 2 && (
         <div className="GameContainer">
           <div className="game-area">
             <div className={`track ${gameActive ? "active" : ""}`}>
               {/* Timer circle */}
               <div className="answer-timer">
-                <svg
-                  viewBox={`0 0 ${R * 2 + 6} ${R * 2 + 6}`}
-                  style={{ width: "40px", height: "40px" }}
-                >
+                <svg viewBox={`0 0 ${R * 2 + 6} ${R * 2 + 6}`} style={{ width: "40px", height: "40px" }}>
                   <circle cx={R + 3} cy={R + 3} r={R} className="timer-bg" />
                   <circle
                     cx={R + 3}
@@ -231,7 +224,7 @@ export default function SpeedTyping() {
                 <span className="timer-text">{timeLeft}</span>
               </div>
 
-              {/* Track layers */}
+              {/* Track */}
               <div className="bg-static gif"></div>
               <div className="bg-layer bg3"></div>
               <div className="bg-layer bg1"></div>
@@ -287,7 +280,7 @@ export default function SpeedTyping() {
           {/* End modal */}
           {modalOpen && (
             <div className="modal-overlay">
-              <div className="modal-content">
+              <div className="end-modal-content">
                 <h2>{result.includes("Congratulations") ? "You Won!" : "You Lost!"}</h2>
                 <p>{currentFact}</p>
                 <button className="start-btn" onClick={startGame}>Try Again</button>

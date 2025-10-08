@@ -26,10 +26,10 @@ export default function JumbledFacts() {
   const [gameStarted, setGameStarted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // 🐱 Cat image state
+  // Cat image state
   const [catImage, setCatImage] = useState("/images/jumbledGuide.png");
 
-  // 🔥 Timer states
+  // Timer states
   const TOTAL_TIME = 60; // 60 seconds per fact
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const timerRef = useRef(null);
@@ -91,7 +91,7 @@ export default function JumbledFacts() {
         if (isPausedRef.current) return prev; // pause guard
         if (prev <= 1) {
           clearInterval(timerRef.current);
-          setResult("⏰ Time's up!");
+          setResult("Time's up!");
           setCatImage("/images/jumbledWrong.png"); // time up → sad cat
           return 0;
         }

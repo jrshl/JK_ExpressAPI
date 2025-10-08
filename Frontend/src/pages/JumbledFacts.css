@@ -42,26 +42,42 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease;
 }
+
 .modal-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  min-width: 300px;
+  position: relative;
+  z-index: 30;
+  width: 50%;
+  height: 70%;
+  background: url('images/CatMenu.png') center center no-repeat;
+  background-size: 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  padding: 40px 30px;
   text-align: center;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  animation: popIn 0.35s ease;
 }
+
+/* ===== Modal Buttons ===== */
 .menu-buttons {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-top: 15px;
 }
+
 .restart-btn { background: #8B4513; }
 .resume-btn { background: #A0522D; }
 .exit-btn   { background: #5D4037; }
 .restart-btn:hover { background: #7a3e12; }
 .resume-btn:hover  { background: #8f4526; }
 .exit-btn:hover    { background: #4e342e; }
+
 
 /* ===== Container ===== */
 .jumbled-facts-container {
@@ -209,9 +225,7 @@ body {
   box-shadow: 0 2px 6px #d9c7b4;
   transition: all 0.2s ease;
 }
-.word-tile.jumbled { 
-  background: #ffe0b2; 
-}
+.word-tile.jumbled { background: #ffe0b2; }
 .word-tile.sequence { background: #c8e6c9; }
 
 /* ===== Drop Lines ===== */
@@ -239,10 +253,9 @@ body {
   font-weight: bold;
   cursor: pointer;
 }
-.jumbled-btn.submit { 
-  background: #965c30; }
+.jumbled-btn.submit { background: #965c30; }
 .jumbled-btn.submit:hover { background: #e09e36; }
-.jumbled-btn.next   { background: #dc8a3d; }
+.jumbled-btn.next { background: #dc8a3d; }
 .jumbled-btn.next:hover { background: #f6ba7b; }
 
 /* ===== Result text ===== */
@@ -259,7 +272,6 @@ body {
   align-items: flex-start;
   gap: 2rem;
   width: 100%;
- 
 }
 
 /* Cat on game screen */
@@ -271,9 +283,9 @@ body {
 }
 
 .cat-game-image {
-  width: 500px;  /* adjust size */
+  width: 500px;
   height: auto;
-  cursor: pointer; /* later editable or animatable */
+  cursor: pointer;
 }
 
 /* Keep the main game area beside the cat */
@@ -303,7 +315,6 @@ body {
   stroke: rgba(0,0,0,0.15);
   stroke-width: 3;
   fill: none;
-  
 }
 
 .ring-progress {
@@ -312,7 +323,6 @@ body {
   fill: none;
   stroke-linecap: round;
   transition: stroke-dashoffset 1s linear;
-  
 }
 
 .timer-text {
@@ -326,127 +336,77 @@ body {
 }
 
 
-/* ...existing code... */
-
-/* ===== Responsive overrides (non-destructive) ===== */
-
-/* Keep layout stable on wide screens but reduce extreme fixed sizes */
-@media (max-width: 1400px) {
-  .jumbled-main-box { max-width: 100%; width: 95%; }
-  .cat-game-image { max-width: 420px; }
-  .upper-box { height: auto; }
-  .lower-box { height: auto; }
+/* ===== Modal Animations ===== */
+@keyframes fadeIn {
+  from { opacity: 0; } 
+  to { opacity: 1; }
+}
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
-/* Desktop / large tablet: make absolutely positioned boxes flow and fit */
+/* Large screens (desktops >1366px) */
+@media (min-width: 1367px) {
+  .modal-content {
+    width: 50%;
+    height: 60%;
+    background-size: 45%;
+  }
+}
+
+/* Laptops & tablets */
 @media (max-width: 1200px) {
-  /* Let boxed elements flow instead of relying on huge fixed absolute positions */
-  .jumbled-box { position: relative; left: auto; top: auto; right: auto; bottom: auto; width: 100%; }
-  .upper-box {
-    position: relative;
-    width: 100%;
-    height: auto;
-    top: auto;
-    right: auto;
-    padding: 1rem;
-    background: rgba(248,240,227,0.95);
+  .modal-content {
+    width: 60%;
+    height: 60%;
+    background-size: 55%;
+    padding: 35px 25px;
   }
-  .upper-box-text { width: 100%; font-size: 0.95rem; margin-top: 0; }
-  .words-area { height: auto; max-height: 260px; overflow-y: auto; }
-
-  .lower-box {
-    position: relative;
-    left: auto;
-    bottom: auto;
-    width: 100%;
-    min-height: 160px;
-    height: auto;
-    padding: 1rem;
-    margin-top: 0.6rem;
-  }
-
-  /* Make cat image scale down */
-  .cat-game-wrapper { position: relative; width: 280px; max-width: 35%; min-width: 160px; margin: 0 auto; }
-  .cat-game-image { width: 100%; max-width: 360px; }
-
-  /* Keep actions visible but not overlapping content */
-  .jumbled-actions { position: absolute; bottom: 12px; right: 12px; }
+  .menu-buttons { max-width: 220px; }
 }
 
-/* Tablet and smaller: stack content vertically, make words and tiles readable */
+/* Medium tablets */
 @media (max-width: 900px) {
-  .jumbled-game-layout,
-  .jumbled-game-content { flex-direction: column; align-items: center; gap: 1rem; width: 100%; }
-
-  /* flow boxes vertically */
-  .upper-box, .lower-box { width: 100%; box-sizing: border-box; }
-
-  /* cat becomes part of flow and smaller */
-  .cat-game-wrapper {
-    position: relative;
-    order: 0;
-    width: 220px;
-    max-width: 70%;
-    margin-top: 0;
+  .modal-content {
+    width: 70%;
+    height: auto;
+    padding: 30px 20px;
+    background-size: 60%;
   }
-  .cat-game-image { max-width: 220px; }
-
-  /* ensure the game area takes full width */
-  .game-area { width: 100%; order: 1; padding: 0 0.5rem; }
-
-  /* words area scroll and resize */
-  .words-area { max-height: 180px; gap: 9px; padding: 0.4rem; }
-
-  /* action buttons flow under content instead of overlapping */
-  .jumbled-actions {
-    position: static;
-    margin-top: 0.6rem;
-    justify-content: center;
-    align-self: center;
-    gap: 0.6rem;
+  .menu-buttons button {
+    font-size: 0.85rem;
+    padding: 10px 16px;
   }
-
-  /* timer smaller and placed inside the flow / non-overlapping */
-  .answer-timer { position: absolute; top: 8px; right: 10px; width: 34px; height: 34px; }
-  .timer-text { font-size: 0.78rem; }
 }
 
-/* Small phones: prioritize content, hide decorative large cat and reduce paddings */
+/* Small tablets / large phones */
 @media (max-width: 600px) {
-  body { font-size: 13px; }
-
-  .jumbled-main-box { padding: 1rem; outline-offset: -12px; }
-  .jumbled-title { font-size: 1.1rem; }
-
-  /* hide tutorial portrait cat graphic to give room */
-  .cat-wrapper { display: none; }
-  .cat-game-wrapper { display: none; }
-
-  .upper-box-text { font-size: 0.85rem; }
-  .words-area { max-height: 150px; }
-
-  .word-tile { padding: 6px 10px; font-size: 11px; white-space: normal; }
-
-  .jumbled-actions { position: static; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
-
-  /* timer minimized but still available */
-  .answer-timer { width: 30px; height: 30px; top: 6px; right: 8px; }
-  .timer-text { font-size: 0.72rem; }
+  .modal-content {
+    width: 85%;
+    height: 60%;
+    padding: 25px 25px;
+    background-size: 70%;
+  }
+  .menu-buttons button {
+    font-size: 0.8rem;
+    padding: 8px 14px;
+  }
 }
 
-/* Very small phones: tighter layout, single-column focus */
+/* Small phones */
 @media (max-width: 420px) {
-  body { font-size: 12px; }
-  .jumbled-main-box { padding: 0.8rem; border-radius: 10px; outline-offset: -8px; }
-  .upper-box-text { font-size: 0.78rem; }
-  .words-area { gap: 6px; max-height: 130px; }
-  .word-tile { padding: 5px 8px; font-size: 10px; }
-  .answer-timer { display: none; }
-  .jumbled-actions { padding-bottom: 6px; justify-content: center; }
+  .modal-content {
+    width: 90%;
+    height: auto;
+    padding: 20px 12px;
+    background-size: 75%;
+  }
+  .menu-buttons {
+    gap: 10px;
+  }
+  .menu-buttons button {
+    font-size: 0.75rem;
+    padding: 7px 12px;
+  }
 }
-
-/* Accessibility: visible focus for keyboard users */
-.word-tile:focus { outline: 3px solid rgba(66,133,244,0.25); outline-offset: 2px; }
-.jumbled-btn:focus { outline: 3px solid rgba(66,133,244,0.24); outline-offset: 2px; }
-
-/* End responsive overrides */

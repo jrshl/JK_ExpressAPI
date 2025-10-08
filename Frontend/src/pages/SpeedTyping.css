@@ -421,17 +421,89 @@
   position: relative;
 }
 
+/* ===========================
+   MENU MODAL & END MODAL
+=========================== */
 
+/* Shared overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+}
 
-.modal-content {
+/* Pause Menu Modal */
+.menu-modal-content {
   position: relative;
   z-index: 30;
   width: 50%;
+  height: 70%;
+  background: url('images/CatMenu.png') center center no-repeat;
+  background-size: 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  padding: 40px 30px;
+  text-align: center;
+}
+
+/* Buttons inside menu */
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+}
+.menu-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  background: #d28b5b;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.menu-btn:hover {
+  background: #7b3f00;
+}
+
+/* End Modal */
+.end-modal-content {
+  position: relative;
+  z-index: 30;
+  width: 50%;
+  background: rgba(255, 255, 255, 0.96);
+  border: 4px solid #7b3f00;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+.end-modal-content h2 {
+  font-size: 1.8rem;
+  color: #3a1a0a;
+  margin-bottom: 15px;
+}
+
+.end-modal-content p {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 20px;
 }
 
 /* ===========================
    RESPONSIVE DESIGN
 =========================== */
+
+/* Phones */
 @media (max-width: 480px) {
   .speed-typing-wrapper {
     width: 100%;
@@ -456,8 +528,22 @@
     width: 80px;
     height: 80px;
   }
+
+  /* ✅ Responsive Menu Modal for Mobile */
+  .menu-modal-content {
+    width: 85%;
+    height: auto;
+    background-size: 60%;
+    padding: 25px 15px;
+  }
+
+  .menu-btn {
+    font-size: 0.9rem;
+    padding: 8px 15px;
+  }
 }
 
+/* Tablets */
 @media (min-width: 481px) and (max-width: 768px) {
   .speed-typing-wrapper {
     padding: 15px;
@@ -478,8 +564,17 @@
     width: 100px;
     height: 100px;
   }
+
+
+  .menu-modal-content {
+    width: 70%;
+    height: 60%;
+    background-size: 70%;
+    padding: 30px 30px;
+  }
 }
 
+/* Small Laptops */
 @media (min-width: 769px) and (max-width: 1366px) {
   .speed-typing-wrapper {
     padding: 20px;
@@ -500,8 +595,16 @@
     width: 120px;
     height: 120px;
   }
+
+  /* ✅ Slightly smaller CatMenu background for laptops */
+  .menu-modal-content {
+    width: 45%;
+    height: 60%;
+    background-size: 45%;
+  }
 }
 
+/* Large Screens */
 @media (min-width: 1367px) {
   .speed-typing-wrapper {
     max-width: 1600px;
@@ -523,5 +626,11 @@
   .timer-circle {
     width: 180px;
     height: 180px;
+  }
+
+  .menu-modal-content {
+    width: 40%;
+    height: 65%;
+    background-size: 50%;
   }
 }
