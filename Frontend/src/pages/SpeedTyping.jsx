@@ -16,10 +16,12 @@ export default function SpeedTyping() {
   const [prevCatPosition, setPrevCatPosition] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isPaused, setIsPaused] = useState(false); //  Pause state
+
   const timerRef = useRef(null);
   const navigate = useNavigate();
 
-  // Timer circle setup
+  // ===== Timer Circle Setup =====
   const R = 12;
   const circumference = 2 * Math.PI * R;
   const fraction = maxTime ? timeLeft / maxTime : 0;
@@ -27,6 +29,7 @@ export default function SpeedTyping() {
   const colorVal = Math.round(255 * (1 - fraction));
   const strokeColor = `rgb(${colorVal},${colorVal},${colorVal})`;
 
+  // ===== Fetch Fact =====
   async function fetchFact() {
     try {
       const res = await fetch("https://meowfacts.herokuapp.com/");
@@ -46,13 +49,14 @@ export default function SpeedTyping() {
     }
   }
 
-  // Preload next fact instantly
+  // ===== Preload Next Fact =====
   const nextFactRef = useRef(null);
   async function preloadNextFact() {
     nextFactRef.current = await fetchFact();
   }
   useEffect(() => { preloadNextFact(); }, []);
 
+  // ===== Start Game =====
   async function startGame() {
     setStep(2);
     const newTimeLeft = getDifficultyTime(difficulty);
@@ -69,19 +73,47 @@ export default function SpeedTyping() {
     setCatMovable(true);
     setPrevCatPosition(0);
     setModalOpen(false);
+    setIsPaused(false);
 
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          handleEndGame(false, "Time's up! The cat got caught!");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
   }
 
+  // ===== Fixed Timer Effect (pause/resume works) =====
+  useEffect(() => {
+    if (!gameActive) return;
+
+    if (isPaused) {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      return;
+    }
+
+    if (!timerRef.current) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            handleEndGame(false, "Time's up! The cat got caught!");
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [gameActive, isPaused]); // reacts to pause/resume
+
+  // ===== End Game =====
   function handleEndGame(won, message) {
     setGameActive(false);
     setResult(message);
@@ -92,6 +124,7 @@ export default function SpeedTyping() {
     }
   }
 
+  // ===== Cancel Game =====
   function cancelGame() {
     setGameActive(false);
     setResult("Game canceled!");
@@ -101,14 +134,26 @@ export default function SpeedTyping() {
     setCatMovable(true);
     setPrevCatPosition(0);
     setModalOpen(false);
+    setIsPaused(false);
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
   }
 
-  // Typing logic
+  // ===== Pause Logic =====
+  function togglePause(open) {
+    setIsMenuOpen(open);
+    if (open) {
+      setIsPaused(true);
+    } else {
+      setIsPaused(false);
+    }
+  }
+
+  // ===== Typing Logic =====
   useEffect(() => {
+    if (!gameActive || isPaused) return;
     const limit = Math.min(typed.length, currentFact.length);
     let correctCount = 0;
     let hasWrong = false;
@@ -127,12 +172,12 @@ export default function SpeedTyping() {
     if (correctCount === currentFact.length && gameActive) {
       handleEndGame(true, "Congratulations! You typed the cat fact correctly!");
     }
-  }, [typed, currentFact]);
+  }, [typed, currentFact, isPaused]);
 
-  // Key listener
+  // ===== Key Listener =====
   useEffect(() => {
     function handleKeyDown(e) {
-      if (!gameActive) return;
+      if (!gameActive || isPaused) return;
       if (e.key.length === 1) {
         if (typed.length >= currentFact.length) return;
         setTyped(prev => prev + e.key);
@@ -142,24 +187,31 @@ export default function SpeedTyping() {
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [gameActive, typed, currentFact]);
+  }, [gameActive, isPaused, typed, currentFact]);
 
+  // ===== RENDER =====
   return (
     <div className="speed-typing-game">
-      {/* Hamburger button */}
-      <button className="hamburger" onClick={() => setIsMenuOpen(true)}>
+      {/*  Hamburger button to pause */}
+      <button className="hamburger" onClick={() => togglePause(true)}>
         <span></span><span></span><span></span>
       </button>
 
-      {/* Pause Menu Modal */}
+      {/* ===== Pause Menu ===== */}
       {isMenuOpen && (
-        <div className="modal-overlay" onClick={() => setIsMenuOpen(false)}>
+        <div className="modal-overlay" onClick={() => togglePause(false)}>
           <div className="menu-modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Menu</h2>
             <div className="menu-buttons">
-              <button className="menu-btn resume-btn" onClick={() => setIsMenuOpen(false)}>Resume</button>
-              <button className="menu-btn restart-btn" onClick={() => { setIsMenuOpen(false); startGame(); }}>Restart</button>
-              <button className="menu-btn exit-btn" onClick={() => navigate("/")}>Exit</button>
+              <button className="menu-btn resume-btn" onClick={() => togglePause(false)}>
+                Resume
+              </button>
+              <button className="menu-btn restart-btn" onClick={() => { togglePause(false); startGame(); }}>
+                Restart
+              </button>
+              <button className="menu-btn exit-btn" onClick={() => navigate("/")}>
+                Exit
+              </button>
             </div>
           </div>
         </div>
@@ -167,7 +219,7 @@ export default function SpeedTyping() {
 
       <div className="background-layer"></div>
 
-      {/* GUIDE SCREENS */}
+      {/* ===== GUIDE SCREENS ===== */}
       {(step === 0 || step === 1) && (
         <div className="GuideContainer">
           {step === 0 && (
@@ -175,7 +227,7 @@ export default function SpeedTyping() {
               <h1>Cat Speed Typing Adventure</h1>
               <p className="instructions">
                 Type the cat fact as fast as you can! The faster you type correctly,
-                the further the cat runs toward the goal
+                the further the cat runs toward the goal.
               </p>
               <div className="controls">
                 <button onClick={() => setStep(1)}>Next</button>
@@ -202,12 +254,12 @@ export default function SpeedTyping() {
         </div>
       )}
 
-      {/* GAME SCREEN */}
+      {/* ===== GAME SCREEN ===== */}
       {step === 2 && (
         <div className="GameContainer">
           <div className="game-area">
-            <div className={`track ${gameActive ? "active" : ""}`}>
-              {/* Timer circle */}
+            <div className={`track ${gameActive && !isPaused ? "active" : ""}`}>
+              {/* Timer Circle */}
               <div className="answer-timer">
                 <svg viewBox={`0 0 ${R * 2 + 6} ${R * 2 + 6}`} style={{ width: "40px", height: "40px" }}>
                   <circle cx={R + 3} cy={R + 3} r={R} className="timer-bg" />
@@ -224,7 +276,7 @@ export default function SpeedTyping() {
                 <span className="timer-text">{timeLeft}</span>
               </div>
 
-              {/* Track */}
+              {/* Background Layers */}
               <div className="bg-static gif"></div>
               <div className="bg-layer bg3"></div>
               <div className="bg-layer bg1"></div>
@@ -233,15 +285,15 @@ export default function SpeedTyping() {
               <div className="bushes"></div>
               <div className="foreground-layer"></div>
 
-              {/* Cat */}
+              {/* Optional: change cat image when paused */}
               <img
-                src="images/running_cat.gif"
+                src={isPaused ? "images/sitting_cat.png" : "images/running_cat.gif"}
                 alt="Cat"
                 className="cat"
                 style={{ left: catMovable ? `${progress}%` : `${prevCatPosition}%` }}
               />
 
-              {/* Progress line */}
+              {/* Progress Line */}
               <div className="progress-line">
                 <div
                   className="tracker-cat"
@@ -251,7 +303,7 @@ export default function SpeedTyping() {
               </div>
             </div>
 
-            {/* Fact box */}
+            {/* Fact Box */}
             <div className="fact-box">
               {currentFact.split("").map((char, idx) => {
                 let cls = "untyped-char";
@@ -277,7 +329,7 @@ export default function SpeedTyping() {
             </div>
           </div>
 
-          {/* End modal */}
+          {/* End Modal */}
           {modalOpen && (
             <div className="modal-overlay">
               <div className="end-modal-content">

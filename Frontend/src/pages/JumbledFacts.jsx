@@ -26,7 +26,7 @@ export default function JumbledFacts() {
   const [gameStarted, setGameStarted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Cat image state
+  //Cat image state
   const [catImage, setCatImage] = useState("/images/jumbledGuide.png");
 
   // Timer states
