@@ -28,7 +28,6 @@ export default function JumbledFacts() {
   const [catImage, setCatImage] = useState("/images/jumbledGuide.png");
   const [shouldRetryFact, setShouldRetryFact] = useState(false);
   const [originalFact, setOriginalFact] = useState("");
-  const [showFailureModal, setShowFailureModal] = useState(false);
 
   // Timer states
   const TOTAL_TIME = 60; // 60 seconds per fact
@@ -93,7 +92,7 @@ export default function JumbledFacts() {
           setResult("Time's up!");
           setCatImage("/images/jumbledWrong.png"); // time up → sad cat
           setShouldRetryFact(true); // Set retry flag for timeout
-          setShowFailureModal(true); // Show failure modal for timeout
+          setShowAnswer(false); // Don't show answer for timeout
           return 0;
         }
         return prev - 1;
@@ -227,9 +226,9 @@ export default function JumbledFacts() {
       setShouldRetryFact(false); // No retry needed
     } else {
       setResult("Try again!");
+      setShowAnswer(false); // Don't show answer for failed attempts
       setCatImage("/images/jumbledWrong.png"); // wrong → sad cat
       setShouldRetryFact(true); // Set retry flag
-      setShowFailureModal(true); // Show failure modal
     }
   }
   function handleNextFact() {
@@ -240,15 +239,6 @@ export default function JumbledFacts() {
       // Otherwise, get a new fact
       fetchFact();
     }
-  }
-
-  function handleTryAgain() {
-    setShowFailureModal(false);
-    // Reset for retry with same fact
-    setUserSequence([]);
-    setResult("");
-    setCatImage("/images/tmCat.png");
-    resetTimer(); // Restart the timer
   }
 
   // Timer circle math
@@ -393,19 +383,6 @@ export default function JumbledFacts() {
                 </div>
               )}
               {showAnswer && <AnswerReveal correctAnswer={fact} onClose={() => setShowAnswer(false)} />}
-              
-              {/* Failure Modal */}
-              {showFailureModal && (
-                <div className="answer-reveal-overlay">
-                  <div className="answer-reveal-modal">
-                    <h3>Oops! You didn't get it right this time</h3>
-                    <p>Don't worry, practice makes purr-fect! Let's try this same fact again.</p>
-                    <button onClick={handleTryAgain} className="answer-reveal-btn">
-                      Try Again
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
