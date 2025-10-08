@@ -1,4 +1,4 @@
-/* Background grid */
+/* ===== Background ===== */
 body {
   margin: 0;
   padding: 0;
@@ -7,8 +7,8 @@ body {
   font-family: "Press Start 2P", monospace;
 }
 
-/* Modal */
-.hamburger-btn {
+/* ===== Hamburger button ===== */
+.hamburger {
   position: fixed;
   top: 45px;
   left: 50px;
@@ -25,7 +25,6 @@ body {
   border-radius: 8px;
   z-index: 1000;
 }
-
 .hamburger span {
   display: block;
   width: 20px;
@@ -34,33 +33,43 @@ body {
   border-radius: 4px;
 }
 
+/* ===== Modal ===== */
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  inset: 0;
   background: rgba(0,0,0,0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease;
 }
 
 .modal-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  min-width: 300px;
+  position: relative;
+  z-index: 30;
+  width: 50%;
+  height: 70%;
+  background: url('images/CatMenu.png') center center no-repeat;
+  background-size: 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  padding: 40px 30px;
   text-align: center;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  animation: popIn 0.35s ease;
 }
 
-/* Menu buttons */
+/* ===== Modal Buttons ===== */
 .menu-buttons {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-top: 15px;
 }
-
-
 
 .restart-btn { background: #8B4513; }
 .resume-btn { background: #A0522D; }
@@ -70,30 +79,28 @@ body {
 .exit-btn:hover    { background: #4e342e; }
 
 
-/* Outer container */
+/* ===== Container ===== */
 .jumbled-facts-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  min-height: 100vh;
-  padding-top: 2rem; /* extra space for the cat */
+  min-height: 90vh;
+  padding-top: 2rem;
 }
 
-/* Cat wrapper */
+/* ===== Guide Cat (KEEPED for tutorial only) ===== */
 .cat-wrapper {
   text-align: center;
   position: relative;
-  margin-bottom: -3.5rem; /* overlaps the box */
+  margin-bottom: -3.5rem;
   z-index: 2;
 }
-
 .cat-image {
   width: 500px;
   height: auto;
 }
 
-/* Main box */
+/* ===== Tutorial Box ===== */
 .jumbled-main-box {
   background: #cdc2af;
   padding: 2rem;
@@ -102,41 +109,31 @@ body {
   width: 90%;
   text-align: center;
   box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-
-  /* stitched/border effect */
   border: 4px solid #431c10;
   outline: 3px dashed #5f4222;
   outline-offset: -20px;
 }
-
-/* Title */
 .jumbled-title {
-  font-size: 2.0rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #4a2c2a;
   margin-bottom: 1rem;
 }
-
-/* Guide box */
 .jumbled-guide-box {
   background: #f8f0e3;
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1.5rem;
 }
-
 .jumbled-subtitle {
   color: #5d4037;
   margin-bottom: 1rem;
 }
-
-/* Nav buttons (Prev, Next, Start) */
 .nav-buttons {
   display: flex;
   justify-content: center;
   gap: 1rem;
 }
-
 .nav-btn {
   padding: 10px 24px;
   border: none;
@@ -146,94 +143,107 @@ body {
   background: #ad744b;
   transition: background 0.2s;
 }
+.nav-btn:hover { background: #7a501d; }
+.nav-btn.start { background: #cc6e26; }
+.nav-btn.start:hover { background: #a8440b; }
 
-.nav-btn:hover {
-  background: #7a501d;
+/* ===== GAME LAYOUT ===== */
+.jumbled-game-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 90%;
+  max-width: 900px;
 }
 
-.nav-btn.start {
-  background: #cc6e26; /* green */
-}
-
-.nav-btn.start:hover {
-  background: #a8440b;
-}
-
-/* Jumbled Words Area */
-.jumbled-words-area {
+/* ===== Game Boxes ===== */
+.jumbled-box {
+  padding: 1rem;
+  border-radius: 10px;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
   justify-content: center;
-  margin: 2rem 0;
-  min-height: 60px;
+  align-items: center;
+  gap: 10px;
+  position: absolute;
+}
+.upper-box {
   background: rgba(248, 240, 227, 0.7);
-  border-radius: 8px;
-  padding: 1rem;
+  border: 4px solid #8a3c09;
+  top: 30px;
+  right: 20px;
+  height: 280px;
+  width: 1010px;
+  background-color: #eadfd6;
 }
 
-/* User Sequence Area */
-.user-sequence-area {
+/* Static text inside upper box */
+.upper-box-text {
+  width: 1000%;
+  text-align: center;
+  font-size: 12px;
+  color: #4a2c2a;
+  margin-top: -20px;
+  font-weight: bold;
+  font-style: italic;
+}
+
+/* Wrap words below the text */
+.words-area {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
   justify-content: center;
-  min-height: 60px;
-  background: rgba(248, 240, 227, 0.9);
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border: 2px solid transparent;
+  gap: 11px;
+  width: 95%;
+  top: 30px;
+  height: 220px;
 }
-
+.lower-box {
+  background-color: #ebd7c7;
+  border: 4px dashed #5f4222;
+  flex-direction: row;
+  bottom: -310px;
+  left: -230px;
+  height: 300px;
+  width: 1375px;
+  position: relative;
+}
 .user-sequence-placeholder {
   color: #999;
   font-style: italic;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  text-align: center;
   width: 100%;
-  min-height: 40px;
 }
 
-/* Word Tiles */
+/* ===== Word Tiles ===== */
 .word-tile {
   padding: 8px 16px;
   border-radius: 6px;
   cursor: grab;
-  font-family: inherit;
-  font-size: 1rem;
+  font-size: 11px;
   box-shadow: 0 2px 6px #d9c7b4;
   transition: all 0.2s ease;
 }
+.word-tile.jumbled { background: #ffe0b2; }
+.word-tile.sequence { background: #c8e6c9; }
 
-.word-tile.jumbled {
-  background: #ffe0b2;
-}
-
-.word-tile.sequence {
-  background: #c8e6c9;
-}
-
-/* Drop indicator line */
+/* ===== Drop Lines ===== */
 .drop-line {
   width: 3px;
   height: 40px;
   border-radius: 2px;
 }
+.drop-line.words { background: #2196f3; }
+.drop-line.sequence { background: #4caf50; }
 
-.drop-line.words {
-  background: #2196f3;
-}
-
-.drop-line.sequence {
-  background: #4caf50;
-}
-
-/* Action buttons */
+/* ===== Buttons inside lower box ===== */
 .jumbled-actions {
-  text-align: center;
-  margin-bottom: 1rem;
+  position: absolute;
+  bottom: 15px;
+  right: 20px;
+  display: flex;
+  gap: 1rem;
 }
 
 .jumbled-btn {
@@ -242,33 +252,161 @@ body {
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
-  margin-right: 10px;
 }
+.jumbled-btn.submit { background: #965c30; }
+.jumbled-btn.submit:hover { background: #e09e36; }
+.jumbled-btn.next { background: #dc8a3d; }
+.jumbled-btn.next:hover { background: #f6ba7b; }
 
-.jumbled-btn.submit {
-  background: #ffb74d;
-}
-
-.jumbled-btn.reset {
-  background: #bdbdbd;
-}
-
-.jumbled-btn.next {
-  background: #90caf9;
-}
-
-/* Result Text */
+/* ===== Result text ===== */
 .result-text {
-  text-align: center;
   font-size: 1.2rem;
+  text-align: center;
+}
+.result-text.correct { color: #388e3c; }
+.result-text.incorrect { color: #d32f2f; }
+
+/* ===== Game screen wrapper ===== */
+.jumbled-game-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  width: 100%;
 }
 
-.result-text.correct {
-  color: #388e3c;
+/* Cat on game screen */
+.cat-game-wrapper {
+  position: absolute;
+  left: 60px;
+  top: 100px;
+  z-index: 2;
 }
 
-.result-text.incorrect {
-  color: #d32f2f;
+.cat-game-image {
+  width: 500px;
+  height: auto;
+  cursor: pointer;
+}
+
+/* Keep the main game area beside the cat */
+.game-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.answer-timer {
+  position: absolute;
+  top: 260px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  z-index: 20;
+}
+
+.answer-timer-ring {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.ring-track {
+  stroke: rgba(0,0,0,0.15);
+  stroke-width: 3;
+  fill: none;
+}
+
+.ring-progress {
+  stroke: #000;
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.timer-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #000;
 }
 
 
+/* ===== Modal Animations ===== */
+@keyframes fadeIn {
+  from { opacity: 0; } 
+  to { opacity: 1; }
+}
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Large screens (desktops >1366px) */
+@media (min-width: 1367px) {
+  .modal-content {
+    width: 50%;
+    height: 60%;
+    background-size: 45%;
+  }
+}
+
+/* Laptops & tablets */
+@media (max-width: 1200px) {
+  .modal-content {
+    width: 60%;
+    height: 60%;
+    background-size: 55%;
+    padding: 35px 25px;
+  }
+  .menu-buttons { max-width: 220px; }
+}
+
+/* Medium tablets */
+@media (max-width: 900px) {
+  .modal-content {
+    width: 70%;
+    height: auto;
+    padding: 30px 20px;
+    background-size: 60%;
+  }
+  .menu-buttons button {
+    font-size: 0.85rem;
+    padding: 10px 16px;
+  }
+}
+
+/* Small tablets / large phones */
+@media (max-width: 600px) {
+  .modal-content {
+    width: 85%;
+    height: 60%;
+    padding: 25px 25px;
+    background-size: 70%;
+  }
+  .menu-buttons button {
+    font-size: 0.8rem;
+    padding: 8px 14px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 420px) {
+  .modal-content {
+    width: 90%;
+    height: auto;
+    padding: 20px 12px;
+    background-size: 75%;
+  }
+  .menu-buttons {
+    gap: 10px;
+  }
+  .menu-buttons button {
+    font-size: 0.75rem;
+    padding: 7px 12px;
+  }
+}
