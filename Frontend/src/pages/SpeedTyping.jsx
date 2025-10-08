@@ -16,8 +16,18 @@ export default function SpeedTyping() {
   const [prevCatPosition, setPrevCatPosition] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
+  const [countdownValue, setCountdownValue] = useState(3);
+  const [shouldRetryCurrentFact, setShouldRetryCurrentFact] = useState(false);
   const timerRef = useRef(null);
+  const isPausedRef = useRef(false);
   const navigate = useNavigate();
+
+  // Update ref when isPaused changes
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
 
   // Timer circle setup
   const R = 12;
@@ -63,31 +73,53 @@ export default function SpeedTyping() {
   }, []);
   useEffect(() => { preloadNextFact(); }, [preloadNextFact]);
 
+  // Function to start a fresh game (from guide pages)
+  function startFreshGame() {
+    setShouldRetryCurrentFact(false);
+    startGame();
+  }
+
   async function startGame() {
     setStep(2);
     const newTimeLeft = getDifficultyTime(difficulty);
-    const fact = nextFactRef.current || (await fetchFact());
-    setCurrentFact(fact);
-    preloadNextFact();
+    
+    // Only get new fact if not retrying current one
+    if (!shouldRetryCurrentFact) {
+      const fact = nextFactRef.current || (await fetchFact());
+      setCurrentFact(fact);
+      preloadNextFact();
+    }
+    
+    // Reset retry flag
+    setShouldRetryCurrentFact(false);
 
     setTyped("");
     setProgress(0);
     setResult("");
     setTimeLeft(newTimeLeft);
     setMaxTime(newTimeLeft);
-    setGameActive(true);
     setCatMovable(true);
     setPrevCatPosition(0);
     setModalOpen(false);
+    setIsPaused(false);
+
+    // Start countdown before game begins
+    await startCountdown();
+    
+    setGameActive(true);
 
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
-        if (prev <= 1) {
-          handleEndGame(false, "Time's up! The cat got caught!");
-          return 0;
+        // Only decrease time if not paused
+        if (!isPausedRef.current) {
+          if (prev <= 1) {
+            handleEndGame(false, "Time's up! The cat got caught!");
+            return 0;
+          }
+          return prev - 1;
         }
-        return prev - 1;
+        return prev;
       });
     }, 1000);
   }
@@ -96,25 +128,43 @@ export default function SpeedTyping() {
     setGameActive(false);
     setResult(message);
     setModalOpen(true);
+    
+    // Set retry flag based on whether user won or lost
+    setShouldRetryCurrentFact(!won);
+    
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
   }
 
-  function cancelGame() {
-    setGameActive(false);
-    setResult("Game canceled!");
-    setTyped("");
-    setProgress(0);
-    setTimeLeft(0);
-    setCatMovable(true);
-    setPrevCatPosition(0);
-    setModalOpen(false);
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
+  // Countdown before game starts
+  async function startCountdown() {
+    setShowCountdown(true);
+    for (let i = 3; i > 0; i--) {
+      setCountdownValue(i);
+      // Wait but check for pause every 100ms
+      for (let j = 0; j < 10; j++) {
+        if (isPausedRef.current) {
+          // Wait until unpaused
+          while (isPausedRef.current) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
     }
+    setCountdownValue("START!");
+    // Wait for START but also check for pause
+    for (let j = 0; j < 5; j++) {
+      if (isPausedRef.current) {
+        while (isPausedRef.current) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    setShowCountdown(false);
   }
 
   // Typing logic
@@ -157,18 +207,31 @@ export default function SpeedTyping() {
   return (
     <div className="speed-typing-game">
       {/* Hamburger button */}
-      <button className="hamburger" onClick={() => setIsMenuOpen(true)}>
+      <button className="hamburger" onClick={() => {
+        setIsMenuOpen(true);
+        setIsPaused(true);
+      }}>
         <span></span><span></span><span></span>
       </button>
 
       {/* Pause Menu Modal */}
       {isMenuOpen && (
-        <div className="modal-overlay" onClick={() => setIsMenuOpen(false)}>
+        <div className="modal-overlay" onClick={() => {
+          setIsMenuOpen(false);
+          setIsPaused(false);
+        }}>
           <div className="menu-modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Menu</h2>
             <div className="menu-buttons">
-              <button className="menu-btn resume-btn" onClick={() => setIsMenuOpen(false)}>Resume</button>
-              <button className="menu-btn restart-btn" onClick={() => { setIsMenuOpen(false); startGame(); }}>Restart</button>
+              <button className="menu-btn resume-btn" onClick={() => {
+                setIsMenuOpen(false);
+                setIsPaused(false);
+              }}>Resume</button>
+              <button className="menu-btn restart-btn" onClick={() => { 
+                setIsMenuOpen(false); 
+                setIsPaused(false);
+                startGame(); 
+              }}>Restart</button>
               <button className="menu-btn exit-btn" onClick={() => navigate("/")}>Exit</button>
             </div>
           </div>
@@ -189,7 +252,16 @@ export default function SpeedTyping() {
               </p>
               <div className="controls">
                 <button onClick={() => setStep(1)}>Next</button>
-                <button className="start-btn" onClick={startGame}>Start Game</button>
+                <select
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                  className="difficulty-selector"
+                >
+                  <option value="easy">Easy (45s)</option>
+                  <option value="medium">Medium (30s)</option>
+                  <option value="hard">Hard (20s)</option>
+                </select>
+                <button className="start-btn" onClick={startFreshGame}>Start Game</button>
               </div>
             </>
           )}
@@ -205,7 +277,16 @@ export default function SpeedTyping() {
               </ul>
               <div className="controls">
                 <button onClick={() => setStep(0)}>Back</button>
-                <button className="start-btn" onClick={startGame}>Start Game</button>
+                <select
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                  className="difficulty-selector"
+                >
+                  <option value="easy">Easy (45s)</option>
+                  <option value="medium">Medium (30s)</option>
+                  <option value="hard">Hard (20s)</option>
+                </select>
+                <button className="start-btn" onClick={startFreshGame}>Start Game</button>
               </div>
             </>
           )}
@@ -215,8 +296,22 @@ export default function SpeedTyping() {
       {/* GAME SCREEN */}
       {step === 2 && (
         <div className="GameContainer">
+          {/* Difficulty Display */}
+          <div className="difficulty-display">
+            <span className="difficulty-text">
+              Difficulty: {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} 
+              ({getDifficultyTime(difficulty)}s)
+            </span>
+          </div>
+          
           <div className="game-area">
-            <div className={`track ${gameActive ? "active" : ""}`}>
+            <div className={`track ${gameActive ? "active" : ""} ${isPaused ? "paused" : ""} ${showCountdown ? "countdown" : ""}`}>
+              {/* Countdown Overlay */}
+              {showCountdown && (
+                <div className="countdown-overlay">
+                  <div className="countdown-text">{countdownValue}</div>
+                </div>
+              )}
               {/* Timer circle */}
               <div className="answer-timer">
                 <svg viewBox={`0 0 ${R * 2 + 6} ${R * 2 + 6}`} style={{ width: "40px", height: "40px" }}>
@@ -270,21 +365,7 @@ export default function SpeedTyping() {
               })}
             </div>
 
-            {/* Controls */}
-            <div className="controls bottom-controls">
-              <label>Difficulty:</label>
-              <select
-                value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value)}
-                disabled={gameActive}
-              >
-                <option value="easy">Easy (45s)</option>
-                <option value="medium">Medium (30s)</option>
-                <option value="hard">Hard (20s)</option>
-              </select>
-              <button className="start-btn" onClick={startGame} disabled={gameActive}>Restart Game</button>
-              <button className="cancel-btn" onClick={cancelGame} disabled={!gameActive}>Cancel Game</button>
-            </div>
+
           </div>
 
           {/* End modal */}
@@ -293,7 +374,9 @@ export default function SpeedTyping() {
               <div className="end-modal-content">
                 <h2>{result.includes("Congratulations") ? "You Won!" : "You Lost!"}</h2>
                 <p>{currentFact}</p>
-                <button className="start-btn" onClick={startGame}>Try Again</button>
+                <button className="start-btn" onClick={startGame}>
+                  {result.includes("Congratulations") ? "Next Fact" : "Try Again"}
+                </button>
               </div>
             </div>
           )}

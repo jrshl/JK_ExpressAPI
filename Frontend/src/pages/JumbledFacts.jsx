@@ -13,7 +13,7 @@ function shuffle(array) {
 }
 
 export default function JumbledFacts() {
-  const [index, setIndex] = useState(0);
+
   const [fact, setFact] = useState("");
   const [words, setWords] = useState([]);
   const [userSequence, setUserSequence] = useState([]);
@@ -25,9 +25,10 @@ export default function JumbledFacts() {
   const [showAnswer, setShowAnswer] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // Cat image state
   const [catImage, setCatImage] = useState("/images/jumbledGuide.png");
+  const [shouldRetryFact, setShouldRetryFact] = useState(false);
+  const [originalFact, setOriginalFact] = useState("");
+  const [showFailureModal, setShowFailureModal] = useState(false);
 
   // Timer states
   const TOTAL_TIME = 60; // 60 seconds per fact
@@ -38,47 +39,45 @@ export default function JumbledFacts() {
   const navigate = useNavigate();
   const wordsAreaRef = useRef(null);
 
-  const guides = [
-    "Drag the words below into the answer area to form the correct sentence!",
-    "Tip: You can drag words back if you make a mistake.",
-    "Keep practicing to get faster!"
-  ];
+  const guide = "Drag the words below into the answer area to form the correct sentence! You can drag words back if you make a mistake.";
 
-  function handlePrev() {
-    setIndex(prev => (prev > 0 ? prev - 1 : prev));
-  }
-  function handleNextGuide() {
-    setIndex(prev => (prev + 1) % guides.length);
-  }
+
   function handleStartGame() {
     setGameStarted(true);
+    setShouldRetryFact(false);
+    setOriginalFact("");
     fetchFact();
     resetTimer();
     setCatImage("/images/jumbledGuide.png"); // reset default cat
   }
 
   async function fetchFact() {
-    try {
-      const res = await fetch("/api/facts");
-      const data = await res.json();
-      const factText = Array.isArray(data.fact) ? data.fact[0] : data.fact;
-      setFact(factText);
-      setWords(shuffle(factText.split(" ")));
-      setUserSequence([]);
-      setResult("");
-      setShowAnswer(false);
-      setCatImage("/images/jumbledGuide.png"); // reset default cat
-      resetTimer();
-    } catch {
-      const fallback = "Cats are mysterious creatures.";
-      setFact(fallback);
-      setWords(shuffle(fallback.split(" ")));
-      setUserSequence([]);
-      setResult("");
-      setShowAnswer(false);
-      setCatImage("/images/jumbledGuide.png"); // reset default cat
-      resetTimer();
+    let factText;
+    
+    if (shouldRetryFact && originalFact) {
+      // Use the same fact for retry
+      factText = originalFact;
+      setShouldRetryFact(false); // Reset retry flag
+    } else {
+      // Fetch new fact
+      try {
+        const res = await fetch("/api/facts");
+        const data = await res.json();
+        factText = Array.isArray(data.fact) ? data.fact[0] : data.fact;
+        setOriginalFact(factText); // Store for potential retry
+      } catch {
+        factText = "Cats are mysterious creatures.";
+        setOriginalFact(factText); // Store for potential retry
+      }
     }
+    
+    setFact(factText);
+    setWords(shuffle(factText.split(" ")));
+    setUserSequence([]);
+    setResult("");
+    setShowAnswer(false);
+    setCatImage("/images/jumbledGuide.png"); // reset default cat
+    resetTimer();
   }
 
   // Reset + start timer
@@ -93,6 +92,8 @@ export default function JumbledFacts() {
           clearInterval(timerRef.current);
           setResult("Time's up!");
           setCatImage("/images/jumbledWrong.png"); // time up → sad cat
+          setShouldRetryFact(true); // Set retry flag for timeout
+          setShowFailureModal(true); // Show failure modal for timeout
           return 0;
         }
         return prev - 1;
@@ -221,15 +222,33 @@ export default function JumbledFacts() {
   function handleSubmit() {
     if (userSequence.join(" ") === fact) {
       setResult("Correct!");
+      setShowAnswer(true); // Show answer for correct attempts
       setCatImage("/images/jumbledRight.png"); // correct → happy cat
+      setShouldRetryFact(false); // No retry needed
     } else {
       setResult("Try again!");
-      setShowAnswer(true);
       setCatImage("/images/jumbledWrong.png"); // wrong → sad cat
+      setShouldRetryFact(true); // Set retry flag
+      setShowFailureModal(true); // Show failure modal
     }
   }
   function handleNextFact() {
-    fetchFact();
+    if (shouldRetryFact) {
+      // If retry is needed, retry the same fact
+      fetchFact();
+    } else {
+      // Otherwise, get a new fact
+      fetchFact();
+    }
+  }
+
+  function handleTryAgain() {
+    setShowFailureModal(false);
+    // Reset for retry with same fact
+    setUserSequence([]);
+    setResult("");
+    setCatImage("/images/tmCat.png");
+    resetTimer(); // Restart the timer
   }
 
   // Timer circle math
@@ -267,10 +286,8 @@ export default function JumbledFacts() {
           <div className="jumbled-main-box">
             <h1 className="jumbled-title">JUMBLED CAT FACTS</h1>
             <div className="jumbled-guide-box">
-              <p className="jumbled-subtitle">{guides[index]}</p>
+              <p className="jumbled-subtitle">{guide}</p>
               <div className="nav-buttons">
-                {index > 0 && <button className="nav-btn" onClick={handlePrev}>Prev</button>}
-                <button className="nav-btn" onClick={handleNextGuide}>Next</button>
                 <button className="nav-btn start" onClick={handleStartGame}>Start Game</button>
               </div>
             </div>
@@ -364,7 +381,9 @@ export default function JumbledFacts() {
                 ))}
                 <div className="jumbled-actions">
                   <button onClick={handleSubmit} className="jumbled-btn submit">Submit</button>
-                  <button onClick={handleNextFact} className="jumbled-btn next">Next Fact</button>
+                  <button onClick={handleNextFact} className="jumbled-btn next">
+                    {shouldRetryFact ? "Try Again" : "Next Fact"}
+                  </button>
                 </div>
               </div>
 
@@ -374,6 +393,19 @@ export default function JumbledFacts() {
                 </div>
               )}
               {showAnswer && <AnswerReveal correctAnswer={fact} onClose={() => setShowAnswer(false)} />}
+              
+              {/* Failure Modal */}
+              {showFailureModal && (
+                <div className="answer-reveal-overlay">
+                  <div className="answer-reveal-modal">
+                    <h3>Oops! You didn't get it right this time</h3>
+                    <p>Don't worry, practice makes purr-fect! Let's try this same fact again.</p>
+                    <button onClick={handleTryAgain} className="answer-reveal-btn">
+                      Try Again
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

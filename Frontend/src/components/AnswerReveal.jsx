@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AnswerReveal = ({ correctAnswer, onClose }) => {
+const AnswerReveal = ({ correctAnswer, onClose, buttonText = "Got it!" }) => {
   if (!correctAnswer) return null;
 
   return (
@@ -50,7 +50,7 @@ const AnswerReveal = ({ correctAnswer, onClose }) => {
             fontWeight: 'bold'
           }}
         >
-          Got it!
+          {buttonText}
         </button>
       </div>
     </div>

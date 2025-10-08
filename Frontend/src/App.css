@@ -121,11 +121,11 @@ body {
 
 /* new inner rotator for JS-driven rotation; keeps CSS idle animation on the face separate */
 .wheel-inner {
-  width: 100%;
-  height: 100%;
+  width: 102%;
+  height: 102%;
   display: block;
   transform-origin: center center;
-  background-image: url('/images/wheel1.png');
+  background-image: url('/images/wheelz1.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;

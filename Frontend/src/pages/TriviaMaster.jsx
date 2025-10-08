@@ -57,14 +57,16 @@ const AutoResizeText = ({ text, maxFontSize = 22, minFontSize = 12 }) => {
 
 const TriviaMaster = () => {
   const [stage, setStage] = useState('intro');
-  const [introStep, setIntroStep] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [currentFact, setCurrentFact] = useState('');
+  const [originalFact, setOriginalFact] = useState(''); // Store original fact for retries
   const [missingWord, setMissingWord] = useState('');
   const [userAnswer, setUserAnswer] = useState('');
   const [gameHistory, setGameHistory] = useState([]);
   const [answerTimeLeft, setAnswerTimeLeft] = useState(ANSWER_TIME);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [shouldRetryFact, setShouldRetryFact] = useState(false);
 
   const isPausedRef = useRef(isPaused);
   const answerTimerRef = useRef(null);
@@ -93,22 +95,26 @@ const TriviaMaster = () => {
   const restartToIntro = () => {
     clearAllTimers();
     setStage('intro');
-    setIntroStep(0);
+    setCurrentSlide(0);
     setGameHistory([]);
     setCurrentFact('');
+    setOriginalFact('');
     setMissingWord('');
     setUserAnswer('');
     setAnswerTimeLeft(ANSWER_TIME);
     setIsMenuOpen(false);
     setIsPaused(false);
+    setShouldRetryFact(false);
   };
 
   const startGame = async () => {
     clearAllTimers();
     setGameHistory([]);
     setCurrentFact('');
+    setOriginalFact('');
     setMissingWord('');
     setUserAnswer('');
+    setShouldRetryFact(false);
     setStage('showFact');
     await nextFact();
   };
@@ -139,10 +145,47 @@ const TriviaMaster = () => {
     setUserAnswer('');
     setStage('showFact');
 
-    const fact = await fetchFact();
+    let fact;
+    if (shouldRetryFact && originalFact) {
+      // Use the original fact for retry
+      fact = originalFact;
+      setShouldRetryFact(false); // Reset retry flag
+    } else {
+      // Fetch new fact
+      fact = await fetchFact();
+      setOriginalFact(fact); // Store for potential retry
+    }
+    
     setCurrentFact(fact);
-
     startAnswerTimer(FACT_DISPLAY_TIME, () => showCurtain(fact));
+  };
+
+  const selectRandomWord = (fact, excludeWord = '') => {
+    const words = fact.split(' ');
+    // Filter out words that are too short or are the excluded word
+    const validWords = words.map((word, index) => ({
+      word: word.replace(/[^a-zA-Z]/g, ''),
+      index,
+      original: word
+    })).filter(item => 
+      item.word.length > 2 && // At least 3 letters
+      item.word.toLowerCase() !== excludeWord.toLowerCase()
+    );
+
+    if (validWords.length === 0) {
+      // Fallback to any word if no valid words found
+      const randomIndex = Math.floor(Math.random() * words.length);
+      return {
+        word: words[randomIndex].replace(/[^a-zA-Z]/g, ''),
+        index: randomIndex
+      };
+    }
+
+    const randomValidWord = validWords[Math.floor(Math.random() * validWords.length)];
+    return {
+      word: randomValidWord.word,
+      index: randomValidWord.index
+    };
   };
 
   const showCurtain = async (fact) => {
@@ -155,10 +198,15 @@ const TriviaMaster = () => {
 
     const words = fact.split(' ');
     let wordToHide = '';
+    
     if (words.length > 1) {
-      const randomIndex = Math.floor(Math.random() * words.length);
-      wordToHide = words[randomIndex].replace(/[^a-zA-Z]/g, '');
-      words[randomIndex] = '_'.repeat(wordToHide.length);
+      // Get the last failed word to exclude it (if retrying)
+      const lastGame = gameHistory[gameHistory.length - 1];
+      const excludeWord = (shouldRetryFact && lastGame && !lastGame.isCorrect) ? lastGame.correctWord : '';
+      
+      const selection = selectRandomWord(fact, excludeWord);
+      wordToHide = selection.word;
+      words[selection.index] = '_'.repeat(wordToHide.length);
     }
 
     setMissingWord(wordToHide);
@@ -173,6 +221,7 @@ const TriviaMaster = () => {
       ...prev,
       { fact: fullFact, correctWord, userAnswer: '', isCorrect: false },
     ]);
+    setShouldRetryFact(true); // Set retry flag for failed attempt
     setStage('factResult');
   };
 
@@ -197,6 +246,9 @@ const TriviaMaster = () => {
       },
     ]);
 
+    // Set retry flag based on whether user was correct
+    setShouldRetryFact(!isCorrect);
+
     clearAllTimers();
     setStage('factResult');
   };
@@ -215,22 +267,27 @@ const TriviaMaster = () => {
 
   useEffect(() => { return () => clearAllTimers(); }, []);
 
+  // Slideshow effect for intro
+  useEffect(() => {
+    if (stage === 'intro') {
+      const slideInterval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % 3); // Cycle through 3 images
+      }, 3000); // Change slide every 3 seconds
+      
+      return () => clearInterval(slideInterval);
+    }
+  }, [stage]);
+
   const circumference = 2 * Math.PI * 16;
   const progressPct =
     (answerTimeLeft /
       (stage === 'showFact' ? FACT_DISPLAY_TIME : ANSWER_TIME)) * 100;
   const dashOffset = circumference - (progressPct / 100) * circumference;
 
-  const introSteps = [
-    { type: 'text', content: 'Welcome to Trivia Master!' },
-    {
-      type: 'text',
-      content:
-        "You'll see a cat fact for 15 seconds 🐾. After that, the screen will hide briefly, and then one word will be missing. Fill it in!",
-    },
-    { type: 'image', src: '/images/guide1.png' },
-    { type: 'image', src: '/images/tutorial2.png' },
-    { type: 'image', src: '/images/tutorial3.png' },
+  const slideImages = [
+    '/images/guide1.png',
+    '/images/guide2.png', 
+    '/images/guide3.png'
   ];
 
   return (
@@ -283,21 +340,21 @@ const TriviaMaster = () => {
             <div className="intro-box-wrapper">
               <div className="intro-bigbox">
                 <div className="intro-smallbox">
-                  {introSteps[introStep].type === 'text' ? (
-                    <p>{introSteps[introStep].content}</p>
-                  ) : (
-                    <img src={introSteps[introStep].src} alt={`Step ${introStep + 1}`} className="intro-image" />
-                  )}
+                  <div className="welcome-text">
+                    <p>Welcome to Trivia Master!</p>
+                    <p>You'll see a cat fact for 10 seconds 🐾. After that, the screen will hide briefly, and then one word will be missing. Fill it in!</p>
+                  </div>
+                  <div className="slideshow-container">
+                    <img 
+                      src={slideImages[currentSlide]} 
+                      alt={`Guide ${currentSlide + 1}`} 
+                      className="intro-image slideshow-image" 
+                      key={currentSlide}
+                    />
+                  </div>
                 </div>
                 <div className="intro-controls">
-                  {introStep > 0 && (
-                    <button className="prev-btn" onClick={() => setIntroStep((s) => s - 1)}>Previous</button>
-                  )}
-                  {introStep < introSteps.length - 1 ? (
-                    <button className="next-btn" onClick={() => setIntroStep((s) => s + 1)}>Next</button>
-                  ) : (
-                    <button className="start-btn" onClick={startGame}>Start Game</button>
-                  )}
+                  <button className="start-btn" onClick={startGame}>Start Game</button>
                 </div>
               </div>
             </div>
@@ -389,7 +446,7 @@ const TriviaMaster = () => {
                     nextFact();       // fetch next fact instantly
                   }}
                 >
-                  Next Fact
+                  {gameHistory.at(-1)?.isCorrect ? "Next Fact" : "Try Again"}
                 </button>
               </div>
             )}

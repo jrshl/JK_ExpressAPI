@@ -94,6 +94,52 @@
   border: 5px solid #301401;
 }
 
+/* Difficulty Display */
+.difficulty-display {
+  width: 380px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 2px solid #301401;
+  z-index: 10;
+  margin: 0 auto 15px auto;
+  text-align: center;
+  
+}
+
+.difficulty-text {
+  font-family: "Press Start 2P", monospace;
+  font-size: 12px;
+  color: #301401;
+  font-weight: bold;
+}
+
+/* Countdown Overlay */
+.countdown-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  border-radius: 15px;
+}
+
+.countdown-text {
+  font-family: "Press Start 2P", monospace;
+  font-size: 4rem;
+  color: white;
+  text-shadow: 3px 3px 0px #301401;
+  animation: countdownPulse 1s ease-in-out;
+}
+
+@keyframes countdownPulse {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 .GameContainer h1 { 
   font-size: 2rem; 
   margin-bottom: 20px; 
@@ -135,6 +181,13 @@
   border: none;
   cursor: pointer;
   background: #d28b5b;
+}
+
+.difficulty-selector {
+  background: #d28b5b;
+  color: white;
+  border: 2px solid #301401;
+  font-weight: bold;
 }
 
 .start-btn { 
@@ -204,34 +257,55 @@
   animation-play-state: running; 
 }
 
+.track.paused .bg-layer { 
+  animation-play-state: paused !important; 
+}
+
+.track.countdown .bg-layer { 
+  animation-play-state: paused !important; 
+}
+
 .bg-static {
   position: absolute;
   inset: 0;
-  width: 200%;
-  height: 180%;
+  width: 150%;
+  height: 100%;
   background-size: cover;
-  top: -80%;
+  top: -30%;
 }
 
 .gif { 
   background-image: url("images/speedStaticBG.gif"); 
-  animation: bg1Scroll 60s linear infinite; 
-  z-index: 0; 
 }
 .bg1 { 
   background-image: url("images/speedBG1.png"); 
-  animation: bg3Scroll 15s linear infinite; 
+  background-repeat: repeat-x !important;
+  background-size: contain !important;
+  width: 200% !important;
+  height: 100%;
+  animation: bg1Scroll 25s linear infinite; 
   z-index: 1; 
+  top: 5%;
 }
 .bg2 { 
   background-image: url("images/speedBG2.png"); 
+  background-repeat: repeat-x !important;
+  background-size: contain !important;
+  width: 200% !important;
+  height: 100%;
   animation: bg2Scroll 30s linear infinite; 
   z-index: 0.5; 
+  top: 0;
 }
 .bg3 { 
   background-image: url("images/speedBG3.png"); 
-  animation: bg1Scroll 60s linear infinite; 
+  background-repeat: repeat-x !important;
+  background-size: contain !important;
+  width: 200% !important;
+  height: 100%;
+  animation: bg3Scroll 60s linear infinite; 
   z-index: 0; 
+  top: 0;
 }
 
 @keyframes bg1Scroll { 
@@ -244,7 +318,7 @@
 }
 @keyframes bg3Scroll { 
   0% { transform: translateX(0); } 
-  100% { transform: translateX(-20%); } 
+  100% { transform: translateX(-50%); } 
 }
 
 /* ===========================
@@ -266,6 +340,14 @@
   animation-play-state: running; 
 }
 
+.track.paused .road { 
+  animation-play-state: paused !important; 
+}
+
+.track.countdown .road { 
+  animation-play-state: paused !important; 
+}
+
 .bushes { 
   position: absolute; 
   bottom: 0; 
@@ -282,6 +364,14 @@
   animation-play-state: running; 
 }
 
+.track.paused .bushes { 
+  animation-play-state: paused !important; 
+}
+
+.track.countdown .bushes { 
+  animation-play-state: paused !important; 
+}
+
 .foreground-layer { 
   position: absolute; 
   bottom: 0; 
@@ -293,6 +383,18 @@
   animation: roadScroll 3s linear infinite; 
   z-index: 1; 
   animation-play-state: paused; 
+}
+
+.track.active .foreground-layer { 
+  animation-play-state: running; 
+}
+
+.track.paused .foreground-layer { 
+  animation-play-state: paused !important; 
+}
+
+.track.countdown .foreground-layer { 
+  animation-play-state: paused !important; 
 }
 
 @keyframes roadScroll { 
@@ -309,8 +411,8 @@
 =========================== */
 .cat { 
   position: absolute; 
-  bottom: 20px; 
-  width: 100px; 
+  bottom: -30px; 
+  width: 250px; 
   height: auto; 
   transition: left 0.3s ease; 
   z-index: 4; 

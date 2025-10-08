@@ -119,7 +119,6 @@ body {
   font-weight: bold;
   font-family: "Press Start 2P", monospace;
   letter-spacing: 2px;
-  position: relative;
   padding-left: 675px;
 }
 
@@ -184,12 +183,46 @@ body {
   min-height: 300px;
   width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   font-family: "Press Start 2P", monospace;
   font-size: 0.9rem;
   text-align: center;
   line-height: 1.4;
+  gap: 20px;
+}
+
+.welcome-text {
+  flex-shrink: 0;
+}
+
+.slideshow-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+}
+
+.slideshow-image {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain;
+  animation: slideIn 0.5s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Buttons at bottom of big box */
