@@ -25,9 +25,10 @@ export default function SpeedTyping() {
 
   async function fetchFact() {
     try {
-      const res = await fetch('https://meowfacts.herokuapp.com/');
+      const res = await fetch(`/api/facts?count=1`);
       const data = await res.json();
-      return data.fact[0];
+      const list = Array.isArray(data.fact) ? data.fact : Array.isArray(data.facts) ? data.facts : Array.isArray(data.data) ? data.data : [data.data];
+      return list[0] || "Cats are amazing creatures!";
     } catch {
       return "Cats are amazing creatures!";
     }
