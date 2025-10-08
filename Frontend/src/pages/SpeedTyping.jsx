@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SpeedTyping.css";
 
@@ -32,27 +32,18 @@ export default function SpeedTyping() {
   // ===== Fetch Fact (Fixed) =====
   async function fetchFact() {
     try {
-      // Try fetching from your backend API first
-      const resLocal = await fetch(`/api/facts?count=1`);
-      const dataLocal = await resLocal.json();
-      const localFact = dataLocal?.fact || dataLocal?.facts || dataLocal?.data;
-
-      if (localFact) {
-        const list = Array.isArray(localFact) ? localFact : [localFact];
-        return list[0] || "Cats are amazing creatures!";
+      const res = await fetch("/api/facts");
+      const data = await res.json();
+      
+      // Get one random fact from your server's response
+      let facts = data.fact || data.facts || [];
+      if (Array.isArray(facts) && facts.length > 0) {
+        const randomIndex = Math.floor(Math.random() * facts.length);
+        const fact = facts[randomIndex];
+        return typeof fact === 'string' ? fact : "Cats are amazing creatures!";
       }
-
-      // Fallback to external API
-      const resExternal = await fetch("https://meowfacts.herokuapp.com/");
-      const dataExternal = await resExternal.json();
-      const list = Array.isArray(dataExternal.fact)
-        ? dataExternal.fact
-        : Array.isArray(dataExternal.facts)
-        ? dataExternal.facts
-        : Array.isArray(dataExternal.data)
-        ? dataExternal.data
-        : [dataExternal.data];
-      return list[0] || "Cats are amazing creatures!";
+      
+      return "Cats are amazing creatures!";
     } catch (error) {
       console.error("Error fetching fact:", error);
       return "Cats are amazing creatures!";
@@ -70,10 +61,10 @@ export default function SpeedTyping() {
 
   // ===== Preload Next Fact =====
   const nextFactRef = useRef(null);
-  async function preloadNextFact() {
+  const preloadNextFact = useCallback(async () => {
     nextFactRef.current = await fetchFact();
-  }
-  useEffect(() => { preloadNextFact(); }, []);
+  }, []);
+  useEffect(() => { preloadNextFact(); }, [preloadNextFact]);
 
   // ===== Start Game =====
   async function startGame() {
@@ -188,7 +179,7 @@ export default function SpeedTyping() {
     if (correctCount === currentFact.length && gameActive) {
       handleEndGame(true, "Congratulations! You typed the cat fact correctly!");
     }
-  }, [typed, currentFact, isPaused]);
+  }, [typed, currentFact, gameActive]);
 
   // ===== Key Listener =====
   useEffect(() => {
@@ -302,7 +293,7 @@ export default function SpeedTyping() {
               <div className="foreground-layer"></div>
 
               <img
-                src={isPaused ? "images/sitting_cat.png" : "images/running_cat.gif"}
+                src="images/catwalk.gif"
                 alt="Cat"
                 className="cat"
                 style={{ left: catMovable ? `${progress}%` : `${prevCatPosition}%` }}
@@ -320,7 +311,7 @@ export default function SpeedTyping() {
 
             {/* Fact Box */}
             <div className="fact-box">
-              {currentFact.split("").map((char, idx) => {
+              {(currentFact && typeof currentFact === 'string' ? currentFact : 'Press "Start Game" to begin!').split("").map((char, idx) => {
                 let cls = "untyped-char";
                 if (idx < typed.length) cls = typed[idx] === char ? "typed-char" : "wrong-char";
                 return <span key={idx} className={cls}>{char}</span>;
