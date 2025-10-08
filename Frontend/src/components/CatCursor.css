@@ -1,0 +1,50 @@
+/* Hide the native cursor when the CatCursor is active */
+.hide-native-cursor, .hide-native-cursor body, .hide-native-cursor * {
+  cursor: none !important;
+}
+
+/* Fixed element anchored to the bottom that follows mouse X and stretches to reach Y */
+.cat-cursor {
+  position: fixed;
+  bottom: -10px; /* keeps the base offscreen so no cuts are visible */
+  left: 0;
+  width: 500px; /* fixed BIG width */
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.cat-cursor-img {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Align the image so the paw tip sits near the top center.
+     We keep bottom anchoring but nudge background position slightly above bottom
+     to better align the hotspot visually. */
+  background: url('/images/pawrest.png') no-repeat center bottom;
+  background-size: contain; /* maintain aspect ratio */
+  transition: transform 50ms linear, filter 80ms ease-in-out; /* responsive tilt and press feedback */
+}
+
+/* Click/press state swaps to the closed paw image and adds a tiny squash effect */
+.cat-cursor-img.pressed {
+  background-image: url('/images/pawclick.png');
+  width: 500px;
+  filter: brightness(0.98);
+}
+
+/* debug hotspot crosshair */
+.cat-cursor-hotspot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: rgba(255,0,0,0.9);
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.9);
+  pointer-events: none;
+  z-index: 10000;
+}
+

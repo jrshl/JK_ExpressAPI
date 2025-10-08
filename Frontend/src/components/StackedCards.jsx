@@ -1,7 +1,17 @@
 import React, { useState } from "react";
 import "./StackedCards.css";
 
-export default function StackedCards({ cards, onClose }) {
+export default function StackedCards({ cards, onClose, onStoreComplete }) {
+  // compute id from fact text (same algorithm as App)
+  function generateFactId(fact) {
+    let hash = 0;
+    for (let i = 0; i < fact.length; i++) {
+      const char = fact.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash) % 234 + 1;
+  }
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isStoring, setIsStoring] = useState(false);
   const [isBundling, setIsBundling] = useState(false);
@@ -21,6 +31,15 @@ export default function StackedCards({ cards, onClose }) {
         
         // Close modal after storing animation completes
         setTimeout(() => {
+          // notify parent which ids were stored (useful to mark as new in library)
+          if (onStoreComplete) {
+            try {
+              const ids = cards.map(c => generateFactId(c.content));
+              onStoreComplete(ids);
+            } catch {
+              // ignore
+            }
+          }
           if (onClose) {
             onClose();
           }

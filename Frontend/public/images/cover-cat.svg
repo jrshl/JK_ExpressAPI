@@ -1,0 +1,33 @@
+<svg viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cat head -->
+  <path d="M0 600 Q0 200 200 100 Q300 0 600 0 Q900 0 1000 100 Q1200 200 1200 600 Z" fill="#e8d5c0"/>
+  
+  <!-- Left ear -->
+  <path d="M100 200 Q50 50 200 0 Q250 50 250 150 Q200 200 100 200 Z" fill="#e8d5c0"/>
+  <path d="M130 160 Q110 80 180 50 Q220 80 220 130 Q190 160 130 160 Z" fill="#b8936f"/>
+  
+  <!-- Right ear -->
+  <path d="M950 150 Q950 50 1000 0 Q1150 50 1100 200 Q1000 200 950 150 Z" fill="#e8d5c0"/>
+  <path d="M980 130 Q980 80 1020 50 Q1090 80 1070 160 Q1010 160 980 130 Z" fill="#b8936f"/>
+  
+  <!-- Left eyebrow -->
+  <path d="M200 420 Q350 380 500 420" stroke="#8b4513" stroke-width="25" fill="none" stroke-linecap="round"/>
+  
+  <!-- Right eyebrow -->
+  <path d="M700 420 Q850 380 1000 420" stroke="#8b4513" stroke-width="25" fill="none" stroke-linecap="round"/>
+  
+  <!-- Left cheek blush -->
+  <ellipse cx="250" cy="500" rx="60" ry="30" fill="#d4b896" opacity="0.7"/>
+  
+  <!-- Right cheek blush -->
+  <ellipse cx="950" cy="500" rx="60" ry="30" fill="#d4b896" opacity="0.7"/>
+  
+  <!-- Left eye highlight -->
+  <ellipse cx="230" cy="480" rx="15" ry="10" fill="white"/>
+  
+  <!-- Right eye highlight -->
+  <ellipse cx="970" cy="480" rx="15" ry="10" fill="white"/>
+  
+  <!-- Nose -->
+  <path d="M580 520 Q600 500 620 520 Q600 540 580 520 Z" fill="#b8936f"/>
+</svg>

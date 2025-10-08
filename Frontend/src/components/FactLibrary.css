@@ -1,0 +1,851 @@
+/* Centered modal overlay (classic book styles) */
+.flc-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.flc-container { 
+  width: 420px; 
+}
+
+/* Timings (overridable via data attributes) */
+:root {
+  --flip-duration: 1s;
+  --cover-duration: 1s;
+  --fade-duration: 0.3s;
+}
+
+.flc-book-wrap[data-fast="true"] {
+  --flip-duration: 0.5s; /* fast page flips during open/close */
+  --cover-duration: 0.3s; /* cover stays at 0.3s per your request */
+}
+
+.book {
+  width: 450px;
+  height: 450px;
+  position: relative;
+  transition: transform var(--cover-duration);
+  perspective: 1500px;
+  margin: 0 auto;
+}
+
+input { 
+  display: none; 
+}
+
+.cover, .back-cover {
+  background-color: #997935;
+  width: 100%;
+  height: 100%;
+  border-radius: 0 15px 15px 0;
+  box-shadow: 0 0 5px rgb(41, 41, 41);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center left;
+}
+
+.cover { 
+  position: absolute; 
+  z-index: 4; 
+  transition: transform var(--cover-duration);
+}
+
+.cover label { 
+  width: 100%; 
+  height: 100%; 
+  cursor: pointer; 
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.cover-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  z-index: 2;
+  position: relative;
+  pointer-events: none;
+  height: 100%;
+  padding: 20px 0;
+  box-sizing: border-box;
+}
+
+.cover-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 18px;
+  color: #f8f0e3;
+  margin: 0;
+  text-align: center;
+  padding: 25px 20px;
+  background: linear-gradient(145deg, rgba(248, 240, 227, 0.1), rgba(184, 147, 111, 0.2));
+  backdrop-filter: blur(1px);
+  border: 3px solid #f8f0e3;
+  border-radius: 15px;
+  box-shadow: 
+    inset 2px 2px 5px rgba(0, 0, 0, 0.3),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.1),
+    0px 4px 15px rgba(0, 0, 0, 0.4),
+    0px 0px 0px 1px rgba(184, 147, 111, 0.8),
+    0px 0px 0px 6px rgba(107, 68, 35, 0.6);
+  letter-spacing: 1px;
+  position: relative;
+}
+
+.title-line {
+  display: block;
+  line-height: 1.3;
+  margin-bottom: 8px;
+  text-shadow: 
+    1px 1px 0px #6b4423,
+    2px 2px 0px #5a3a1e,
+    3px 3px 0px #4a3019,
+    -1px -1px 0px #b8936f,
+    -2px -2px 0px #c2a076,
+    0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.title-line:last-child {
+  margin-bottom: 0;
+}
+
+.cover-cat {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  margin-top: auto;
+}
+
+.cover-cat-img {
+  width: 320px;
+  height: auto;
+  opacity: 0.8;
+  margin-bottom: -20px;
+  filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Decorative corner elements */
+.cover-title::before,
+.cover-title::after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border: 2px solid #f8f0e3;
+}
+
+.cover-title::before {
+  top: 8px;
+  left: 8px;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 8px 0 0 0;
+}
+
+.cover-title::after {
+  bottom: 8px;
+  right: 8px;
+  border-left: none;
+  border-top: none;
+  border-radius: 0 0 8px 0;
+}
+
+.back-cover { 
+  position: relative; 
+  z-index: -1; 
+}
+
+.page { 
+  position: absolute; 
+  background-color: white; 
+  width: 425px; 
+  height: 430px; 
+  border-radius: 0 15px 15px 0; 
+  margin-top: 10px; 
+  transform-origin: left; 
+  transform-style: preserve-3d; 
+  transform: rotateY(0deg); 
+  transition: transform var(--flip-duration); 
+}
+
+.page img { 
+  width: 100%; 
+  height: 100%; 
+  border-radius: 15px 0 0 15px; 
+}
+
+.front-page { 
+  position: absolute; 
+  width: 100%; 
+  height: 100%; 
+  backface-visibility: hidden; 
+  box-sizing: border-box; 
+  padding: 1rem; 
+  top: 0; 
+  left: 0;
+  background: linear-gradient(135deg, #f8f0e3 0%, #ede0d3 100%);
+  border-radius: 0 15px 15px 0;
+}
+
+.page-title {
+  text-align: center;
+  color: #5d4037;
+  font-family: "Press Start 2P", monospace;
+  font-size: 16px;
+  margin: 0 0 5px 0;
+  text-shadow: 1px 1px 0px rgba(139, 94, 60, 0.3);
+}
+
+.fact-grid-container {
+  position: relative;
+  height: calc(100% - 30px);
+}
+
+.fact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6px;
+  height: 100%;
+}
+
+/* Paw notification overlay grid - positioned exactly over the fact grid */
+.paw-overlay-grid {
+  position: absolute;
+  top: 10px; /* Match padding */
+  left: 10px; /* Match padding */
+  right: 10px; /* Match padding */
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 12px; /* Match fact-grid gap */
+  pointer-events: none; /* Allow clicks to pass through to cards below */
+  z-index: 10; /* Above fact cards */
+}
+
+.paw-overlay-cell {
+  position: relative;
+  pointer-events: none;
+}
+
+.fact-card {
+  background: linear-gradient(145deg, #d9b89c, #c4a082);
+  border: 3px solid #8b5e3c;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.fact-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  background: linear-gradient(145deg, #e2c5a9, #d1b295);
+}
+
+.fact-card:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.fact-number {
+  font-family: "Press Start 2P", monospace;
+  font-size: 14px;
+  font-weight: bold;
+  color: #5d4037;
+  margin-bottom: 4px;
+  text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.8);
+  background: none !important;
+  background-color: transparent !important;
+}
+
+.fact-icon {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.back-page { 
+  transform: rotateY(180deg); 
+  position: absolute; 
+  width: 100%; 
+  height: 100%; 
+  backface-visibility: hidden; 
+  top: 0; 
+  left: 0; 
+}
+
+/* Interaction gating moved from inline to CSS */
+.page .front-page {
+  pointer-events: none;
+  cursor: default;
+}
+.page[data-current="true"] .front-page:not(.disabled) {
+  pointer-events: auto;
+  cursor: pointer;
+}
+.page .back-page {
+  pointer-events: none;
+  cursor: default;
+}
+.page[data-lastflipped="true"] .back-page:not(.disabled) {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Cover open/close behavior with sibling cover checkbox */
+/* The checkbox and book wrap are siblings: #checkbox-cover-<uid> ~ .flc-book-wrap */
+.flc-book-wrap .book .cover { z-index: 999; }
+.flc-book-wrap[data-cover="open"] .book { transform: translateX(200px); }
+.flc-book-wrap[data-cover="open"] .book .cover { transform: rotateY(-180deg); z-index: -1; transition: transform var(--cover-duration), z-index 0s var(--cover-duration); }
+
+/* Hide the back of the cover when flipped open to prevent text showing through */
+.flc-book-wrap[data-cover="open"] .book .cover .cover-content { opacity: 0; }
+
+/* Hide pages until the cover has fully opened (avoid showing pages before cover rotation completes) */
+.flc-book-wrap[data-cover="closed"] .page { opacity: 0; }
+.flc-book-wrap[data-cover="open"] .page { opacity: 1; transition: opacity 0s linear var(--cover-duration); }
+
+/* Fade + zoom when data-fading=true */
+.flc-book-wrap[data-fading="true"] .book { animation: flc-book-zoom  var(--fade-duration) forwards; }
+.flc-book-wrap[data-fading="true"]        { animation: flc-book-fade  var(--fade-duration) forwards; }
+
+@keyframes flc-book-zoom { to { transform: scale(0.9); } }
+@keyframes flc-book-fade { to { opacity: 0; } }
+
+/* Opening sequence: pop/bounce + slight slide-right for 300ms, then auto-open */
+.flc-book-wrap[data-opening="true"] .book {
+  animation: flc-book-pop 300ms ease-out;
+}
+.flc-book-wrap[data-opening="true"] {
+  animation: flc-wrap-slide 400ms ease-out;
+}
+@keyframes flc-book-pop {
+  0% { transform: scale(0.9); }
+  60% { transform: scale(1.04); }
+  100% { transform: scale(1.0); }
+}
+@keyframes flc-wrap-slide {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(12px); }
+}
+
+/* legacy selectors removed (checkbox-driven rules and fixed z-index pages) */
+
+.front-page p { 
+  margin: 0 0 36px 0; 
+}
+
+.back-content { 
+  height: 100%; 
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.flc-close-row { 
+  text-align:center; 
+  margin-top: 12px; 
+}
+
+.flc-close-btn { 
+  font-family: "Press Start 2P", monospace; 
+  font-size: 14px; 
+  padding: 12px 24px; 
+  background: linear-gradient(135deg, #f4e4c1, #e8d5b7);
+  border: 4px solid #8b5e3c; 
+  border-radius: 8px; 
+  color: #5d4037; 
+  cursor: pointer; 
+  transition: all 0.3s ease; 
+  box-shadow: 0 6px 12px rgba(139, 94, 60, 0.4);
+  margin-top: 20px;
+}
+
+.flc-close-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(139, 94, 60, 0.5);
+  background: linear-gradient(135deg, #f8e8c5, #edd9c0);
+}
+
+.flc-close-btn:active {
+  transform: scale(1.02);
+}
+
+/* Unencountered fact card - not clickable, cute themed style */
+.fact-card.unencountered {
+  background: linear-gradient(135deg, #fdf8e1 0%, #f5f0d3 100%);
+  border: 2px dashed #d4a574;
+  border-color: #d4a574;
+  cursor: not-allowed;
+  opacity: 0.8;
+  box-shadow: none; /* Remove shadow */
+}
+
+.fact-card.unencountered:hover {
+  transform: none;
+  box-shadow: none; /* Keep no shadow on hover */
+  background: linear-gradient(135deg, #fdf8e1 0%, #f5f0d3 100%);
+}
+
+.mystery-icon {
+  font-family: "Press Start 2P", monospace;
+  font-size: 28px;
+  color: #d4a574;
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
+}
+
+.mystery-text {
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  color: #d4a574;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* Encountered fact card - clickable */
+.fact-card.encountered {
+  background: linear-gradient(145deg, #d9b89c, #e5ba97);
+  border-color: #8b5e3c;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+
+.fact-card.encountered:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  background: linear-gradient(145deg, #e2c5a9, #d1b295);
+}
+
+.fact-card.encountered:active {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+/* Selected fact card styles - lighter versions of tile colors */
+.fact-card.selected {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* All selected cards use the same orange color */
+.fact-card.selected {
+  background: linear-gradient(145deg, #fed7aa, #fdba74);
+  border-color: #ea580c;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Selected cards don't have hover effects since they're not clickable */
+.fact-card.selected {
+  opacity: 0.9;
+}
+
+.fact-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  color: #5d4037;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.click-hint {
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  color: #8b5e3c;
+  margin-top: 4px;
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+/* Intro page styles */
+.intro-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.intro-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 16px;
+  color: #5d4037;
+  margin-bottom: 20px;
+  left: -90%;
+  text-shadow: 1px 1px 0px rgba(139, 94, 60, 0.3);
+  word-wrap: break-word;
+  max-width: calc(100% - 40px);
+  line-height: 1.4;
+}
+
+.intro-text {
+  font-family: "Press Start 2P", monospace;
+  font-size: 12px;
+  color: #5d4037;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.intro-subtitle {
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  color: #8b5e3c;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.intro-arrow {
+  font-size: 24px;
+  color: #d9b89c;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateX(0); }
+  40% { transform: translateX(-5px); }
+  60% { transform: translateX(5px); }
+}
+
+/* Back page content styles */
+.idle-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.idle-cat {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.idle-cat-img {
+  width: 100px;
+  height: auto;
+  opacity: 0.8;
+  filter: drop-shadow(0 2px 4px rgba(139, 94, 60, 0.3));
+}
+
+@keyframes idleCatBobbing {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-5px); 
+  }
+}
+
+.idle-text {
+  font-family: "Press Start 2P", monospace;
+  font-size: 14px;
+  color: #5d4037;
+  margin-bottom: 10px;
+}
+
+.idle-subtitle {
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  color: #8b5e3c;
+  line-height: 1.4;
+}
+
+.facts-display {
+  height: 100%;
+  box-sizing: border-box;
+  position: relative;
+  padding: 15px;
+}
+
+.facts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fact-item {
+  background: rgba(217, 184, 156, 0.3);
+  border: 2px solid #d9b89c;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.fact-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  color: #8b5e3c;
+  font-weight: bold;
+}
+
+.fact-text {
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  color: #5d4037;
+  margin: 6px 0 0 0;
+  line-height: 1.3;
+}
+
+/* Single fact display styles */
+.single-fact-container {
+  height: calc(100% - 30px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.fact-content {
+  background: linear-gradient(135deg, #f8f0e3 0%, #ede0d3 100%);
+  border: 3px solid #8b5e3c;
+  border-radius: 12px;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(139, 94, 60, 0.2);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  position: relative;
+}
+
+/* Custom themed scrollbar for fact content */
+.fact-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.fact-content::-webkit-scrollbar-track {
+  background: rgba(139, 94, 60, 0.1);
+  border-radius: 4px;
+}
+
+.fact-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #8b5e3c, #6e4b2d);
+  border-radius: 4px;
+  border: 1px solid rgba(139, 94, 60, 0.3);
+}
+
+.fact-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #a67449, #8b5e3c);
+}
+
+.fact-content:hover {
+  box-shadow: 0 6px 12px rgba(139, 94, 60, 0.3);
+  transform: translateY(-2px);
+}
+
+.fact-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px dotted #8b5e3c;
+}
+
+.fact-badge {
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  color: #5d4037;
+  background: linear-gradient(135deg, #d9b89c, #c4a082);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 2px solid #8b5e3c;
+  box-shadow: 0 2px 4px rgba(139, 94, 60, 0.2);
+}
+
+.fact-paw {
+  font-size: 20px;
+  animation: pawBounce 2s ease-in-out infinite;
+}
+
+@keyframes pawBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.fact-text-large {
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  color: #5d4037;
+  line-height: 1.6;
+  margin: 0;
+  text-align: left;
+  text-shadow: 0.5px 0.5px 0px rgba(255, 255, 255, 0.8);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Cat overlay - positioned absolutely to not interfere with content flow */
+.cat-overlay {
+  position: absolute;
+  bottom: 25px;
+  right: 30px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cat-reading-overlay {
+  width: 80px;
+  height: auto;
+  opacity: 0.7;
+  filter: drop-shadow(0 2px 4px rgba(139, 94, 60, 0.3));
+  animation: catBobbing 3s ease-in-out infinite;
+}
+
+@keyframes catBobbing {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-3px); 
+  }
+}
+
+/* Smooth transition for fact changes */
+.facts-display {
+  animation: fadeInFact 0.4s ease-in-out;
+}
+
+@keyframes fadeInFact {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Book container with navigation arrows */
+.book-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Navigation arrows */
+.nav-arrow {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 4px solid #8b5e3c;
+  background: linear-gradient(135deg, #f4e4c1, #e8d5b7);
+  color: #5d4037;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 12px rgba(139, 94, 60, 0.4);
+  font-family: "Press Start 2P", monospace;
+  z-index: 1000;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: fadeInArrow 0.5s ease-in-out;
+}
+
+@keyframes fadeInArrow {
+  from { 
+    opacity: 0; 
+    transform: translateY(-50%) scale(0.5);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+.nav-arrow:hover:not(:disabled) {
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 8px 16px rgba(139, 94, 60, 0.5);
+  background: linear-gradient(135deg, #f8e8c5, #edd9c0);
+}
+
+.nav-arrow:active:not(:disabled) {
+  transform: translateY(-50%) scale(1.05);
+}
+
+.nav-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #e0d0b0, #d0c0a0);
+  color: #8b7355;
+  transform: translateY(-50%);
+}
+
+.nav-arrow-left {
+  left: -350px; /* Account for book's 200px translation: -100px - 200px = -300px */
+}
+
+.nav-arrow-right {
+  right: -300px; /* Position normally on the right side */
+}
+
+/* Paw notification for new facts in library tiles - matches the fact collection button styling */
+.paw-overlay-cell .paw-notif {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  background: white;
+  padding: 4px;
+  z-index: 1; /* base layer */
+}
+
+.paw-overlay-cell .paw-notif.pulse {
+  animation: factPawPulse 2s ease-in-out infinite;
+}
+
+@keyframes factPawPulse {
+  0%, 100% { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: scale(1.1); 
+    opacity: 0.8; 
+  }
+}
