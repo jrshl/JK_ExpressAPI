@@ -409,9 +409,9 @@ function HomePage() {
         </div>
 
         <div className="right-side">
-          <div className="game-modal" onClick={() => navigate("/speed-typing")}>Speed Typing</div>
-          <div className="game-modal" onClick={() => navigate("/trivia")}>Trivia Master</div>
-          <div className="game-modal" onClick={() => navigate("/jumbled-facts")}>Jumbled Facts</div>
+          <div className="game-modal" onClick={() => navigate("/speed-typing")}>Game 1</div>
+          <div className="game-modal" onClick={() => navigate("/trivia")}>Game 2</div>
+          <div className="game-modal" onClick={() => navigate("/jumbled-facts")}>Game 3</div>
         </div>
       </div>
 

@@ -258,11 +258,11 @@
 }
 
 .track.paused .bg-layer { 
-  animation-play-state: paused !important; 
+  animation-play-state: paused; 
 }
 
 .track.countdown .bg-layer { 
-  animation-play-state: paused !important; 
+  animation-play-state: paused; 
 }
 
 .bg-static {
@@ -279,9 +279,9 @@
 }
 .bg1 { 
   background-image: url("images/speedBG1.png"); 
-  background-repeat: repeat-x !important;
-  background-size: contain !important;
-  width: 200% !important;
+  background-repeat: repeat-x;
+  background-size: contain ;
+  width: 200%;
   height: 100%;
   animation: bg1Scroll 25s linear infinite; 
   z-index: 1; 
@@ -289,8 +289,8 @@
 }
 .bg2 { 
   background-image: url("images/speedBG2.png"); 
-  background-repeat: repeat-x !important;
-  background-size: contain !important;
+  background-repeat: repeat-x;
+  background-size: contain ;
   width: 200% !important;
   height: 100%;
   animation: bg2Scroll 30s linear infinite; 
@@ -299,8 +299,8 @@
 }
 .bg3 { 
   background-image: url("images/speedBG3.png"); 
-  background-repeat: repeat-x !important;
-  background-size: contain !important;
+  background-repeat: repeat-x;
+  background-size: contain;
   width: 200% !important;
   height: 100%;
   animation: bg3Scroll 60s linear infinite; 
@@ -341,11 +341,11 @@
 }
 
 .track.paused .road { 
-  animation-play-state: paused !important; 
+  animation-play-state: paused; 
 }
 
 .track.countdown .road { 
-  animation-play-state: paused !important; 
+  animation-play-state: paused; 
 }
 
 .bushes { 
@@ -365,11 +365,11 @@
 }
 
 .track.paused .bushes { 
-  animation-play-state: paused !important; 
+  animation-play-state: paused ; 
 }
 
 .track.countdown .bushes { 
-  animation-play-state: paused !important; 
+  animation-play-state: paused; 
 }
 
 .foreground-layer { 
@@ -390,11 +390,11 @@
 }
 
 .track.paused .foreground-layer { 
-  animation-play-state: paused !important; 
+  animation-play-state: paused; 
 }
 
 .track.countdown .foreground-layer { 
-  animation-play-state: paused !important; 
+  animation-play-state: paused; 
 }
 
 @keyframes roadScroll { 
@@ -503,7 +503,7 @@
 .timer-svg {
   width: 40px;
   height: 40px;
-  transform: rotate(-90deg); /* make it start at top just like JumbledFacts */
+  transform: rotate(-90deg);
 }
 
 .timer-bg {
@@ -517,7 +517,7 @@
   stroke-width: 3;
   fill: none;
   stroke-linecap: round;
-  transition: stroke-dashoffset 0.8s linear; /* smooth fade like JumbledFacts */
+  transition: stroke-dashoffset 0.8s linear; 
 }
 
 .timer-text {
