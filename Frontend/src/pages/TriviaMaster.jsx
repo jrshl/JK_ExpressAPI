@@ -59,7 +59,7 @@ const TriviaMaster = () => {
   const [stage, setStage] = useState('intro');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentFact, setCurrentFact] = useState('');
-  const [originalFact, setOriginalFact] = useState(''); // Store original fact for retries
+  const [originalFact, setOriginalFact] = useState(''); 
   const [missingWord, setMissingWord] = useState('');
   const [userAnswer, setUserAnswer] = useState('');
   const [gameHistory, setGameHistory] = useState([]);
@@ -149,11 +149,11 @@ const TriviaMaster = () => {
     if (shouldRetryFact && originalFact) {
       // Use the original fact for retry
       fact = originalFact;
-      setShouldRetryFact(false); // Reset retry flag
+      setShouldRetryFact(false); 
     } else {
       // Fetch new fact
       fact = await fetchFact();
-      setOriginalFact(fact); // Store for potential retry
+      setOriginalFact(fact); 
     }
     
     setCurrentFact(fact);
@@ -162,13 +162,13 @@ const TriviaMaster = () => {
 
   const selectRandomWord = (fact, excludeWord = '') => {
     const words = fact.split(' ');
-    // Filter out words that are too short or are the excluded word
+    
     const validWords = words.map((word, index) => ({
       word: word.replace(/[^a-zA-Z]/g, ''),
       index,
       original: word
     })).filter(item => 
-      item.word.length > 2 && // At least 3 letters
+      item.word.length > 2 && 
       item.word.toLowerCase() !== excludeWord.toLowerCase()
     );
 
@@ -192,7 +192,7 @@ const TriviaMaster = () => {
     setStage('curtain');
 
     for (let i = 0; i < CURTAIN_TIME; i++) {
-      if (answerTimerRef.current === null) return; // exit if cancelled
+      if (answerTimerRef.current === null) return; 
       await sleep(1);
     }
 
@@ -200,7 +200,7 @@ const TriviaMaster = () => {
     let wordToHide = '';
     
     if (words.length > 1) {
-      // Get the last failed word to exclude it (if retrying)
+      
       const lastGame = gameHistory[gameHistory.length - 1];
       const excludeWord = (shouldRetryFact && lastGame && !lastGame.isCorrect) ? lastGame.correctWord : '';
       
@@ -221,7 +221,7 @@ const TriviaMaster = () => {
       ...prev,
       { fact: fullFact, correctWord, userAnswer: '', isCorrect: false },
     ]);
-    setShouldRetryFact(true); // Set retry flag for failed attempt
+    setShouldRetryFact(true); 
     setStage('factResult');
   };
 
@@ -271,8 +271,8 @@ const TriviaMaster = () => {
   useEffect(() => {
     if (stage === 'intro') {
       const slideInterval = setInterval(() => {
-        setCurrentSlide((prev) => (prev + 1) % 3); // Cycle through 3 images
-      }, 3000); // Change slide every 3 seconds
+        setCurrentSlide((prev) => (prev + 1) % 3); 
+      }, 3000); 
       
       return () => clearInterval(slideInterval);
     }
@@ -442,8 +442,8 @@ const TriviaMaster = () => {
                 <button
                   className="next-fact-btn"
                   onClick={() => {
-                    clearAllTimers(); // cancel timers & delays
-                    nextFact();       // fetch next fact instantly
+                    clearAllTimers(); 
+                    nextFact();       
                   }}
                 >
                   {gameHistory.at(-1)?.isCorrect ? "Next Fact" : "Try Again"}

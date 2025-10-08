@@ -125,7 +125,7 @@ export default function SpeedTyping() {
     }, 1000);
   }
 
-  // Cleanup timer on component unmount
+  
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -141,7 +141,7 @@ export default function SpeedTyping() {
     setResult(message);
     setModalOpen(true);
     
-    // Set retry flag based on whether user won or lost
+    
     setShouldRetryCurrentFact(!won);
     
     if (timerRef.current) {
@@ -155,7 +155,7 @@ export default function SpeedTyping() {
     setShowCountdown(true);
     for (let i = 3; i > 0; i--) {
       setCountdownValue(i);
-      // Wait but check for pause every 100ms
+      
       for (let j = 0; j < 10; j++) {
         if (isPausedRef.current) {
           // Wait until unpaused

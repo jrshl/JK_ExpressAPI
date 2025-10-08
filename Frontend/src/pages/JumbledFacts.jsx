@@ -47,7 +47,7 @@ export default function JumbledFacts() {
     setOriginalFact("");
     fetchFact();
     resetTimer();
-    setCatImage("/images/jumbledGuide.png"); // reset default cat
+    setCatImage("/images/jumbledGuide.png");
   }
 
   async function fetchFact() {
@@ -56,17 +56,17 @@ export default function JumbledFacts() {
     if (shouldRetryFact && originalFact) {
       // Use the same fact for retry
       factText = originalFact;
-      setShouldRetryFact(false); // Reset retry flag
+      setShouldRetryFact(false); 
     } else {
       // Fetch new fact
       try {
         const res = await fetch("/api/facts");
         const data = await res.json();
         factText = Array.isArray(data.fact) ? data.fact[0] : data.fact;
-        setOriginalFact(factText); // Store for potential retry
+        setOriginalFact(factText); 
       } catch {
         factText = "Cats are mysterious creatures.";
-        setOriginalFact(factText); // Store for potential retry
+        setOriginalFact(factText); 
       }
     }
     
@@ -75,7 +75,7 @@ export default function JumbledFacts() {
     setUserSequence([]);
     setResult("");
     setShowAnswer(false);
-    setCatImage("/images/jumbledGuide.png"); // reset default cat
+    setCatImage("/images/jumbledGuide.png"); 
     resetTimer();
   }
 
@@ -86,13 +86,13 @@ export default function JumbledFacts() {
     isPausedRef.current = false;
     timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
-        if (isPausedRef.current) return prev; // pause guard
+        if (isPausedRef.current) return prev; 
         if (prev <= 1) {
           clearInterval(timerRef.current);
           setResult("Time's up!");
-          setCatImage("/images/jumbledWrong.png"); // time up → sad cat
-          setShouldRetryFact(true); // Set retry flag for timeout
-          setShowAnswer(false); // Don't show answer for timeout
+          setCatImage("/images/jumbledWrong.png"); 
+          setShouldRetryFact(true); 
+          setShowAnswer(false); 
           return 0;
         }
         return prev - 1;
@@ -221,14 +221,14 @@ export default function JumbledFacts() {
   function handleSubmit() {
     if (userSequence.join(" ") === fact) {
       setResult("Correct!");
-      setShowAnswer(true); // Show answer for correct attempts
-      setCatImage("/images/jumbledRight.png"); // correct → happy cat
-      setShouldRetryFact(false); // No retry needed
+      setShowAnswer(true); 
+      setCatImage("/images/jumbledRight.png"); 
+      setShouldRetryFact(false); 
     } else {
       setResult("Try again!");
-      setShowAnswer(false); // Don't show answer for failed attempts
-      setCatImage("/images/jumbledWrong.png"); // wrong → sad cat
-      setShouldRetryFact(true); // Set retry flag
+      setShowAnswer(false); 
+      setCatImage("/images/jumbledWrong.png"); 
+      setShouldRetryFact(true);
     }
   }
   function handleNextFact() {

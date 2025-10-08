@@ -34,7 +34,7 @@ function HomePage() {
   const [spinning, setSpinning] = useState(false);
   const [idle, setIdle] = useState(true);
   const [idleDelaySec, setIdleDelaySec] = useState(0);
-  const idleDurationSec = 25; // keep in sync with CSS .wheel-inner.idle duration
+  const idleDurationSec = 25; 
   const [spinMs, setSpinMs] = useState(3000);
   const wheelInnerRef = useRef(null);
   const [_facts, setFacts] = useState([]);
@@ -50,7 +50,7 @@ function HomePage() {
     }
   });
   const [libraryAnimating, setLibraryAnimating] = useState(false);
-  // bookFocusIds removed (unused in classic flipbook)
+  
   const [encounteredFacts, setEncounteredFacts] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("encounteredFacts") || "{}");
@@ -82,7 +82,7 @@ function HomePage() {
     });
   };
 
-  // Mark items as newly-stored in the library (called after the store animation completes)
+  // Mark items as newly-stored in the library 
   const markLibraryNewIds = (ids) => {
     if (!Array.isArray(ids)) ids = [ids];
     console.log("Adding new library IDs:", ids, "Types:", ids.map(id => typeof id));
@@ -104,14 +104,12 @@ function HomePage() {
   const handleOpenLibrary = () => {
     // capture the current new ids to pass to modal
   const newIds = libraryNewIds.slice();
-    // Note: do NOT clear the persisted libraryNewIds here. We'll keep the
-    // paw visible until the user actually views each new fact. Individual
-    // cards will be marked-read from inside the FlipBook when opened.
+    
     setLibraryAnimating(true);
     setShowBook(true);
     // hide the paw after the fly animation completes (600ms)
     setTimeout(() => setLibraryAnimating(false), 700);
-    return newIds; // available if needed
+    return newIds; 
   };
 
   // Mark a single library id as viewed/read (called when user opens that fact)
@@ -180,7 +178,7 @@ function HomePage() {
           const fetchCount = Math.max(1, 7 - uniqueFacts.length);
           const res = await fetch(`/api/facts?count=${fetchCount}`);
           const data = await res.json();
-          // server may return { fact: [...] } or { facts: [...] } or upstream { data: [...] }
+          
           const list = Array.isArray(data.fact)
             ? data.fact
             : Array.isArray(data.facts)
@@ -237,21 +235,19 @@ function HomePage() {
 
     ensureWeeklyFacts();
     return () => { mounted = false; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, []); // run once
 
-    // TESTING ONLY (development): force the Daily Fact modal to appear on every reload
-    // when the weekly map is ready. Remove this block before deploying to production.
+    
     useEffect(() => {
       if (!weeklyMap) return;
-      // Avoid referencing `process` in browser code; detect local/dev via hostname.
+      
       const hostname = window && window.location && window.location.hostname ? window.location.hostname : '';
       const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
       if (!isLocal) return;
-      // Always show the daily modal during development so it's easy to verify behavior.
+      
       setShowDailyModal(true);
-      // Intentionally do NOT set localStorage.dailyShownDate here so the modal appears
-      // again on reload. This is only for testing.
+      
     }, [weeklyMap]);
 
   const slices = 6;
@@ -289,14 +285,14 @@ function HomePage() {
 
     // Freeze the wheel at the exact current idle angle for continuity
     const currentAngle = idle ? readCurrentAngle() : (rotation % 360);
-    setIdle(false); // remove idle CSS animation so we control transform
-    setRotation(currentAngle); // inline style holds the frozen angle (no transition)
+    setIdle(false);
+    setRotation(currentAngle); 
 
-    // Compute target angle and start the spin immediately (no pause)
+    
     const selectedSlice = Math.floor(Math.random() * slices);
     const stopAngle = selectedSlice * sliceAngle + sliceAngle / 2;
     const extraSpins = 720 + Math.floor(Math.random() * 360);
-    const base = currentAngle; // start from frozen current angle
+    const base = currentAngle; 
     const finalRotation = base + extraSpins + stopAngle;
 
   // Randomize spin duration between 5s and 7s for a fuller deceleration
@@ -311,8 +307,7 @@ function HomePage() {
       });
     });
 
-    // Stop handling after duration; do NOT resume idle here. Idle will resume only after
-    // the facts store animation completes (via StackedCards onStoreComplete).
+    
     setTimeout(() => {
       setSpinning(false);
       setShowStackedCards(true);
@@ -332,7 +327,7 @@ function HomePage() {
         ? data.data
         : (typeof data === 'string' ? [data] : []);
 
-      // Build a final list of up to `count` facts, preferring not-yet-encountered facts.
+      
       const finalList = [];
       for (const f of raw) {
         const id = generateFactId(f);
@@ -341,7 +336,7 @@ function HomePage() {
         }
         if (finalList.length === count) break;
       }
-      // If still short, fill from raw (including previously encountered) to reach requested count
+      
       if (finalList.length < count) {
         for (const f of raw) {
           if (finalList.length === count) break;
@@ -355,7 +350,7 @@ function HomePage() {
       setStackedFacts(finalList.map((fact, i) => ({ sub: `Fact #${i + 1}`, content: fact })));
 
     } catch {
-      setFacts(["😿 Error loading facts."]);
+      setFacts(["Error loading facts."]);
       // Stopping animation is handled by the timer above
     }
   }
