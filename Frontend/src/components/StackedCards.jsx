@@ -61,6 +61,16 @@ export default function StackedCards({ cards, onClose, onStoreComplete }) {
     }
   };
 
+  // Calculate font size based on content length
+  const getFontSize = (text) => {
+    const length = text.length;
+    if (length < 50) return "12px";
+    if (length < 100) return "11px";
+    if (length < 150) return "10px";  
+    if (length < 200) return "9px";
+    return "8px";
+  };
+
   const renderCards = () => {
     return cards.map((card, i) => {
       let className = "card";
@@ -102,10 +112,15 @@ export default function StackedCards({ cards, onClose, onStoreComplete }) {
         };
       }
       
+      // Dynamic font size for content
+      const contentStyle = {
+        fontSize: getFontSize(card.content)
+      };
+      
       return (
         <div key={i} className={className} style={style}>
           <div className="sub">{card.sub}</div>
-          <div className="content">{card.content}</div>
+          <div className="content" style={contentStyle}>{card.content}</div>
         </div>
       );
     });

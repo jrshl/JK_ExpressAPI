@@ -18,7 +18,9 @@ function generateFactId(fact) {
     hash = ((hash << 5) - hash) + char;
     hash = hash & hash;
   }
-  return Math.abs(hash) % 234 + 1;
+  const id = Math.abs(hash) % 234 + 1;
+  console.log("Generated ID for fact:", fact.substring(0, 50) + "...", "ID:", id);
+  return id;
 }
 
 function addDaysISO(baseIso, offset) {
@@ -83,8 +85,13 @@ function HomePage() {
   // Mark items as newly-stored in the library (called after the store animation completes)
   const markLibraryNewIds = (ids) => {
     if (!Array.isArray(ids)) ids = [ids];
+    console.log("Adding new library IDs:", ids, "Types:", ids.map(id => typeof id));
+    
     setLibraryNewIds(prevIds => {
+      console.log("Previous libraryNewIds:", prevIds);
       const next = [...new Set([...prevIds, ...ids])];
+      console.log("New libraryNewIds:", next);
+      
       try {
         localStorage.setItem("libraryNewIds", JSON.stringify(next));
       } catch (e) {
@@ -109,10 +116,21 @@ function HomePage() {
 
   // Mark a single library id as viewed/read (called when user opens that fact)
   const markLibraryIdViewed = (id) => {
+    console.log("Marking as viewed:", id, "Type:", typeof id);
+    console.log("Current libraryNewIds:", libraryNewIds);
+    
     setLibraryNewIds(prev => {
-      const next = prev.filter(x => String(x) !== String(id));
+      console.log("Before filtering:", prev);
+      const next = prev.filter(x => {
+        const match = String(x) !== String(id);
+        console.log(`Comparing ${x} (${typeof x}) with ${id} (${typeof id}): keep=${match}`);
+        return match;
+      });
+      console.log("After filtering:", next);
+      
       try {
         localStorage.setItem("libraryNewIds", JSON.stringify(next));
+        console.log("Saved to localStorage:", next);
       } catch (e) {
         console.warn("Failed to persist libraryNewIds after marking viewed:", e);
       }
@@ -357,6 +375,7 @@ function HomePage() {
             {libraryNewIds.length > 0 && (
               <img src="/images/paw.png" alt="new" className={`paw-notif ${libraryAnimating ? 'fly-away' : 'pulse'}`} />
             )}
+
           </div>
         </div>
 
@@ -390,9 +409,9 @@ function HomePage() {
         </div>
 
         <div className="right-side">
-          <div className="game-modal" onClick={() => navigate("/speed-typing")}>Game 1</div>
-          <div className="game-modal" onClick={() => navigate("/trivia")}>Game 2</div>
-          <div className="game-modal" onClick={() => navigate("/jumbled-facts")}>Game 3</div>
+          <div className="game-modal" onClick={() => navigate("/speed-typing")}>Speed Typing</div>
+          <div className="game-modal" onClick={() => navigate("/trivia")}>Trivia Master</div>
+          <div className="game-modal" onClick={() => navigate("/jumbled-facts")}>Jumbled Facts</div>
         </div>
       </div>
 
@@ -424,6 +443,7 @@ function HomePage() {
           libraryNewIds={libraryNewIds}
           onClose={() => { setShowBook(false); }}
           onMarkViewed={(id) => markLibraryIdViewed(id)}
+          maxPages={27}
         />
       )}
 

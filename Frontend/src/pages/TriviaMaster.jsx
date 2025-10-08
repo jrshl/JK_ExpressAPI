@@ -92,10 +92,8 @@ const TriviaMaster = () => {
     answerTimerRef.current = null;
   };
 
-  const restartToIntro = () => {
+  const restartGame = async () => {
     clearAllTimers();
-    setStage('intro');
-    setCurrentSlide(0);
     setGameHistory([]);
     setCurrentFact('');
     setOriginalFact('');
@@ -105,6 +103,8 @@ const TriviaMaster = () => {
     setIsMenuOpen(false);
     setIsPaused(false);
     setShouldRetryFact(false);
+    setStage('showFact');
+    await nextFact();
   };
 
   const startGame = async () => {
@@ -312,7 +312,7 @@ const TriviaMaster = () => {
               </button>
               <button
                 className="menu-btn restart-btn"
-                onClick={() => { setIsMenuOpen(false); restartToIntro(); }}
+                onClick={() => { restartGame(); }}
               >
                 Restart
               </button>

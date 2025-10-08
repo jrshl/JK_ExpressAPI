@@ -260,6 +260,13 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
             </>
           )}
 
+          {/* Page Counter - only show when book is opened */}
+          {coverChecked && !isOpening && (
+            <div className="page-counter">
+              Page {lastFlippedIndex + 2}/27
+            </div>
+          )}
+
           <div
             className="flc-book-wrap"
             data-fading={fadingOut ? 'true' : 'false'}
