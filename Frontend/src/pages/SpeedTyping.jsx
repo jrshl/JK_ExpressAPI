@@ -37,6 +37,7 @@ export default function SpeedTyping() {
   const colorVal = Math.round(255 * (1 - fraction));
   const strokeColor = `rgb(${colorVal},${colorVal},${colorVal})`;
 
+  // ===== Fetch Fact (Fixed) =====
   async function fetchFact() {
     try {
       const res = await fetch("/api/facts");
@@ -66,7 +67,7 @@ export default function SpeedTyping() {
     }
   }
 
-  // Preload next fact instantly
+  // ===== Preload Next Fact =====
   const nextFactRef = useRef(null);
   const preloadNextFact = useCallback(async () => {
     nextFactRef.current = await fetchFact();
@@ -124,6 +125,15 @@ export default function SpeedTyping() {
     }, 1000);
   }
 
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [gameActive, isPaused]); // reacts to pause/resume
+
+  // ===== End Game =====
   function handleEndGame(won, message) {
     setGameActive(false);
     setResult(message);
@@ -169,6 +179,7 @@ export default function SpeedTyping() {
 
   // Typing logic
   useEffect(() => {
+    if (!gameActive || isPaused) return;
     const limit = Math.min(typed.length, currentFact.length);
     let correctCount = 0;
     let hasWrong = false;
@@ -189,10 +200,10 @@ export default function SpeedTyping() {
     }
   }, [typed, currentFact, gameActive]);
 
-  // Key listener
+  // ===== Key Listener =====
   useEffect(() => {
     function handleKeyDown(e) {
-      if (!gameActive) return;
+      if (!gameActive || isPaused) return;
       if (e.key.length === 1) {
         if (typed.length >= currentFact.length) return;
         setTyped(prev => prev + e.key);
@@ -202,8 +213,9 @@ export default function SpeedTyping() {
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [gameActive, typed, currentFact]);
+  }, [gameActive, isPaused, typed, currentFact]);
 
+  // ===== RENDER =====
   return (
     <div className="speed-typing-game">
       {/* Hamburger button */}
@@ -214,7 +226,7 @@ export default function SpeedTyping() {
         <span></span><span></span><span></span>
       </button>
 
-      {/* Pause Menu Modal */}
+      {/* ===== Pause Menu ===== */}
       {isMenuOpen && (
         <div className="modal-overlay" onClick={() => {
           setIsMenuOpen(false);
@@ -240,7 +252,7 @@ export default function SpeedTyping() {
 
       <div className="background-layer"></div>
 
-      {/* GUIDE SCREENS */}
+      {/* ===== GUIDE SCREENS ===== */}
       {(step === 0 || step === 1) && (
         <div className="GuideContainer">
           {step === 0 && (
@@ -248,7 +260,7 @@ export default function SpeedTyping() {
               <h1>Cat Speed Typing Adventure</h1>
               <p className="instructions">
                 Type the cat fact as fast as you can! The faster you type correctly,
-                the further the cat runs toward the goal
+                the further the cat runs toward the goal.
               </p>
               <div className="controls">
                 <button onClick={() => setStep(1)}>Next</button>
@@ -293,7 +305,7 @@ export default function SpeedTyping() {
         </div>
       )}
 
-      {/* GAME SCREEN */}
+      {/* ===== GAME SCREEN ===== */}
       {step === 2 && (
         <div className="GameContainer">
           {/* Difficulty Display */}
@@ -329,7 +341,7 @@ export default function SpeedTyping() {
                 <span className="timer-text">{timeLeft}</span>
               </div>
 
-              {/* Track */}
+              {/* Background Layers */}
               <div className="bg-static gif"></div>
               <div className="bg-layer bg3"></div>
               <div className="bg-layer bg1"></div>
@@ -338,7 +350,6 @@ export default function SpeedTyping() {
               <div className="bushes"></div>
               <div className="foreground-layer"></div>
 
-              {/* Cat */}
               <img
                 src="images/catwalk.gif"
                 alt="Cat"
@@ -346,7 +357,7 @@ export default function SpeedTyping() {
                 style={{ left: catMovable ? `${progress}%` : `${prevCatPosition}%` }}
               />
 
-              {/* Progress line */}
+              {/* Progress Line */}
               <div className="progress-line">
                 <div
                   className="tracker-cat"
@@ -356,7 +367,7 @@ export default function SpeedTyping() {
               </div>
             </div>
 
-            {/* Fact box */}
+            {/* Fact Box */}
             <div className="fact-box">
               {(currentFact && typeof currentFact === 'string' ? currentFact : 'Press "Start Game" to begin!').split("").map((char, idx) => {
                 let cls = "untyped-char";
@@ -368,7 +379,7 @@ export default function SpeedTyping() {
 
           </div>
 
-          {/* End modal */}
+          {/* End Modal */}
           {modalOpen && (
             <div className="modal-overlay">
               <div className="end-modal-content">

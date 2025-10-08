@@ -9,6 +9,7 @@ import TriviaMaster from "./pages/TriviaMaster";
 import JumbledFacts from "./pages/JumbledFacts";
 import "./App.css";
 import CatCursor from "./components/CatCursor";
+import LoaderWrapper from "./components/LoaderWrapper";
 
 function generateFactId(fact) {
   let hash = 0;
@@ -440,14 +441,15 @@ export default function App() {
   }
   return (
     <BrowserRouter>
-      {/* Show CatCursor only on the home page */}
-      <CursorForHome />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/speed-typing" element={<SpeedTyping />} />
-        <Route path="/trivia" element={<TriviaMaster />} />
-        <Route path="/jumbled-facts" element={<JumbledFacts />} />
-      </Routes>
+      <LoaderWrapper>
+        <CursorForHome />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/speed-typing" element={<SpeedTyping />} />
+          <Route path="/trivia" element={<TriviaMaster />} />
+          <Route path="/jumbled-facts" element={<JumbledFacts />} />
+        </Routes>
+      </LoaderWrapper>
     </BrowserRouter>
   );
 }
