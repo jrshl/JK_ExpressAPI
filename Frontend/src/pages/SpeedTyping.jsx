@@ -16,7 +16,7 @@ export default function SpeedTyping() {
   const [prevCatPosition, setPrevCatPosition] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isPaused, setIsPaused] = useState(false); //  Pause state
+  const [isPaused, setIsPaused] = useState(false); // Pause state
 
   const timerRef = useRef(null);
   const navigate = useNavigate();
@@ -29,16 +29,32 @@ export default function SpeedTyping() {
   const colorVal = Math.round(255 * (1 - fraction));
   const strokeColor = `rgb(${colorVal},${colorVal},${colorVal})`;
 
-  // ===== Fetch Fact =====
+  // ===== Fetch Fact (Fixed) =====
   async function fetchFact() {
     try {
-      const res = await fetch(`/api/facts?count=1`);
-      const res = await fetch("https://meowfacts.herokuapp.com/");
-      const data = await res.json();
-      const list = Array.isArray(data.fact) ? data.fact : Array.isArray(data.facts) ? data.facts : Array.isArray(data.data) ? data.data : [data.data];
+      // Try fetching from your backend API first
+      const resLocal = await fetch(`/api/facts?count=1`);
+      const dataLocal = await resLocal.json();
+      const localFact = dataLocal?.fact || dataLocal?.facts || dataLocal?.data;
+
+      if (localFact) {
+        const list = Array.isArray(localFact) ? localFact : [localFact];
+        return list[0] || "Cats are amazing creatures!";
+      }
+
+      // Fallback to external API
+      const resExternal = await fetch("https://meowfacts.herokuapp.com/");
+      const dataExternal = await resExternal.json();
+      const list = Array.isArray(dataExternal.fact)
+        ? dataExternal.fact
+        : Array.isArray(dataExternal.facts)
+        ? dataExternal.facts
+        : Array.isArray(dataExternal.data)
+        ? dataExternal.data
+        : [dataExternal.data];
       return list[0] || "Cats are amazing creatures!";
-      return data.data ? data.data[0] : data.fact[0];
-    } catch {
+    } catch (error) {
+      console.error("Error fetching fact:", error);
       return "Cats are amazing creatures!";
     }
   }
@@ -147,11 +163,8 @@ export default function SpeedTyping() {
   // ===== Pause Logic =====
   function togglePause(open) {
     setIsMenuOpen(open);
-    if (open) {
-      setIsPaused(true);
-    } else {
-      setIsPaused(false);
-    }
+    if (open) setIsPaused(true);
+    else setIsPaused(false);
   }
 
   // ===== Typing Logic =====
@@ -195,7 +208,7 @@ export default function SpeedTyping() {
   // ===== RENDER =====
   return (
     <div className="speed-typing-game">
-      {/*  Hamburger button to pause */}
+      {/* Hamburger button to pause */}
       <button className="hamburger" onClick={() => togglePause(true)}>
         <span></span><span></span><span></span>
       </button>
@@ -288,7 +301,6 @@ export default function SpeedTyping() {
               <div className="bushes"></div>
               <div className="foreground-layer"></div>
 
-              {/* Optional: change cat image when paused */}
               <img
                 src={isPaused ? "images/sitting_cat.png" : "images/running_cat.gif"}
                 alt="Cat"
