@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-ro
 import SpeedTyping from "./pages/SpeedTyping";
 import TriviaMaster from "./pages/TriviaMaster";
 import JumbledFacts from "./pages/JumbledFacts";
+import AdminFacts from "./pages/AdminFacts";
 import "./App.css";
 import CatCursor from "./components/CatCursor";
 import LoaderWrapper from "./components/LoaderWrapper";
@@ -372,6 +373,7 @@ function HomePage() {
             )}
 
           </div>
+          <div className="admin-button" onClick={() => navigate("/admin/facts")}>Admin Panel</div>
         </div>
 
         <div className="center-section">
@@ -463,6 +465,7 @@ export default function App() {
           <Route path="/speed-typing" element={<SpeedTyping />} />
           <Route path="/trivia" element={<TriviaMaster />} />
           <Route path="/jumbled-facts" element={<JumbledFacts />} />
+          <Route path="/admin/facts" element={<AdminFacts />} />
         </Routes>
       </LoaderWrapper>
     </BrowserRouter>
