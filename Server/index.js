@@ -67,6 +67,28 @@ app.put('/api/admin/facts/:id', async (req, res) => {
   }
 });
 
+// Create new fact
+app.post('/api/admin/facts', async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text || text.trim() === '') {
+      return res.status(400).json({ error: "Fact text cannot be empty" });
+    }
+
+    const [result] = await pool.query('INSERT INTO facts (text) VALUES (?)', [text.trim()]);
+    // result.insertId is the new auto-increment id
+    const [rows] = await pool.query('SELECT id, text FROM facts WHERE id = ?', [result.insertId]);
+    const newFact = rows[0];
+
+    // respond with created fact
+    res.status(201).json({ success: true, fact: newFact });
+  } catch (err) {
+    console.error("Error creating fact:", err);
+    res.status(500).json({ error: "Failed to create fact" });
+  }
+});
+
+
 // Public API endpoint
 app.get('/api/facts', async (req, res) => {
   try {

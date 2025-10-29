@@ -2,7 +2,7 @@
   min-height: 100vh;
   max-height: 100vh;
   overflow-y: auto;
-  background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 50%, #fdcb6e 100%);
+  background:  #eda769;
   padding: 20px;
   font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif;
   position: relative;
@@ -19,13 +19,13 @@
 }
 
 .admin-container::-webkit-scrollbar-thumb {
-  background: #ff7675;
+  background: #783407;
   border-radius: 10px;
   border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .admin-container::-webkit-scrollbar-thumb:hover {
-  background: #d63031;
+  background: #b95727;
 }
 
 .admin-header {
@@ -35,11 +35,11 @@
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  border: 3px solid #ff7675;
+  border: 3px solid #4a2200;
 }
 
 .admin-header h1 {
-  color: #ff7675;
+  color: #692e00;
   margin-bottom: 10px;
   font-size: 2.5em;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
@@ -51,7 +51,7 @@
 
 .admin-header h1::before,
 .admin-header h1::after {
-  content: "🐱";
+  content: "";
   font-size: 0.8em;
 }
 
@@ -71,7 +71,7 @@
   padding: 15px;
   border-radius: 15px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  border: 2px solid #fdcb6e;
+  border: 2px solid #4a2200;
 }
 
 .search-input {
@@ -86,14 +86,14 @@
 
 .search-input:focus {
   outline: none;
-  border-color: #ff7675;
+  border-color: #cf5403;
   box-shadow: 0 0 15px rgba(255, 118, 117, 0.3);
   transform: scale(1.02);
 }
 
 .fact-count {
   font-weight: bold;
-  color: #ff7675;
+  color: #692e00;
   white-space: nowrap;
   background: #ffeaa7;
   padding: 8px 16px;
@@ -115,13 +115,13 @@
 .loading {
   text-align: center;
   padding: 40px;
-  color: #ff7675;
+  color: #7d3200;
   font-size: 24px;
   font-weight: bold;
 }
 
 .loading::after {
-  content: " 🐾";
+  content: " ";
   animation: bounce 1s infinite;
 }
 
@@ -141,7 +141,7 @@
 }
 
 .no-facts::before {
-  content: "😿";
+  content: "";
   display: block;
   font-size: 48px;
   margin-bottom: 15px;
@@ -156,7 +156,7 @@
 
 .fact-item {
   background: white;
-  border: 3px solid #fdcb6e;
+  border: 3px solid #4a2200;
   border-radius: 20px;
   padding: 20px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -167,11 +167,11 @@
 .fact-item:hover {
   box-shadow: 0 8px 25px rgba(255, 118, 117, 0.3);
   transform: translateY(-3px);
-  border-color: #ff7675;
+  border-color: #b94d00;
 }
 
 .fact-item::before {
-  content: "🐾";
+  content: "";
   position: absolute;
   top: 10px;
   right: 15px;
@@ -180,15 +180,22 @@
 }
 
 .fact-id {
-  font-size: 12px;
-  color: #ff7675;
-  margin-bottom: 10px;
-  font-weight: bold;
+  position: absolute;
+  top: -10px;
+  left: -10px;
   background: #ffeaa7;
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 10px;
+  color: #692e00;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 12px 0 12px 0;
+  letter-spacing: 0.5px;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  z-index: 10;
 }
+
+
 
 .view-mode {
   display: flex;
@@ -200,7 +207,7 @@
 .fact-text {
   flex: 1;
   margin: 0;
-  color: #2d3436;
+  color: #000000;
   line-height: 1.8;
   font-size: 15px;
 }
@@ -226,13 +233,14 @@
   font-family: inherit;
   resize: vertical;
   min-height: 100px;
-  background: #fffef7;
+  background: #ffffff;
   transition: border-color 0.3s;
+  color: #000000; 
 }
 
 .edit-textarea:focus {
   outline: none;
-  border-color: #ff7675;
+  border-color: #632b00;
   box-shadow: 0 0 15px rgba(255, 118, 117, 0.2);
 }
 
@@ -284,22 +292,21 @@ button:active {
 }
 
 .btn-save {
-  background: linear-gradient(135deg, #55efc4, #00b894);
+  background: linear-gradient(135deg, #fdbf78, #d79d45);
   color: white;
 }
 
 .btn-save:hover {
-  background: linear-gradient(135deg, #00b894, #008c6a);
+  background: linear-gradient(135deg, #e8a048, #ae7024);
 }
 
 .btn-cancel {
-  background: linear-gradient(135deg, #dfe6e9, #b2bec3);
-  color: #2d3436;
+  background: linear-gradient(135deg, #c87100, #fec25b);
+  color: white;
 }
 
 .btn-cancel:hover {
-  background: linear-gradient(135deg, #b2bec3, #636e72);
-  color: white;
+  background: linear-gradient(135deg, #7d4b00, #ffa724);
 }
 
 /* Back button */
@@ -307,7 +314,7 @@ button:active {
   position: fixed;
   top: 20px;
   left: 20px;
-  background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+  background: linear-gradient(135deg, #ecab42, #a25414);
   color: white;
   padding: 12px 24px;
   border-radius: 25px;
@@ -320,14 +327,6 @@ button:active {
   border: none;
 }
 
-.back-button:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.6);
-}
-
-.back-button::before {
-  content: "🏠 ";
-}
 
 /* Responsive design */
 @media (max-width: 768px) {
@@ -364,3 +363,102 @@ button:active {
     font-size: 12px;
   }
 }
+
+/* --- ICON BUTTONS --- */
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  padding: 6px;
+  border-radius: 10px;
+}
+
+.icon-btn:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.icon-btn.edit svg {
+  color: #0984e3;
+}
+
+.icon-btn.delete svg {
+  color: #d63031;
+}
+
+.btn-create {
+  background: linear-gradient(135deg, #55efc4, #00b894);
+  color: white;
+  border-radius: 50%;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-create:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 15px rgba(0, 184, 148, 0.4);
+}
+
+/* --- MODAL STYLES --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background: #ffae63;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+  width: 70%;
+  max-width: 400px;
+  height: 50%;
+  text-align: center;
+}
+
+.modal-content h2 {
+  color: #692e00;
+  margin-bottom: 40px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+
+/* --- All Comments --- */
+/*
+.back-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.6);
+}
+
+.back-button::before {
+  content: "";
+}
+
+.fact-id {
+  font-size: 12px;
+  color: #ff7675;
+  margin-bottom: 10px;
+  font-weight: bold;
+  background: #ffeaa7;
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 10px;
+}
+
