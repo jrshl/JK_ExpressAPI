@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AnswerReveal from "../components/AnswerReveal";
 import "./JumbledFacts.css";
+import GameMenu from '../components/GameMenu';
 
 function shuffle(array) {
   let arr = [...array];
@@ -253,19 +254,13 @@ export default function JumbledFacts() {
         <span></span><span></span><span></span>
       </button>
 
-      {/* Modal */}
-      {isMenuOpen && (
-        <div className="modal-overlay" onClick={handleResume}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Menu</h2>
-            <div className="menu-buttons">
-              <button className="menu-btn resume-btn" onClick={handleResume}>Resume</button>
-              <button className="menu-btn restart-btn" onClick={() => { handleStartGame(); setIsMenuOpen(false); }}>Restart</button>
-              <button className="menu-btn exit-btn" onClick={() => navigate("/")}>Exit</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <GameMenu
+        isOpen={isMenuOpen}
+        onClose={handleResume}
+        onResume={handleResume}
+        onRestart={() => { handleStartGame(); setIsMenuOpen(false); }}
+        onExit={() => navigate("/")}
+      />
 
       {!gameStarted ? (
         /* ===== GUIDE SCREEN ===== */

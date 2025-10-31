@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SpeedTyping.css";
+import GameMenu from '../components/GameMenu';
 
 export default function SpeedTyping() {
   const [step, setStep] = useState(0);
@@ -37,13 +38,13 @@ export default function SpeedTyping() {
   const colorVal = Math.round(255 * (1 - fraction));
   const strokeColor = `rgb(${colorVal},${colorVal},${colorVal})`;
 
-  // ===== Fetch Fact (Fixed) =====
+  // ===== Fetch Fact (Fixed - subject to change) =====
   async function fetchFact() {
     try {
       const res = await fetch("/api/facts");
       const data = await res.json();
       
-      // Get one random fact from your server's response
+      // Get one random fact
       let facts = data.fact || data.facts || [];
       if (Array.isArray(facts) && facts.length > 0) {
         const randomIndex = Math.floor(Math.random() * facts.length);
@@ -74,7 +75,7 @@ export default function SpeedTyping() {
   }, []);
   useEffect(() => { preloadNextFact(); }, [preloadNextFact]);
 
-  // Function to start a fresh game (from guide pages)
+  // Function to start a fresh game
   function startFreshGame() {
     setShouldRetryCurrentFact(false);
     startGame();
@@ -180,7 +181,6 @@ export default function SpeedTyping() {
   }
 
   // Typing logic
-  // Typing logic
   useEffect(() => {
     if (!gameActive || isPaused) return;
     const limit = Math.min(typed.length, currentFact.length);
@@ -229,29 +229,13 @@ export default function SpeedTyping() {
         <span></span><span></span><span></span>
       </button>
 
-      {/* ===== Pause Menu ===== */}
-      {isMenuOpen && (
-        <div className="modal-overlay" onClick={() => {
-          setIsMenuOpen(false);
-          setIsPaused(false);
-        }}>
-          <div className="menu-modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Menu</h2>
-            <div className="menu-buttons">
-              <button className="menu-btn resume-btn" onClick={() => {
-                setIsMenuOpen(false);
-                setIsPaused(false);
-              }}>Resume</button>
-              <button className="menu-btn restart-btn" onClick={() => { 
-                setIsMenuOpen(false); 
-                setIsPaused(false);
-                startGame(); 
-              }}>Restart</button>
-              <button className="menu-btn exit-btn" onClick={() => navigate("/")}>Exit</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <GameMenu
+        isOpen={isMenuOpen}
+        onClose={() => { setIsMenuOpen(false); setIsPaused(false); }}
+        onResume={() => { setIsMenuOpen(false); setIsPaused(false); }}
+        onRestart={() => { setIsMenuOpen(false); setIsPaused(false); startGame(); }}
+        onExit={() => navigate("/")}
+      />
 
       <div className="background-layer"></div>
 

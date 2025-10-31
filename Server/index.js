@@ -16,6 +16,8 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+const { getLeaderboard, addScore } = require('./leaderboard');
+
 app.use(express.json()); // Middleware to parse JSON request bodies
 app.use(express.static(path.join(__dirname, '../Frontend/dist')));
 
@@ -88,27 +90,48 @@ app.post('/api/admin/facts', async (req, res) => {
   }
 });
 
+// Leaderboard endpoint
+app.get('/api/leaderboard', getLeaderboard);
+app.post('/api/leaderboard', addScore);
 
 // Public API endpoint
 app.get('/api/facts', async (req, res) => {
   try {
+    const { game, difficulty } = req.query;
     // get facts from DB
-    const [rows] = await pool.query('SELECT text FROM facts LIMIT 30');
-    if (rows.length > 0) {
-      const facts = rows.map(row => row.text);
-      return res.json({ fact: facts });
+    const [rows] = await pool.query('SELECT text FROM facts');
+    let facts = rows.map(row => row.text);
+
+    if (facts.length === 0) {
+      // If DB is empty, fetch from API and store
+      const response = await axios.get('https://meowfacts.herokuapp.com/?count=30');
+      facts = Array.isArray(response.data.data) ? response.data.data : [response.data.data];
+      // Store in DB
+      for (const fact of facts) {
+        await pool.query('INSERT INTO facts (text) VALUES (?)', [fact]);
+      }
     }
 
-    // If DB is empty, fetch from API and store
-    const response = await axios.get('https://meowfacts.herokuapp.com/?count=30');
-    const facts = Array.isArray(response.data.data) ? response.data.data : [response.data.data];
-
-    // Store in DB
-    for (const fact of facts) {
-      await pool.query('INSERT INTO facts (text) VALUES (?)', [fact]);
+    // Filter for SpeedTyping based on difficulty
+    if (game === 'SpeedTyping' && difficulty) {
+      const wordCountRanges = {
+        easy: [1, 14],
+        medium: [8, 27],
+        hard: [15, 27]
+      };
+      const [minWords, maxWords] = wordCountRanges[difficulty] || [1, 27];
+      facts = facts.filter(fact => {
+        const wordCount = fact.split(' ').length;
+        return wordCount >= minWords && wordCount <= maxWords;
+      });
+      // Take up to 15 facts
+      facts = facts.slice(0, 15);
+    } else {
+      // Default behavior: limit to 30
+      facts = facts.slice(0, 30);
     }
 
-    res.json({ fact: facts.slice(0, 30) });
+    res.json({ fact: facts });
   } catch (err) {
     console.error("Error:", err);
     res.status(500).json({ facts: ["Cats are amazing creatures!"] });
