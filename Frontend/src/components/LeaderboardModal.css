@@ -1,0 +1,15 @@
+.leaderboard-list {
+  list-style: decimal;
+  counter-reset: leaderboard;
+  max-height: 360px;
+  overflow: auto;
+  padding-right: 8px;
+}
+.leaderboard-list li {
+  background: #f7d9b6;
+  border: 2px solid #a67449;
+  border-radius: 8px;
+  padding: 8px 10px;
+  box-shadow: 0 3px #6e4b2d;
+  margin-bottom: 8px;
+}

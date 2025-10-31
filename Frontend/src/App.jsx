@@ -8,6 +8,8 @@ import SpeedTyping from "./pages/SpeedTyping";
 import TriviaMaster from "./pages/TriviaMaster";
 import JumbledFacts from "./pages/JumbledFacts";
 import AdminFacts from "./pages/AdminFacts";
+import LeaderboardModal from "./components/LeaderboardModal";
+import { Settings, Trophy } from "lucide-react";
 import "./App.css";
 import CatCursor from "./components/CatCursor";
 import LoaderWrapper from "./components/LoaderWrapper";
@@ -64,6 +66,7 @@ function HomePage() {
   const [stackedFacts, setStackedFacts] = useState([]);
   const [showDailyModal, setShowDailyModal] = useState(false);
   const [weeklyMap, setWeeklyMap] = useState(null);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const navigate = useNavigate();
 
@@ -254,7 +257,7 @@ function HomePage() {
   const slices = 6;
   const sliceAngle = 360 / slices;
 
-  // read current angle from computed transform of wheelInner (handles idle CSS animation)
+  // read current angle from computed transform of wheelInner
   const readCurrentAngle = () => {
     const el = wheelInnerRef.current;
     if (!el) return rotation % 360;
@@ -272,7 +275,7 @@ function HomePage() {
     return ang;
   };
 
-  // Resume idle spin from the exact current angle by applying a negative animation delay
+  // Resume idle spin
   const resumeIdleFromCurrent = () => {
     const ang = readCurrentAngle();
     const phase = (ang % 360) / 360;
@@ -296,11 +299,11 @@ function HomePage() {
     const base = currentAngle; 
     const finalRotation = base + extraSpins + stopAngle;
 
-  // Randomize spin duration between 5s and 7s for a fuller deceleration
+  // Randomize spin duration between 5s and 7s
   const duration = 5000 + Math.floor(Math.random() * 2001);
     setSpinMs(duration);
 
-    // Ensure transition is applied before transform change to avoid a frame pause
+    // To avoid a frame pause
     requestAnimationFrame(() => {
       setSpinning(true);
       requestAnimationFrame(() => {
@@ -312,7 +315,7 @@ function HomePage() {
     setTimeout(() => {
       setSpinning(false);
       setShowStackedCards(true);
-      // keep rotation small to avoid big numbers
+      // keep rotation small
       setRotation(finalRotation % 360);
     }, duration);
 
@@ -360,7 +363,27 @@ function HomePage() {
 
   return (
     <div className="homepage" data-modal={modalOpen ? 'true' : 'false'}>
-      <h1 className="title">MEÖW FACTS</h1>
+      <div className="title-row">
+        <h1 className="title">MEÖW FACTS</h1>
+          <div className="title-controls">
+            <button
+              className="control-icon leaderboard-icon"
+              onClick={() => setShowLeaderboard(true)}
+              aria-label="Leaderboard"
+              title="Leaderboard"
+            >
+              <Trophy size={50} />
+            </button>
+            <button
+              className="control-icon admin-icon"
+              onClick={() => navigate("/admin/facts")}
+              aria-label="Admin"
+              title="Admin"
+            >
+            <Settings size={50} />
+          </button>
+      </div>
+    </div>
 
       <div className="layout">
         <div className="left-side">
@@ -373,7 +396,6 @@ function HomePage() {
             )}
 
           </div>
-          <div className="admin-button" onClick={() => navigate("/admin/facts")}>Admin Panel</div>
         </div>
 
         <div className="center-section">
@@ -396,9 +418,20 @@ function HomePage() {
                 {spinning ? "..." : "SPIN"}
               </button>
               <div className="controller">
-                <button className="btn-control" onClick={() => setCount(Math.max(1, count - 1))}>-</button>
+                <button 
+                  className="btn-control" 
+                  onClick={() => setCount(Math.max(1, count - 1))}
+                  >
+                    -
+                  </button>
                 <div className="count-display">x{count}</div>
-                <button className="btn-control" onClick={() => setCount(count + 1)}>+</button>
+                <button 
+                  className="btn-control" 
+                  onClick={() => setCount(c => Math.min(5, c + 1))} 
+                  disabled={count >= 5}
+                  >
+                    +
+                  </button>
               </div>
             </div>
             <div className="arrow" />
@@ -447,6 +480,11 @@ function HomePage() {
       {showCatGallery && (
         <CatGallery onClose={() => setShowCatGallery(false)} />
       )}
+
+      {showLeaderboard && (
+        <LeaderboardModal onClose={() => setShowLeaderboard(false)} />
+      )}
+      
     </div>
   );
 }
