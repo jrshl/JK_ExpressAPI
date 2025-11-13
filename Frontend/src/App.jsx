@@ -390,6 +390,12 @@ function HomePage() {
                   >
                     -
                   </button>
+                <button 
+                  className="btn-control" 
+                  onClick={() => setCount(Math.max(1, count - 1))}
+                  >
+                    -
+                  </button>
                 <div className="count-display">x{count}</div>
                 <button className="btn-control" onClick={() => setCount(c => Math.min(5, c + 1))} disabled={count >= 5}>+</button>
               </div>
