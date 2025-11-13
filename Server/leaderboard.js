@@ -10,7 +10,6 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-// Function to get leaderboard
 async function getLeaderboard(req, res) {
   try {
     const { game, difficulty } = req.query;
@@ -43,7 +42,7 @@ async function getLeaderboard(req, res) {
   }
 }
 
-// Function to add or update score (if needed for posting scores)
+// Function to add or update score (if needed for posting scores) - subject to change
 async function addScore(req, res) {
   try {
     const { name, score, game, difficulty } = req.body;
