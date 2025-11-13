@@ -1,0 +1,90 @@
+/* Make sure the form is visible */
+.login-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* more gap to prevent overlap */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.login-wrapper h2 {
+  font-family: "Press Start 2P", monospace;
+  font-size: 18px;
+  text-align: center;
+  color: #3b1f1f;
+  margin-bottom: 20px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.login-form label {
+  font-size: 12px;
+  color: #000;
+}
+
+.login-form input {
+  display: block;
+  width: 100%;
+  height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  color: #000;
+  background: #fff;
+  box-sizing: border-box;
+  z-index: 5;
+}
+
+.login-form input::placeholder {
+  color: #444;
+}
+
+.login-btn {
+  background: #713704;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: "Press Start 2P", monospace;
+  transition: 0.2s ease;
+}
+
+.login-btn:hover {
+  background: #a15a2e;
+}
+
+.login-message {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 13px;
+  color: #444;
+}
+
+/* Force visibility inside modal */
+.modal-box .login-wrapper {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+/* DEBUG: force input fields to show no matter what 
+.login-form input {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  background: #fff !important;
+  color: #000 !important;
+  position: relative !important;
+  z-index: 999 !important;
+  border: 1px solid #000 !important;
+}*/
+

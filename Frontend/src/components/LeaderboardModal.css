@@ -1,0 +1,111 @@
+.leaderboard-list {
+  list-style: decimal;
+  counter-reset: leaderboard;
+  max-height: 360px;
+  overflow: auto;
+  padding-right: 8px;
+}
+.leaderboard-list li {
+  background: #f7d9b6;
+  border: 2px solid #a67449;
+  border-radius: 8px;
+  padding: 8px 10px;
+  box-shadow: 0 3px #6e4b2d;
+  margin-bottom: 8px;
+}
+
+.modal-leaderboard {
+  max-width: 520px;
+  width: 90%;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-header h2 {
+  margin: 0;
+}
+
+.modal-content {
+  margin-top: 16px;
+}
+
+.game-tabs, .difficulty-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tab-btn {
+  padding: 8px 12px;
+  border: 1px solid #a67449;
+  background: #f7d9b6;
+  color: #a67449;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: #a67449;
+  color: white;
+}
+
+.loading, .error {
+  margin-top: 12px;
+}
+
+.error {
+  color: crimson;
+}
+
+.leaderboard-list {
+  padding-left: 18px;
+  text-align: left;
+  margin-top: 12px;
+}
+
+.leaderboard-list li {
+  margin-bottom: 8px;
+}
+
+.modal-footer {
+  margin-top: 16px;
+}
+
+.difficulty-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.arrow-container {
+  display: flex;
+}
+
+.arrow-btn {
+  background: #f7d9b6;
+  border: 1px solid #a67449;
+  border-radius: 4px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arrow-btn:hover {
+  background: #e8c8a0;
+}
+
+.difficulty-label {
+  font-weight: bold;
+  color: #a67449;
+  width: 100px;
+  text-align: center;
+}

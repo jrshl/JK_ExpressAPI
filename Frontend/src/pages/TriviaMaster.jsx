@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TriviaMaster.css';
+import GameMenu from '../components/GameMenu';
 
 const FACT_DISPLAY_TIME = 10;
 const CURTAIN_TIME = 5;
@@ -299,30 +300,13 @@ const TriviaMaster = () => {
         <span></span><span></span><span></span>
       </button>
 
-      {isMenuOpen && (
-        <div className="modal-overlay" onClick={() => { setIsMenuOpen(false); setIsPaused(false); }}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Menu</h2>
-            <div className="menu-buttons">
-              <button
-                className="menu-btn resume-btn"
-                onClick={() => { setIsMenuOpen(false); setIsPaused(false); }}
-              >
-                Resume
-              </button>
-              <button
-                className="menu-btn restart-btn"
-                onClick={() => { restartGame(); }}
-              >
-                Restart
-              </button>
-              <button className="menu-btn exit-btn" onClick={() => navigate("/")}>
-                Exit
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <GameMenu
+        isOpen={isMenuOpen}
+        onClose={() => { setIsMenuOpen(false); setIsPaused(false); }}
+        onResume={() => { setIsMenuOpen(false); setIsPaused(false); }}
+        onRestart={() => { restartGame(); }}
+        onExit={() => navigate("/")}
+      />
 
       {/* INTRO SCREEN */}
       {stage === 'intro' && (

@@ -8,9 +8,29 @@ import SpeedTyping from "./pages/SpeedTyping";
 import TriviaMaster from "./pages/TriviaMaster";
 import JumbledFacts from "./pages/JumbledFacts";
 import AdminFacts from "./pages/AdminFacts";
+import LeaderboardModal from "./components/LeaderboardModal";
+import { Settings, Trophy, User } from "lucide-react";
 import "./App.css";
 import CatCursor from "./components/CatCursor";
 import LoaderWrapper from "./components/LoaderWrapper";
+import { UserProvider } from "./context/UserContext";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import axios from "axios";
+
+function ProtectedRoute({ children }) {
+  const [isAuth, setIsAuth] = useState(null);
+
+  useEffect(() => {
+    axios.get("/api/check-auth")
+      .then(res => setIsAuth(res.data.authenticated))
+      .catch(() => setIsAuth(false));
+  }, []);
+
+  if (isAuth === null) return <div>Loading...</div>;
+  
+  return children;
+}
 
 function generateFactId(fact) {
   let hash = 0;
@@ -51,7 +71,6 @@ function HomePage() {
     }
   });
   const [libraryAnimating, setLibraryAnimating] = useState(false);
-  
   const [encounteredFacts, setEncounteredFacts] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("encounteredFacts") || "{}");
@@ -64,10 +83,13 @@ function HomePage() {
   const [stackedFacts, setStackedFacts] = useState([]);
   const [showDailyModal, setShowDailyModal] = useState(false);
   const [weeklyMap, setWeeklyMap] = useState(null);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [activeUserTab, setActiveUserTab] = useState("login");
 
   const navigate = useNavigate();
 
-  // persist encounteredFacts to localStorage when it changes
+  // persist encounteredFacts to localStorage
   useEffect(() => {
     try {
       localStorage.setItem("encounteredFacts", JSON.stringify(encounteredFacts));
@@ -83,16 +105,10 @@ function HomePage() {
     });
   };
 
-  // Mark items as newly-stored in the library 
   const markLibraryNewIds = (ids) => {
     if (!Array.isArray(ids)) ids = [ids];
-    console.log("Adding new library IDs:", ids, "Types:", ids.map(id => typeof id));
-    
     setLibraryNewIds(prevIds => {
-      console.log("Previous libraryNewIds:", prevIds);
       const next = [...new Set([...prevIds, ...ids])];
-      console.log("New libraryNewIds:", next);
-      
       try {
         localStorage.setItem("libraryNewIds", JSON.stringify(next));
       } catch (e) {
@@ -103,33 +119,16 @@ function HomePage() {
   };
 
   const handleOpenLibrary = () => {
-    // capture the current new ids to pass to modal
-  const newIds = libraryNewIds.slice();
-    
     setLibraryAnimating(true);
     setShowBook(true);
-    // hide the paw after the fly animation completes (600ms)
     setTimeout(() => setLibraryAnimating(false), 700);
-    return newIds; 
   };
 
-  // Mark a single library id as viewed/read (called when user opens that fact)
   const markLibraryIdViewed = (id) => {
-    console.log("Marking as viewed:", id, "Type:", typeof id);
-    console.log("Current libraryNewIds:", libraryNewIds);
-    
     setLibraryNewIds(prev => {
-      console.log("Before filtering:", prev);
-      const next = prev.filter(x => {
-        const match = String(x) !== String(id);
-        console.log(`Comparing ${x} (${typeof x}) with ${id} (${typeof id}): keep=${match}`);
-        return match;
-      });
-      console.log("After filtering:", next);
-      
+      const next = prev.filter(x => String(x) !== String(id));
       try {
         localStorage.setItem("libraryNewIds", JSON.stringify(next));
-        console.log("Saved to localStorage:", next);
       } catch (e) {
         console.warn("Failed to persist libraryNewIds after marking viewed:", e);
       }
@@ -137,7 +136,7 @@ function HomePage() {
     });
   };
 
-  // Ensure weekly 7 facts exist and are reserved (not used elsewhere).
+  // Weekly facts logic (same as your previous code)
   useEffect(() => {
     let mounted = true;
 
@@ -145,7 +144,6 @@ function HomePage() {
       const todayIso = new Date().toISOString().slice(0, 10);
       const stored = JSON.parse(localStorage.getItem("weeklyFacts") || "null");
 
-      // validate stored weekly set
       if (stored && stored.startDate) {
         const start = new Date(stored.startDate);
         const diffDays = Math.floor((new Date(todayIso) - start) / (1000 * 60 * 60 * 24));
@@ -155,7 +153,7 @@ function HomePage() {
             const dayKey = addDaysISO(stored.startDate, i);
             map[dayKey] = stored.facts[i];
             const id = generateFactId(stored.facts[i]);
-            addEncounteredFact(id, stored.facts[i]); // reserve
+            addEncounteredFact(id, stored.facts[i]);
           }
           if (mounted) {
             setWeeklyMap(map);
@@ -169,24 +167,17 @@ function HomePage() {
         }
       }
 
-      // Need to fetch 7 unique facts (avoid duplicates and existing encounteredFacts)
       const uniqueFacts = [];
       const seenIds = new Set(Object.keys(encounteredFacts).map(k => Number(k)));
       let attempts = 0;
+
       while (uniqueFacts.length < 7 && attempts < 12) {
         attempts++;
         try {
           const fetchCount = Math.max(1, 7 - uniqueFacts.length);
           const res = await fetch(`/api/facts?count=${fetchCount}`);
           const data = await res.json();
-          
-          const list = Array.isArray(data.fact)
-            ? data.fact
-            : Array.isArray(data.facts)
-            ? data.facts
-            : Array.isArray(data.data)
-            ? data.data
-            : (typeof data === 'string' ? [data] : []);
+          const list = Array.isArray(data.fact) ? data.fact : Array.isArray(data.facts) ? data.facts : Array.isArray(data.data) ? data.data : (typeof data === 'string' ? [data] : []);
           for (const txt of list) {
             const id = generateFactId(txt);
             if (seenIds.has(id)) continue;
@@ -195,9 +186,8 @@ function HomePage() {
             seenIds.add(id);
             if (uniqueFacts.length === 7) break;
           }
-          } catch (e) {
-          console.warn("Failed to fetch facts API (attempt", attempts, "):", e);
-          // ignore and retry
+        } catch (e) {
+          console.warn("Failed to fetch facts API:", e);
         }
       }
 
@@ -215,15 +205,15 @@ function HomePage() {
         const dayKey = addDaysISO(startDate, i);
         map[dayKey] = uniqueFacts[i];
         const id = generateFactId(uniqueFacts[i]);
-        addEncounteredFact(id, uniqueFacts[i]); // reserve
+        addEncounteredFact(id, uniqueFacts[i]);
       }
 
-      const toStore = { startDate, facts: uniqueFacts };
       try {
-        localStorage.setItem("weeklyFacts", JSON.stringify(toStore));
+        localStorage.setItem("weeklyFacts", JSON.stringify({ startDate, facts: uniqueFacts }));
       } catch (e) {
-        console.warn("Failed to persist weeklyFacts to localStorage:", e);
+        console.warn("Failed to persist weeklyFacts:", e);
       }
+
       if (mounted) {
         setWeeklyMap(map);
         const shownDate = localStorage.getItem("dailyShownDate");
@@ -236,32 +226,17 @@ function HomePage() {
 
     ensureWeeklyFacts();
     return () => { mounted = false; };
-    
-  }, []); // run once
-
-    
-    useEffect(() => {
-      if (!weeklyMap) return;
-      
-      const hostname = window && window.location && window.location.hostname ? window.location.hostname : '';
-      const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '';
-      if (!isLocal) return;
-      
-      setShowDailyModal(true);
-      
-    }, [weeklyMap]);
+  }, []);
 
   const slices = 6;
   const sliceAngle = 360 / slices;
 
-  // read current angle from computed transform of wheelInner (handles idle CSS animation)
   const readCurrentAngle = () => {
     const el = wheelInnerRef.current;
     if (!el) return rotation % 360;
     const st = window.getComputedStyle(el);
     const tr = st.transform || st.webkitTransform || "none";
     if (tr === "none") return rotation % 360;
-    // matrix(a, b, c, d, e, f)
     const m = tr.match(/matrix\(([^)]+)\)/);
     if (!m) return rotation % 360;
     const parts = m[1].split(',').map(v => parseFloat(v));
@@ -272,7 +247,6 @@ function HomePage() {
     return ang;
   };
 
-  // Resume idle spin from the exact current angle by applying a negative animation delay
   const resumeIdleFromCurrent = () => {
     const ang = readCurrentAngle();
     const phase = (ang % 360) / 360;
@@ -283,24 +257,17 @@ function HomePage() {
 
   async function spinWheel() {
     if (spinning) return;
-
-    // Freeze the wheel at the exact current idle angle for continuity
     const currentAngle = idle ? readCurrentAngle() : (rotation % 360);
     setIdle(false);
-    setRotation(currentAngle); 
+    setRotation(currentAngle);
 
-    
     const selectedSlice = Math.floor(Math.random() * slices);
     const stopAngle = selectedSlice * sliceAngle + sliceAngle / 2;
     const extraSpins = 720 + Math.floor(Math.random() * 360);
-    const base = currentAngle; 
-    const finalRotation = base + extraSpins + stopAngle;
-
-  // Randomize spin duration between 5s and 7s for a fuller deceleration
-  const duration = 5000 + Math.floor(Math.random() * 2001);
+    const finalRotation = currentAngle + extraSpins + stopAngle;
+    const duration = 5000 + Math.floor(Math.random() * 2001);
     setSpinMs(duration);
 
-    // Ensure transition is applied before transform change to avoid a frame pause
     requestAnimationFrame(() => {
       setSpinning(true);
       requestAnimationFrame(() => {
@@ -308,36 +275,24 @@ function HomePage() {
       });
     });
 
-    
     setTimeout(() => {
       setSpinning(false);
       setShowStackedCards(true);
-      // keep rotation small to avoid big numbers
       setRotation(finalRotation % 360);
     }, duration);
 
-    // Fetch concurrently while spinning
     try {
       const res = await fetch(`/api/facts?count=${count}`);
       const data = await res.json();
-      const raw = Array.isArray(data.fact)
-        ? data.fact
-        : Array.isArray(data.facts)
-        ? data.facts
-        : Array.isArray(data.data)
-        ? data.data
-        : (typeof data === 'string' ? [data] : []);
+      const raw = Array.isArray(data.fact) ? data.fact : Array.isArray(data.facts) ? data.facts : Array.isArray(data.data) ? data.data : (typeof data === 'string' ? [data] : []);
 
-      
       const finalList = [];
       for (const f of raw) {
         const id = generateFactId(f);
-        if (!encounteredFacts[id]) {
-          finalList.push(f);
-        }
+        if (!encounteredFacts[id]) finalList.push(f);
         if (finalList.length === count) break;
       }
-      
+
       if (finalList.length < count) {
         for (const f of raw) {
           if (finalList.length === count) break;
@@ -347,33 +302,68 @@ function HomePage() {
 
       setFacts(finalList);
       finalList.forEach(f => addEncounteredFact(generateFactId(f), f));
-
       setStackedFacts(finalList.map((fact, i) => ({ sub: `Fact #${i + 1}`, content: fact })));
-
     } catch {
       setFacts(["Error loading facts."]);
-      // Stopping animation is handled by the timer above
     }
   }
 
-  const modalOpen = showBook || showStackedCards || showDailyModal || showCatGallery;
+  const modalOpen = showBook || showStackedCards || showDailyModal || showCatGallery || showUserModal;
 
   return (
     <div className="homepage" data-modal={modalOpen ? 'true' : 'false'}>
-      <h1 className="title">MEÖW FACTS</h1>
+      <div className="title-row">
+        <h1 className="title">MEÖW FACTS</h1>
+        <div className="title-controls">
+          <button className="control-icon leaderboard-icon" onClick={() => setShowLeaderboard(true)} aria-label="Leaderboard" title="Leaderboard">
+            <Trophy size={50} />
+          </button>
+          <button className="control-icon admin-icon" onClick={() => navigate("/admin/facts")} aria-label="Admin" title="Admin">
+            <Settings size={50} />
+          </button>
+          <button className="control-icon user-icon" onClick={() => setShowUserModal(true)} aria-label="User" title="User">
+            <User size={50} />
+          </button>
+        </div>
+      </div>
 
+
+      {showUserModal && (
+  <div className="modal-overlay">
+    <div className="modal-box modal-box-user">
+      <button className="close-btn" onClick={() => setShowUserModal(false)}>✖</button>
+      <div className="modal-tabs-text">
+        <span
+          className={activeUserTab === "login" ? "active-tab" : ""}
+          onClick={() => setActiveUserTab("login")}
+        >
+          Login
+        </span>
+        <span
+          className={activeUserTab === "register" ? "active-tab" : ""}
+          onClick={() => setActiveUserTab("register")}
+        >
+          Register
+        </span>
+      </div>
+      <div className="modal-content">
+        {activeUserTab === "login" ? <Login /> : <Register />}
+      </div>
+    </div>
+  </div>
+)}
+
+
+      {/* Rest of your layout */}
       <div className="layout">
         <div className="left-side">
           <div className="cat-gallery" onClick={() => setShowCatGallery(true)}>Cat Gallery</div>
           <div className="fact-collection" onClick={handleOpenLibrary}>
             Fact Library
-            {/* paw notification */}
             {libraryNewIds.length > 0 && (
               <img src="/images/paw.png" alt="new" className={`paw-notif ${libraryAnimating ? 'fly-away' : 'pulse'}`} />
             )}
-
           </div>
-          <div className="admin-button" onClick={() => navigate("/admin/facts")}>Admin Panel</div>
         </div>
 
         <div className="center-section">
@@ -392,13 +382,16 @@ function HomePage() {
               </div>
             </div>
             <div className="spin-area">
-              <button className="btn-spin" onClick={spinWheel} disabled={spinning}>
-                {spinning ? "..." : "SPIN"}
-              </button>
+              <button className="btn-spin" onClick={spinWheel} disabled={spinning}>{spinning ? "..." : "SPIN"}</button>
               <div className="controller">
-                <button className="btn-control" onClick={() => setCount(Math.max(1, count - 1))}>-</button>
+                <button 
+                  className="btn-control" 
+                  onClick={() => setCount(Math.max(1, count - 1))}
+                  >
+                    -
+                  </button>
                 <div className="count-display">x{count}</div>
-                <button className="btn-control" onClick={() => setCount(count + 1)}>+</button>
+                <button className="btn-control" onClick={() => setCount(c => Math.min(5, c + 1))} disabled={count >= 5}>+</button>
               </div>
             </div>
             <div className="arrow" />
@@ -426,11 +419,7 @@ function HomePage() {
         <StackedCards
           cards={stackedFacts}
           onClose={() => setShowStackedCards(false)}
-          onStoreComplete={(ids) => {
-            markLibraryNewIds(ids);
-            // resume idle only after the store animation finishes, from the same frame
-            resumeIdleFromCurrent();
-          }}
+          onStoreComplete={(ids) => { markLibraryNewIds(ids); resumeIdleFromCurrent(); }}
         />
       )}
 
@@ -438,15 +427,14 @@ function HomePage() {
         <FactLibrary
           encounteredFacts={encounteredFacts}
           libraryNewIds={libraryNewIds}
-          onClose={() => { setShowBook(false); }}
+          onClose={() => setShowBook(false)}
           onMarkViewed={(id) => markLibraryIdViewed(id)}
           maxPages={27}
         />
       )}
 
-      {showCatGallery && (
-        <CatGallery onClose={() => setShowCatGallery(false)} />
-      )}
+      {showCatGallery && <CatGallery onClose={() => setShowCatGallery(false)} />}
+      {showLeaderboard && <LeaderboardModal onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
 }
@@ -458,16 +446,25 @@ export default function App() {
   }
   return (
     <BrowserRouter>
-      <LoaderWrapper>
-        <CursorForHome />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/speed-typing" element={<SpeedTyping />} />
-          <Route path="/trivia" element={<TriviaMaster />} />
-          <Route path="/jumbled-facts" element={<JumbledFacts />} />
-          <Route path="/admin/facts" element={<AdminFacts />} />
-        </Routes>
-      </LoaderWrapper>
+      <UserProvider>
+        <LoaderWrapper>
+          <CursorForHome />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route
+              path="/admin/facts"
+              element={
+                <ProtectedRoute>
+                  <AdminFacts />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/speed-typing" element={<SpeedTyping />} />
+            <Route path="/trivia" element={<TriviaMaster />} />
+            <Route path="/jumbled-facts" element={<JumbledFacts />} />
+          </Routes>
+        </LoaderWrapper>
+      </UserProvider>
     </BrowserRouter>
   );
 }

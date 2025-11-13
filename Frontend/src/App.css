@@ -19,6 +19,15 @@ html, body, #root {
 /* =========================
    Title
 ========================= */
+.title-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 24px;
+  margin-bottom: 8px;
+}
+
 .title {
   text-align: center;
   font-size: 64px;
@@ -28,6 +37,154 @@ html, body, #root {
   font-family: "Press Start 2P", monospace;
   padding-top: 30px;
 }
+
+.title-controls {
+  position: absolute;
+  right: 2.25rem;
+  top: 0.5rem;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 30;
+}
+
+.control-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  width: auto;
+  height: auto;
+  border-radius: 8px;
+  border: 3px solid #5d4037;
+  box-shadow: 0 6px #5d4037;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  color: #5d4037;
+}
+
+.control-icon svg {
+  width: 40px;
+  height: 40px;
+  display: block;
+  color: #5d4037;
+}
+
+.control-icon:hover { transform: translateY(-2px); box-shadow: 0 8px #5d4037; }
+.control-icon:active { transform: translateY(2px); box-shadow: 0 3px #5d4037; }
+
+.leaderboard-icon {
+  background: linear-gradient(135deg, #ffd59e, #f7b66a);
+  border-color: #b36a2a;
+  box-shadow: 0 6px #b36a2a;
+}
+.admin-icon {
+  background: linear-gradient(135deg, #beafaa, #ddc3c3);
+  border-color: #5d4037;
+  box-shadow: 0 6px #5d4037;
+}
+
+.control-icon.user-icon {
+  background-color: #f7d9b6;  
+  color: #5d4037;           
+  border: 3px solid #a67449;
+  border-radius: 12px;
+  padding: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px #d1ae8a;
+}
+
+.control-icon.user-icon:hover {
+  background-color: #f0c084;
+  transform: translateY(-3px);
+  box-shadow: 0 6px #d1ae8a;
+}
+
+.control-icon.user-icon:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px #d1ae8a;
+}
+
+/* Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal box */
+.modal-box-user {
+  position: relative;
+  background: #fff;
+  padding: 2rem 1.5rem 1.5rem;
+  border-radius: 12px;
+  width: 500px;
+  height: 450px;
+  max-width: 600px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+.modal-content {
+  background: rgb(224, 191, 151);
+  width: 450px;
+  height: 350px;
+
+}
+
+/* Close button top-right */
+.modal-box-user .close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #333;
+}
+
+/* Tab container */
+.modal-tabs-text {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  gap: 2rem;
+}
+
+/* Tab text */
+.modal-tabs-text span {
+  cursor: pointer;
+  font-weight: 500;
+  padding-bottom: 4px;
+  position: relative;
+  color: #555;
+  transition: color 0.2s;
+}
+
+.modal-tabs-text span:hover {
+  color: #000;
+}
+
+/* Underline for active tab */
+.modal-tabs-text .active-tab {
+  color: #000;
+  font-weight: 600;
+}
+
+.modal-tabs-text .active-tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 3px;
+  background-color: #000;
+  border-radius: 2px;
+}
+
 
 /* =========================
    Layout
@@ -91,32 +248,6 @@ html, body, #root {
   transition: transform 0.1s ease-in-out;
   margin-bottom: 20px;
   width: 150px;
-}
-
-.admin-button {
-  background: linear-gradient(135deg, #a29bfe, #6c5ce7);
-  padding: 40px 40px;
-  border-radius: 14px;
-  font-size: 1.3rem;
-  font-weight: bold;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: 0 6px #4834a8;
-  border: 3px solid #4834a8;
-  transition: all 0.2s ease-in-out;
-  margin-bottom: 20px;
-  width: 150px;
-  color: white;
-}
-
-.admin-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px #4834a8;
-}
-
-.admin-button:active {
-  transform: translateY(2px);
-  box-shadow: 0 3px #4834a8;
 }
 
 /* =========================
@@ -233,6 +364,18 @@ button {
   transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
 }
 
+.btn-spin:hover,
+.btn-spin:focus {
+  transform: translate(-50%, -50%);
+  box-shadow: 0 20px #d1ae8a;
+}
+
+.btn-spin:hover,
+.btn-spin:focus {
+  transform: translate(-50%, -50%);
+  box-shadow: 0 20px #d1ae8a;
+}
+
 .btn-spin:active {
   transform: translate(-50%, -50%) translateY(6px);
   box-shadow: 0 6px #d1ae8a;
@@ -328,6 +471,52 @@ button {
 
 .game-modal:active {
   transform: translateY(3px);
+  box-shadow: 0 3px #8b5e3c;
+}
+
+/*transform for all buttons in home*/
+.cat-gallery,
+.fact-collection,
+.game-modal {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  will-change: transform, box-shadow;
+  z-index: 2;
+}
+
+.cat-gallery:hover,
+.fact-collection:hover,
+.game-modal:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px #8b5e3c;
+}
+
+.cat-gallery:active,
+.fact-collection:active,
+.game-modal:active {
+  transform: translateY(4px);
+  box-shadow: 0 3px #8b5e3c;
+}
+
+/*transform for all buttons in home*/
+.cat-gallery,
+.fact-collection,
+.game-modal {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  will-change: transform, box-shadow;
+  z-index: 2;
+}
+
+.cat-gallery:hover,
+.fact-collection:hover,
+.game-modal:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px #8b5e3c;
+}
+
+.cat-gallery:active,
+.fact-collection:active,
+.game-modal:active {
+  transform: translateY(4px);
   box-shadow: 0 3px #8b5e3c;
 }
 

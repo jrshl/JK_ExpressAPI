@@ -182,7 +182,7 @@
   font-family: "Press Start 2P", monospace;
   font-size: 32px;
   font-weight: bold;
-  text-shadow: 3px 3px #4a2c2a;
+  /* text-shadow: 3px 3px #4a2c2a; */
 }
 
 /* Card flip animation */
