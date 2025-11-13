@@ -6,7 +6,9 @@ const PORT = 3000;
 const mysql = require('mysql2/promise');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
-const authRoutes = require('./auth');
+const authRoutes = require('./route/auth');
+const MySQLStore = require('express-mysql-session')(session);
+
 
 const pool = mysql.createPool({
   host: 'localhost',
@@ -18,16 +20,36 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+
+const sessionStore = new MySQLStore({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'meowfacts'
+});
+
 const { getLeaderboard, addScore } = require('./leaderboard');
+const cors = require('cors');
+
+app.use(cors({
+  origin: 'http://localhost:5173', // or your frontend’s URL
+  credentials: true
+}));
 
 app.use(express.json()); // Middleware to parse JSON request bodies
 app.use(express.static(path.join(__dirname, '../Frontend/dist')));
 
 app.use(session({
-  secret: 'supersecretkey', // change this to a strong random string
+  key: 'connect.sid',
+  secret: 'supersecretkey',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, maxAge: null } // true only if HTTPS
+  store: sessionStore,
+  cookie: {
+    httpOnly: true,
+    secure: false, // set true if HTTPS
+    maxAge: 1000 * 60 * 60 * 24 // 1 day
+  }
 }));
 
 app.use('/api/user', authRoutes);

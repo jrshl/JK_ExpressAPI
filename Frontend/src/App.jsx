@@ -22,8 +22,8 @@ function ProtectedRoute({ children }) {
   const [isAuth, setIsAuth] = useState(null);
 
   useEffect(() => {
-    axios.get("/api/check-auth")
-      .then(res => setIsAuth(res.data.authenticated))
+    axios.get("/api/user/session", { withCredentials: true })
+      .then(res => setIsAuth(res.data.loggedIn))
       .catch(() => setIsAuth(false));
   }, []);
 
@@ -309,6 +309,28 @@ function HomePage() {
   }
 
   const modalOpen = showBook || showStackedCards || showDailyModal || showCatGallery || showUserModal;
+  
+  const [user, setUser] = useState(() => {
+  try {
+    return JSON.parse(localStorage.getItem("user")) || null;
+  } catch {
+    return null;
+  }
+});
+
+  useEffect(() => {
+  axios
+    .get("/api/user/session", { withCredentials: true })
+    .then((res) => {
+      if (res.data.loggedIn && res.data.user) {
+        setUser(res.data.user);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+      }
+    })
+    .catch(() => {});
+}, []);
+
+
 
   return (
     <div className="homepage" data-modal={modalOpen ? 'true' : 'false'}>
@@ -332,26 +354,57 @@ function HomePage() {
   <div className="modal-overlay">
     <div className="modal-box modal-box-user">
       <button className="close-btn" onClick={() => setShowUserModal(false)}>✖</button>
-      <div className="modal-tabs-text">
-        <span
-          className={activeUserTab === "login" ? "active-tab" : ""}
-          onClick={() => setActiveUserTab("login")}
-        >
-          Login
-        </span>
-        <span
-          className={activeUserTab === "register" ? "active-tab" : ""}
-          onClick={() => setActiveUserTab("register")}
-        >
-          Register
-        </span>
-      </div>
-      <div className="modal-content">
-        {activeUserTab === "login" ? <Login /> : <Register />}
-      </div>
+
+      {!user ? (
+        <>
+          <div className="modal-tabs-text">
+            <span
+              className={activeUserTab === "login" ? "active-tab" : ""}
+              onClick={() => setActiveUserTab("login")}
+            >
+              Login
+            </span>
+            <span
+              className={activeUserTab === "register" ? "active-tab" : ""}
+              onClick={() => setActiveUserTab("register")}
+            >
+              Register
+            </span>
+          </div>
+          <div className="modal-content">
+            {activeUserTab === "login" ? (
+              <Login
+                onLogin={(userData) => {
+                  setUser(userData);
+                  localStorage.setItem("user", JSON.stringify(userData));
+                  setShowUserModal(false);
+                }}
+              />
+            ) : (
+              <Register onRegister={() => setActiveUserTab("login")} />
+            )}
+          </div>
+        </>
+      ) : (
+        <div className="modal-content text-center">
+          <h3>Welcome, {user.username}!</h3>
+          <button
+            className="logout-btn"
+            onClick={async () => {
+              await axios.post("/api/user/logout", {}, { withCredentials: true });
+              localStorage.removeItem("user");
+              setUser(null);
+              setShowUserModal(false);
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      )}
     </div>
   </div>
 )}
+
 
 
       {/* Rest of your layout */}
@@ -384,12 +437,6 @@ function HomePage() {
             <div className="spin-area">
               <button className="btn-spin" onClick={spinWheel} disabled={spinning}>{spinning ? "..." : "SPIN"}</button>
               <div className="controller">
-                <button 
-                  className="btn-control" 
-                  onClick={() => setCount(Math.max(1, count - 1))}
-                  >
-                    -
-                  </button>
                 <button 
                   className="btn-control" 
                   onClick={() => setCount(Math.max(1, count - 1))}

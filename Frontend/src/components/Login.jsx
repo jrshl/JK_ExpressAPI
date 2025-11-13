@@ -18,11 +18,6 @@ export default function Login({ onLogin }) {
       localStorage.setItem('user', JSON.stringify(res.data.user));
     }
     onLogin?.(res.data.user);
-
-    // show welcome modal (we'll implement showModal in App or a context)
-    if (window.showWelcomeModal) {
-      window.showWelcomeModal(`Welcome back, ${res.data.user.username}!`);
-    }
   } catch (err) {
     setMsg(err.response?.data?.error || "Login failed");
   }
