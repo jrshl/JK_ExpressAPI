@@ -1,24 +1,28 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import './FactLibrary.css';
 
-export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [], onClose, onMarkViewed, maxPages = 20 }) {
+export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [], onClose, onMarkViewed, totalFacts = 0 }) {
   // unique id suffix so multiple instances won't clash with identical IDs
   const uidRef = useRef(Math.random().toString(36).slice(2, 9));
   const uid = uidRef.current;
 
-  const pagesCount = Math.max(1, Number(maxPages) || 20);
+  // Calculate pages: 1 intro page + pages needed for facts (9 facts per page)
+  // totalFacts = 91 => 91/9 = 10.11 => ceil = 11 pages + 1 intro = 12 total pages
+  const factsPerPage = 9;
+  const factPagesCount = Math.ceil(totalFacts / factsPerPage);
+  const pagesCount = factPagesCount + 1; // +1 for intro page
 
   // normalize encounteredFacts (accepts array or object keyed by 1..n)
   const facts = useMemo(() => {
     const out = [];
-    for (let i = 0; i < pagesCount; i++) {
+    for (let i = 0; i < totalFacts; i++) {
       let v;
       if (Array.isArray(encounteredFacts)) v = encounteredFacts[i];
       else v = encounteredFacts[i + 1];
       out.push(v ?? `Cat Fact placeholder ${i + 1}`);
     }
     return out;
-  }, [encounteredFacts, pagesCount]);
+  }, [encounteredFacts, totalFacts]);
 
   const [coverChecked, setCoverChecked] = useState(false);
   const [pageChecks, setPageChecks] = useState(() => Array(pagesCount).fill(false));
@@ -159,6 +163,28 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
     return currentIndex - 1;
   }, [currentIndex, pagesCount]);
 
+  // Find the first page with an unviewed new fact
+  const firstNewFactPage = useMemo(() => {
+    for (let pageIdx = 1; pageIdx < pagesCount; pageIdx++) {
+      for (let cardIdx = 0; cardIdx < factsPerPage; cardIdx++) {
+        const factNumber = ((pageIdx - 1) * factsPerPage) + cardIdx + 1;
+        if (factNumber > totalFacts) break;
+        const isEncountered = !!encounteredFacts[factNumber];
+        const isNew = libraryNewIds.includes(factNumber);
+        if (isEncountered && isNew) {
+          return pageIdx;
+        }
+      }
+    }
+    return null;
+  }, [pagesCount, factsPerPage, totalFacts, encounteredFacts, libraryNewIds]);
+
+  // Check if there are unviewed new facts beyond the current page
+  const hasNewFactsAhead = useMemo(() => {
+    if (!firstNewFactPage) return false;
+    return firstNewFactPage > lastFlippedIndex;
+  }, [firstNewFactPage, lastFlippedIndex]);
+
   const handleNext = (i) => {
     if (i < 0 || i >= pagesCount - 1) return;
     // only allow next on the current front page
@@ -171,6 +197,22 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
     // only allow prev on the last flipped page
     if (i !== lastFlippedIndex) return;
     handlePageChange(i, false);
+  };
+
+  // Auto-navigate to the page with the first new fact
+  const handleAutoNavigate = () => {
+    if (!firstNewFactPage || firstNewFactPage <= lastFlippedIndex) return;
+    
+    // Flip pages sequentially to reach the target page
+    let currentPage = lastFlippedIndex + 1;
+    const flipInterval = setInterval(() => {
+      if (currentPage < firstNewFactPage) {
+        handlePageChange(currentPage, true);
+        currentPage++;
+      } else {
+        clearInterval(flipInterval);
+      }
+    }, 300); // 600ms delay between page flips for smooth animation
   };
 
   const dynamicStyles = useMemo(() => {
@@ -217,12 +259,16 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
               </button>
               
               <button 
-                className="nav-arrow nav-arrow-right"
+                className={`nav-arrow nav-arrow-right ${hasNewFactsAhead ? 'highlight-new' : ''}`}
                 onClick={() => {
-                  if (currentIndex >= 0 && currentIndex < pagesCount - 1) handleNext(currentIndex);
+                  if (hasNewFactsAhead) {
+                    handleAutoNavigate();
+                  } else if (currentIndex >= 0 && currentIndex < pagesCount - 1) {
+                    handleNext(currentIndex);
+                  }
                 }}
                 disabled={currentIndex < 0 || currentIndex >= pagesCount - 1}
-                title="Next Page"
+                title={hasNewFactsAhead ? "Jump to New Fact" : "Next Page"}
               >
                 »
               </button>
@@ -231,7 +277,7 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
 
           {coverChecked && !isOpening && (
             <div className="page-counter">
-              Page {lastFlippedIndex + 2}/27
+              Page {lastFlippedIndex + 1}/{pagesCount - 1}
             </div>
           )}
 
@@ -277,24 +323,27 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
                   ) : (
 
                     <>
-                      <h3 className="page-title">Page {i + 1}</h3>
+                      <h3 className="page-title">Page {i}</h3>
                       <div className="fact-grid-container">
                         <div className="fact-grid">
-                        {Array.from({ length: 9 }).map((_, cardIndex) => {
-                          const factNumber = ((i - 1) * 9) + cardIndex + 1; 
-                          const isEncountered = encounteredFacts[factNumber] || facts[factNumber - 1];
+                        {Array.from({ length: factsPerPage }).map((_, cardIndex) => {
+                          const factNumber = ((i - 1) * factsPerPage) + cardIndex + 1;
+                          // Don't render if this fact doesn't exist
+                          if (factNumber > totalFacts) {
+                            return <div key={cardIndex} className="fact-card empty" />;
+                          }
+                          const isEncountered = !!encounteredFacts[factNumber]; // Check if user has encountered this fact
                           const isSelected = pageSelectedFacts[i] === factNumber;
-                          const isClickable = !!isEncountered;
                           const isNew = libraryNewIds.includes(factNumber);
                           
                           return (
                             <div 
                               key={cardIndex} 
                               className={`fact-card ${
-                                !isClickable ? 'unencountered' : 
+                                !isEncountered ? 'unencountered' : 
                                 isSelected ? 'selected' : 'encountered'
                               }`}
-                              onClick={isClickable && !isSelected ? (e) => {
+                              onClick={isEncountered && !isSelected ? (e) => {
                                 e.stopPropagation();
                                 setPageSelectedFacts(prev => {
                                   return { ...prev, [i]: factNumber };
@@ -304,7 +353,7 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
                                 }
                               } : undefined}
                             >
-                              {!isClickable ? (
+                              {!isEncountered ? (
                                 <>
                                   <div className="mystery-icon">?</div>
                                 </>
@@ -321,9 +370,12 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
 
                         {/* Paw notification overlay grid */}
                         <div className="paw-overlay-grid">
-                          {Array.from({ length: 9 }).map((_, cardIndex) => {
-                            const factNumber = ((i - 1) * 9) + cardIndex + 1;
-                            const isEncountered = encounteredFacts[factNumber] || facts[factNumber - 1];
+                          {Array.from({ length: factsPerPage }).map((_, cardIndex) => {
+                            const factNumber = ((i - 1) * factsPerPage) + cardIndex + 1;
+                            if (factNumber > totalFacts) {
+                              return <div key={cardIndex} className="paw-overlay-cell" />;
+                            }
+                            const isEncountered = !!encounteredFacts[factNumber]; // Check if user has encountered this fact
                             const isNew = libraryNewIds.includes(factNumber);
                             
                             return (
@@ -358,6 +410,8 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
                       }
                       
                       const factText = encounteredFacts[selectedFactNumber] || facts[selectedFactNumber - 1] || `Amazing cat fact #${selectedFactNumber} goes here! This is where the detailed information about cats would be displayed.`;
+                      const wordCount = factText.trim().split(/\s+/).length;
+                      const isLongFact = wordCount > 26;
                       
                       return (
                         <div className="facts-display">
@@ -373,8 +427,8 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
                             </div>
                           </div>
 
-                          {/* Cat overlay */}
-                          <div className="cat-overlay">
+                          {/* Cat overlay - position changes based on text length */}
+                          <div className={`cat-overlay ${isLongFact ? 'bottom-right' : ''}`}>
                             <img src="/images/catfact.png" alt="Cat reading" className="cat-reading-overlay" />
                           </div>
                         </div>
@@ -387,7 +441,7 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
 
             <div className="back-cover" />
           </div>
-        </div>
+        </div>a
         </div>
 
         <div className="flc-close-row">

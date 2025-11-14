@@ -32,24 +32,6 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-function generateFactId(fact) {
-  let hash = 0;
-  for (let i = 0; i < fact.length; i++) {
-    const char = fact.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  const id = Math.abs(hash) % 234 + 1;
-  console.log("Generated ID for fact:", fact.substring(0, 50) + "...", "ID:", id);
-  return id;
-}
-
-function addDaysISO(baseIso, offset) {
-  const d = new Date(baseIso);
-  d.setDate(d.getDate() + offset);
-  return d.toISOString().slice(0, 10);
-}
-
 function HomePage() {
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
@@ -58,174 +40,102 @@ function HomePage() {
   const idleDurationSec = 25; 
   const [spinMs, setSpinMs] = useState(3000);
   const wheelInnerRef = useRef(null);
-  const [_facts, setFacts] = useState([]);
   const [count, setCount] = useState(1);
   const [showBook, setShowBook] = useState(false);
   const [showCatGallery, setShowCatGallery] = useState(false);
-  const [libraryNewIds, setLibraryNewIds] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("libraryNewIds") || "[]");
-    } catch (err) {
-      console.warn("Failed to read libraryNewIds:", err);
-      return [];
-    }
-  });
+  const [libraryNewIds, setLibraryNewIds] = useState([]);
   const [libraryAnimating, setLibraryAnimating] = useState(false);
-  const [encounteredFacts, setEncounteredFacts] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("encounteredFacts") || "{}");
-    } catch (e) {
-      console.warn("Failed to parse encounteredFacts from localStorage:", e);
-      return {};
-    }
-  });
+  const [encounteredFacts, setEncounteredFacts] = useState({});
   const [showStackedCards, setShowStackedCards] = useState(false);
   const [stackedFacts, setStackedFacts] = useState([]);
   const [showDailyModal, setShowDailyModal] = useState(false);
-  const [weeklyMap, setWeeklyMap] = useState(null);
+  const [dailyFact, setDailyFact] = useState(null);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
   const [activeUserTab, setActiveUserTab] = useState("login");
+  const [totalFactsCount, setTotalFactsCount] = useState(0); // Will be fetched from database
 
   const navigate = useNavigate();
 
-  // persist encounteredFacts to localStorage
+  // Fetch user's encountered facts from backend on load
   useEffect(() => {
-    try {
-      localStorage.setItem("encounteredFacts", JSON.stringify(encounteredFacts));
-    } catch (e) {
-      console.warn("Failed to persist encounteredFacts to localStorage:", e);
-    }
-  }, [encounteredFacts]);
+    axios.get('/api/facts/user', { withCredentials: true })
+      .then(res => {
+        setEncounteredFacts(res.data.facts || {});
+      })
+      .catch(err => {
+        console.error("Failed to fetch user facts:", err);
+      });
+  }, []);
 
-  const addEncounteredFact = (id, text) => {
-    setEncounteredFacts(prev => {
-      if (prev[id]) return prev;
-      return { ...prev, [id]: text };
-    });
+  // Fetch total facts count from backend
+  useEffect(() => {
+    axios.get('/api/facts/count')
+      .then(res => {
+        setTotalFactsCount(res.data.count || 91);
+      })
+      .catch(err => {
+        console.error("Failed to fetch facts count:", err);
+      });
+  }, []);
+
+  const addEncounteredFact = async (id, text) => {
+    if (encounteredFacts[id]) return; // Already encountered
+
+    // Store with actual text
+    setEncounteredFacts(prev => ({ ...prev, [id]: text }));
+    
+    try {
+      await axios.post('/api/facts/encounter', { factId: id }, { withCredentials: true });
+    } catch (err) {
+      console.error("Failed to store encountered fact:", err);
+      // Revert if failed
+      setEncounteredFacts(prev => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    }
   };
 
   const markLibraryNewIds = (ids) => {
     if (!Array.isArray(ids)) ids = [ids];
-    setLibraryNewIds(prevIds => {
-      const next = [...new Set([...prevIds, ...ids])];
-      try {
-        localStorage.setItem("libraryNewIds", JSON.stringify(next));
-      } catch (e) {
-        console.warn("Failed to persist libraryNewIds:", e);
-      }
-      return next;
-    });
+    setLibraryNewIds(prevIds => [...new Set([...prevIds, ...ids])]);
   };
 
   const handleOpenLibrary = () => {
+    // Refetch total facts count in case admin added/deleted facts
+    axios.get('/api/facts/count')
+      .then(res => {
+        setTotalFactsCount(res.data.count || 91);
+      })
+      .catch(err => {
+        console.error("Failed to fetch facts count:", err);
+      });
+    
     setLibraryAnimating(true);
     setShowBook(true);
     setTimeout(() => setLibraryAnimating(false), 700);
   };
 
   const markLibraryIdViewed = (id) => {
-    setLibraryNewIds(prev => {
-      const next = prev.filter(x => String(x) !== String(id));
-      try {
-        localStorage.setItem("libraryNewIds", JSON.stringify(next));
-      } catch (e) {
-        console.warn("Failed to persist libraryNewIds after marking viewed:", e);
-      }
-      return next;
-    });
+    setLibraryNewIds(prev => prev.filter(x => String(x) !== String(id)));
   };
 
-  // Weekly facts logic (same as your previous code)
+  // Fetch daily fact from backend
   useEffect(() => {
-    let mounted = true;
+    const today = new Date().toISOString().slice(0, 10);
+    const dailyShown = localStorage.getItem('dailyShownDate');
 
-    async function ensureWeeklyFacts() {
-      const todayIso = new Date().toISOString().slice(0, 10);
-      const stored = JSON.parse(localStorage.getItem("weeklyFacts") || "null");
-
-      if (stored && stored.startDate) {
-        const start = new Date(stored.startDate);
-        const diffDays = Math.floor((new Date(todayIso) - start) / (1000 * 60 * 60 * 24));
-        if (diffDays >= 0 && diffDays < 7 && Array.isArray(stored.facts) && stored.facts.length === 7) {
-          const map = {};
-          for (let i = 0; i < 7; i++) {
-            const dayKey = addDaysISO(stored.startDate, i);
-            map[dayKey] = stored.facts[i];
-            const id = generateFactId(stored.facts[i]);
-            addEncounteredFact(id, stored.facts[i]);
-          }
-          if (mounted) {
-            setWeeklyMap(map);
-            const shownDate = localStorage.getItem("dailyShownDate");
-            if (shownDate !== todayIso) {
-              setShowDailyModal(true);
-              localStorage.setItem("dailyShownDate", todayIso);
-            }
-          }
-          return;
-        }
-      }
-
-      const uniqueFacts = [];
-      const seenIds = new Set(Object.keys(encounteredFacts).map(k => Number(k)));
-      let attempts = 0;
-
-      while (uniqueFacts.length < 7 && attempts < 12) {
-        attempts++;
-        try {
-          const fetchCount = Math.max(1, 7 - uniqueFacts.length);
-          const res = await fetch(`/api/facts?count=${fetchCount}`);
-          const data = await res.json();
-          const list = Array.isArray(data.fact) ? data.fact : Array.isArray(data.facts) ? data.facts : Array.isArray(data.data) ? data.data : (typeof data === 'string' ? [data] : []);
-          for (const txt of list) {
-            const id = generateFactId(txt);
-            if (seenIds.has(id)) continue;
-            if (uniqueFacts.some(f => generateFactId(f) === id)) continue;
-            uniqueFacts.push(txt);
-            seenIds.add(id);
-            if (uniqueFacts.length === 7) break;
-          }
-        } catch (e) {
-          console.warn("Failed to fetch facts API:", e);
-        }
-      }
-
-      while (uniqueFacts.length < 7) uniqueFacts.push("😿 (No new fact available)");
-
-      // shuffle
-      for (let i = uniqueFacts.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [uniqueFacts[i], uniqueFacts[j]] = [uniqueFacts[j], uniqueFacts[i]];
-      }
-
-      const startDate = todayIso;
-      const map = {};
-      for (let i = 0; i < 7; i++) {
-        const dayKey = addDaysISO(startDate, i);
-        map[dayKey] = uniqueFacts[i];
-        const id = generateFactId(uniqueFacts[i]);
-        addEncounteredFact(id, uniqueFacts[i]);
-      }
-
-      try {
-        localStorage.setItem("weeklyFacts", JSON.stringify({ startDate, facts: uniqueFacts }));
-      } catch (e) {
-        console.warn("Failed to persist weeklyFacts:", e);
-      }
-
-      if (mounted) {
-        setWeeklyMap(map);
-        const shownDate = localStorage.getItem("dailyShownDate");
-        if (shownDate !== todayIso) {
+    if (dailyShown !== today) {
+      axios.get('/api/facts/daily')
+        .then(res => {
+          setDailyFact(res.data);
           setShowDailyModal(true);
-          localStorage.setItem("dailyShownDate", todayIso);
-        }
-      }
+          localStorage.setItem('dailyShownDate', today);
+        })
+        .catch(err => console.error("Failed to fetch daily fact:", err));
     }
-
-    ensureWeeklyFacts();
-    return () => { mounted = false; };
   }, []);
 
   const slices = 6;
@@ -282,41 +192,23 @@ function HomePage() {
     }, duration);
 
     try {
-      const res = await fetch(`/api/facts?count=${count}`);
-      const data = await res.json();
-      const raw = Array.isArray(data.fact) ? data.fact : Array.isArray(data.facts) ? data.facts : Array.isArray(data.data) ? data.data : (typeof data === 'string' ? [data] : []);
+      const res = await axios.get(`/api/spin-facts?count=${count}`);
+      const facts = res.data.facts || []; // Note: backend sends { facts: [...] }
+      
+      // Add all facts to encountered list and store them
+      facts.forEach(fact => addEncounteredFact(fact.id, fact.text));
+      
+      setStackedFacts(facts.map((fact, i) => ({ sub: `Fact #${i + 1}`, content: fact.text })));
+      markLibraryNewIds(facts.map(f => f.id));
 
-      const finalList = [];
-      for (const f of raw) {
-        const id = generateFactId(f);
-        if (!encounteredFacts[id]) finalList.push(f);
-        if (finalList.length === count) break;
-      }
-
-      if (finalList.length < count) {
-        for (const f of raw) {
-          if (finalList.length === count) break;
-          if (!finalList.includes(f)) finalList.push(f);
-        }
-      }
-
-      setFacts(finalList);
-      finalList.forEach(f => addEncounteredFact(generateFactId(f), f));
-      setStackedFacts(finalList.map((fact, i) => ({ sub: `Fact #${i + 1}`, content: fact })));
     } catch {
-      setFacts(["Error loading facts."]);
+      setStackedFacts([{ sub: 'Error', content: 'Could not load facts.' }]);
     }
   }
 
   const modalOpen = showBook || showStackedCards || showDailyModal || showCatGallery || showUserModal;
   
-  const [user, setUser] = useState(() => {
-  try {
-    return JSON.parse(localStorage.getItem("user")) || null;
-  } catch {
-    return null;
-  }
-});
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
   axios
@@ -324,7 +216,6 @@ function HomePage() {
     .then((res) => {
       if (res.data.loggedIn && res.data.user) {
         setUser(res.data.user);
-        localStorage.setItem("user", JSON.stringify(res.data.user));
       }
     })
     .catch(() => {});
@@ -376,7 +267,6 @@ function HomePage() {
               <Login
                 onLogin={(userData) => {
                   setUser(userData);
-                  localStorage.setItem("user", JSON.stringify(userData));
                   setShowUserModal(false);
                 }}
               />
@@ -392,7 +282,6 @@ function HomePage() {
             className="logout-btn"
             onClick={async () => {
               await axios.post("/api/user/logout", {}, { withCredentials: true });
-              localStorage.removeItem("user");
               setUser(null);
               setShowUserModal(false);
             }}
@@ -458,12 +347,14 @@ function HomePage() {
         </div>
       </div>
 
-      {showDailyModal && weeklyMap && (
+      {showDailyModal && dailyFact && (
         <DailyFact
-          weeklyMap={weeklyMap}
-          todayKey={new Date().toISOString().slice(0, 10)}
-          addEncounteredFact={(id, txt) => addEncounteredFact(id, txt)}
-          onStoreComplete={(ids) => markLibraryNewIds(ids)}
+          fact={dailyFact.text}
+          factId={dailyFact.id}
+          onStore={() => {
+            addEncounteredFact(dailyFact.id, dailyFact.text);
+            markLibraryNewIds([dailyFact.id]);
+          }}
           onClose={() => setShowDailyModal(false)}
         />
       )}
@@ -482,7 +373,7 @@ function HomePage() {
           libraryNewIds={libraryNewIds}
           onClose={() => setShowBook(false)}
           onMarkViewed={(id) => markLibraryIdViewed(id)}
-          maxPages={27}
+          totalFacts={totalFactsCount}
         />
       )}
 

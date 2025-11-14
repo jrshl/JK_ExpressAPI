@@ -264,6 +264,19 @@ input {
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
+.fact-card.empty {
+  background: transparent;
+  border: 2px dashed rgba(139, 94, 60, 0.3);
+  cursor: default;
+  box-shadow: none;
+}
+
+.fact-card.empty:hover {
+  transform: none;
+  box-shadow: none;
+  background: transparent;
+}
+
 .fact-number {
   font-family: "Press Start 2P", monospace;
   font-size: 14px;
@@ -712,6 +725,12 @@ input {
   right: 30px;
   pointer-events: none;
   z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.cat-overlay.bottom-right {
+  bottom: 40px;
+  right: 20px;
 }
 
 .cat-reading-overlay {
@@ -720,6 +739,11 @@ input {
   opacity: 0.7;
   filter: drop-shadow(0 2px 4px rgba(139, 94, 60, 0.3));
   animation: catBobbing 3s ease-in-out infinite;
+  transition: width 0.3s ease;
+}
+
+.cat-overlay.bottom-right .cat-reading-overlay {
+  width: 80px;
 }
 
 @keyframes catBobbing {
@@ -811,6 +835,29 @@ input {
 
 .nav-arrow-right {
   right: -300px; 
+}
+
+/* Highlight for new facts indicator */
+.nav-arrow.highlight-new {
+  background: linear-gradient(135deg, #fed7aa, #fdba74);
+  border-color: #ea580c;
+  animation: arrowGlow 2s ease-in-out infinite;
+  box-shadow: 0 8px 20px rgba(234, 88, 12, 0.5);
+}
+
+.nav-arrow.highlight-new:hover:not(:disabled) {
+  background: linear-gradient(135deg, #fec89a, #fda54f);
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 10px 25px rgba(234, 88, 12, 0.6);
+}
+
+@keyframes arrowGlow {
+  0%, 100% {
+    box-shadow: 0 8px 20px rgba(234, 88, 12, 0.5);
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba(234, 88, 12, 0.8);
+  }
 }
 
 /* Page Counter */

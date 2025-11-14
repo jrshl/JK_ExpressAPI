@@ -23,9 +23,9 @@ async function migrate() {
       );
     `);
 
-    console.log('✅ Migration complete: users table created successfully (no sex column).');
+    console.log('Migration complete: users table created successfully.');
   } catch (err) {
-    console.error('❌ Migration failed:', err);
+    console.error('Migration failed:', err);
   } finally {
     await pool.end();
   }

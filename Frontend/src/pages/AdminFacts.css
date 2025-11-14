@@ -131,6 +131,28 @@
   background: #5d4037;
 }
 
+/* --- STYLE FOR POPULATE BUTTON --- */
+.btn-populate {
+  background: #5d4037;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+  margin-left: 10px;
+}
+
+.btn-populate:hover {
+  background: #0056b3;
+}
+
+.btn-populate:disabled {
+  background: #a1a1a1;
+  cursor: not-allowed;
+}
+
 /* =========================
    Messages
 ========================= */
@@ -235,7 +257,8 @@
   resize: vertical;
   min-height: 80px;
   line-height: 1.6;
-  color: #4e342e;
+  background-color: #f7e8e5;
+  color: #302724;
 }
 
 .edit-textarea:focus {
