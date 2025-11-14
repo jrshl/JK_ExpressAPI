@@ -56,6 +56,7 @@ app.use(session({
 
 // API Routes
 app.use('/api/user', authRoutes);
+app.use('/api/cats', catRoutes);
 app.use('/api/facts', factsRoutes);
 
 // Leaderboard endpoint
