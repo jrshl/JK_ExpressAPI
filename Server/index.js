@@ -11,6 +11,7 @@ const factsRoutes = require('./route/facts');
 const MySQLStore = require('express-mysql-session')(session);
 
 
+
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
@@ -31,6 +32,7 @@ const sessionStore = new MySQLStore({
 
 const { getLeaderboard, addScore } = require('./leaderboard');
 const cors = require('cors');
+const catRoutes = require('./route/cats')(pool);
 
 app.use(cors({
   origin: 'http://localhost:5173',

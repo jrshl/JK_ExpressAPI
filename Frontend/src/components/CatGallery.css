@@ -313,6 +313,7 @@
 /* Grid Container */
 .grid-container {
   flex: 1;
+  max-height: 63vh;
   max-width: 500px;
   background: linear-gradient(135deg, #F5E6D3 0%, #E8D5B7 100%);
   border: 3px solid #6B2C0A;
