@@ -1,3 +1,13 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
 .leaderboard-list {
   list-style: decimal;
   counter-reset: leaderboard;
@@ -15,8 +25,12 @@
 }
 
 .modal-leaderboard {
-  max-width: 520px;
-  width: 90%;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 14px;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
 }
 
 .modal-header {
@@ -82,14 +96,18 @@
   justify-content: center;
   gap: 12px;
   margin-bottom: 16px;
+  background-color: transparent;
+  border: none;
 }
 
 .arrow-container {
   display: flex;
+  margin: 0 3px 0 3px;
 }
 
 .arrow-btn {
   background: #f7d9b6;
+  color: #745438;
   border: 1px solid #a67449;
   border-radius: 4px;
   padding: 8px;
@@ -105,7 +123,7 @@
 
 .difficulty-label {
   font-weight: bold;
-  color: #a67449;
+  color: #745438;
   width: 100px;
   text-align: center;
 }

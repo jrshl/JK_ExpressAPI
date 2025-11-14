@@ -57,8 +57,17 @@ app.use('/api/user', authRoutes);
 app.use('/api/facts', factsRoutes);
 
 // Leaderboard endpoint
-app.get('/api/leaderboard', getLeaderboard);
-app.post('/api/leaderboard', addScore);
+app.get('/api/leaderboard', (req, res, next) => {
+  console.log('GET /api/leaderboard - Session:', req.session?.userId ? `User ${req.session.userId}` : 'No session');
+  console.log('Query params:', req.query);
+  next();
+}, getLeaderboard);
+
+app.post('/api/leaderboard', (req, res, next) => {
+  console.log('POST /api/leaderboard - Session:', req.session?.userId ? `User ${req.session.userId}` : 'No session');
+  console.log('Request body:', req.body);
+  next();
+}, addScore);
 
 // Public API endpoint for games
 app.get('/api/random-facts', async (req, res) => {

@@ -101,7 +101,10 @@ export default function LeaderboardModal({ onClose }) {
               {list.length === 0 && <li>No entries yet</li>}
               {list.map((item, i) => (
                 <li key={item.id || i}>
-                  <strong>{item.name || "Anonymous"}</strong> — {item.score ?? item.points ?? 0}
+                  <strong>{item.name || "Anonymous"}</strong> — {" "}
+                  {activeTab === "SpeedTyping" 
+                    ? `${item.score}s` 
+                    : `${item.score} points`}
                 </li>
               ))}
             </ol>

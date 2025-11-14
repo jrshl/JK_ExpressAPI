@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./SpeedTyping.css";
 import GameMenu from '../components/GameMenu';
 
@@ -16,6 +17,8 @@ export default function SpeedTyping() {
   const [catMovable, setCatMovable] = useState(true);
   const [prevCatPosition, setPrevCatPosition] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
+  const [completionTime, setCompletionTime] = useState(0);
+  const [isNewBest, setIsNewBest] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
@@ -41,15 +44,15 @@ export default function SpeedTyping() {
   // ===== Fetch Fact (Fixed - subject to change) =====
   async function fetchFact() {
     try {
-      const res = await fetch("/api/facts");
+      const res = await fetch(`/api/random-facts?game=SpeedTyping&difficulty=${difficulty}`);
       const data = await res.json();
       
-      // Get one random fact
-      let facts = data.fact || data.facts || [];
+      // Get one random fact from the database results
+      let facts = data.facts || [];
       if (Array.isArray(facts) && facts.length > 0) {
         const randomIndex = Math.floor(Math.random() * facts.length);
         const fact = facts[randomIndex];
-        return typeof fact === 'string' ? fact : "Cats are amazing creatures!";
+        return fact.text || "Cats are amazing creatures!";
       }
       
       return "Cats are amazing creatures!";
@@ -137,11 +140,9 @@ export default function SpeedTyping() {
   }, []);
 
   // ===== End Game =====
-  function handleEndGame(won, message) {
+  async function handleEndGame(won, message) {
     setGameActive(false);
     setResult(message);
-    setModalOpen(true);
-    
     
     setShouldRetryCurrentFact(!won);
     
@@ -149,6 +150,32 @@ export default function SpeedTyping() {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+
+    // Auto-submit score if won
+    if (won) {
+      const timeTaken = maxTime - timeLeft;
+      setCompletionTime(timeTaken);
+      
+      try {
+        console.log('Submitting SpeedTyping score:', { score: timeTaken, game: 'SpeedTyping', difficulty });
+        const response = await axios.post('/api/leaderboard', {
+          score: timeTaken,
+          game: 'SpeedTyping',
+          difficulty: difficulty
+        }, { withCredentials: true });
+        
+        console.log('Score submission response:', response.data);
+        setIsNewBest(response.data?.newBest || false);
+      } catch (error) {
+        console.error('Failed to submit score:', error.response?.data || error.message);
+        if (error.response?.status === 401) {
+          console.warn('User not logged in - score not saved');
+        }
+        setIsNewBest(false);
+      }
+    }
+    
+    setModalOpen(true);
   }
 
   // Countdown before game starts
@@ -371,6 +398,16 @@ export default function SpeedTyping() {
             <div className="modal-overlay">
               <div className="end-modal-content">
                 <h2>{result.includes("Congratulations") ? "You Won!" : "You Lost!"}</h2>
+                {result.includes("Congratulations") && (
+                  <>
+                    <p className="completion-time">
+                      ⏱Time: <strong>{completionTime}s</strong>
+                    </p>
+                    {isNewBest && (
+                      <p className="new-best">🏆 New Personal Best!</p>
+                    )}
+                  </>
+                )}
                 <p>{currentFact}</p>
                 <button className="start-btn" onClick={startGame}>
                   {result.includes("Congratulations") ? "Next Fact" : "Try Again"}

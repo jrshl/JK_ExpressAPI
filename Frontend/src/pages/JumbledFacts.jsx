@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import AnswerReveal from "../components/AnswerReveal";
 import "./JumbledFacts.css";
 import GameMenu from '../components/GameMenu';
@@ -61,9 +62,15 @@ export default function JumbledFacts() {
     } else {
       // Fetch new fact
       try {
-        const res = await fetch("/api/facts");
+        const res = await fetch("/api/random-facts?game=JumbledFacts");
         const data = await res.json();
-        factText = Array.isArray(data.fact) ? data.fact[0] : data.fact;
+        const facts = data.facts || [];
+        if (facts.length > 0) {
+          const randomFact = facts[Math.floor(Math.random() * facts.length)];
+          factText = randomFact.text || "Cats are mysterious creatures.";
+        } else {
+          factText = "Cats are mysterious creatures.";
+        }
         setOriginalFact(factText); 
       } catch {
         factText = "Cats are mysterious creatures.";
@@ -220,11 +227,29 @@ export default function JumbledFacts() {
 
   // === Game actions ===
   function handleSubmit() {
-    if (userSequence.join(" ") === fact) {
+    const isCorrect = userSequence.join(" ") === fact;
+    
+    if (isCorrect) {
       setResult("Correct!");
       setShowAnswer(true); 
       setCatImage("/images/jumbledRight.png"); 
-      setShouldRetryFact(false); 
+      setShouldRetryFact(false);
+      
+      // Auto-submit score (no difficulty for JumbledFacts)
+      console.log('Submitting JumbledFacts score');
+      axios.post('/api/leaderboard', {
+        score: 1,
+        game: 'JumbledFacts'
+      }, { withCredentials: true })
+        .then((response) => {
+          console.log('JumbledFacts score submitted:', response.data);
+        })
+        .catch(err => {
+          console.error('Failed to submit JumbledFacts score:', err.response?.data || err.message);
+          if (err.response?.status === 401) {
+            console.warn('User not logged in - score not saved');
+          }
+        });
     } else {
       setResult("Try again!");
       setShowAnswer(false); 

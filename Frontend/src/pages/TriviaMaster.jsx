@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './TriviaMaster.css';
 import GameMenu from '../components/GameMenu';
 
@@ -79,10 +80,14 @@ const TriviaMaster = () => {
 
   const fetchFact = async () => {
     try {
-      const res = await fetch(`/api/facts?count=1`);
+      const res = await fetch(`/api/random-facts?game=TriviaMaster`);
       const data = await res.json();
-      const list = Array.isArray(data.fact) ? data.fact : Array.isArray(data.facts) ? data.facts : Array.isArray(data.data) ? data.data : [data.data];
-      return list[0] || 'Cats are amazing creatures with incredible abilities!';
+      const facts = data.facts || [];
+      if (facts.length > 0) {
+        const randomFact = facts[Math.floor(Math.random() * facts.length)];
+        return randomFact.text || 'Cats are amazing creatures with incredible abilities!';
+      }
+      return 'Cats are amazing creatures with incredible abilities!';
     } catch {
       return 'Cats are amazing creatures with incredible abilities!';
     }
@@ -246,6 +251,24 @@ const TriviaMaster = () => {
         isCorrect,
       },
     ]);
+
+    // Auto-submit score if correct (no difficulty for TriviaMaster)
+    if (isCorrect) {
+      console.log('Submitting TriviaMaster score');
+      axios.post('/api/leaderboard', {
+        score: 1,
+        game: 'TriviaMaster'
+      }, { withCredentials: true })
+        .then((response) => {
+          console.log('TriviaMaster score submitted:', response.data);
+        })
+        .catch(err => {
+          console.error('Failed to submit TriviaMaster score:', err.response?.data || err.message);
+          if (err.response?.status === 401) {
+            console.warn('User not logged in - score not saved');
+          }
+        });
+    }
 
     // Set retry flag based on whether user was correct
     setShouldRetryFact(!isCorrect);
