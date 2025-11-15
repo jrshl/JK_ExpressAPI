@@ -316,7 +316,7 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
                 <div className="front-page">
                   {i === 0 ? (
                     <div className="intro-page">
-                      <h2 className="intro-title">Cat Facts Library</h2>
+                      <h2 className="intro-titles">Cat Facts Library</h2>
                       <p className="intro-text">Welcome to your collection of fascinating cat facts!</p>
                       <p className="intro-subtitle">Explore amazing feline knowledge.</p>
                     </div>
@@ -409,7 +409,7 @@ export default function FactLibrary({ encounteredFacts = {}, libraryNewIds = [],
                         );
                       }
                       
-                      const factText = encounteredFacts[selectedFactNumber] || facts[selectedFactNumber - 1] || `Amazing cat fact #${selectedFactNumber} goes here! This is where the detailed information about cats would be displayed.`;
+                      const factText = encounteredFacts[selectedFactNumber] || facts[selectedFactNumber - 1];
                       const wordCount = factText.trim().split(/\s+/).length;
                       const isLongFact = wordCount > 26;
                       

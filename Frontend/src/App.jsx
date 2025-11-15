@@ -16,6 +16,7 @@ import LoaderWrapper from "./components/LoaderWrapper";
 import { UserProvider } from "./context/UserContext";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import LogoutButton from "./components/LogoutButton";
 import axios from "axios";
 
 function ProtectedRoute({ children }) {
@@ -122,19 +123,21 @@ function HomePage() {
     setLibraryNewIds(prev => prev.filter(x => String(x) !== String(id)));
   };
 
-  // Fetch daily fact from backend
+  // daily fact after login
   useEffect(() => {
-    const today = new Date().toISOString().slice(0, 10);
-    const dailyShown = localStorage.getItem('dailyShownDate');
-
-    if (dailyShown !== today) {
-      axios.get('/api/facts/daily')
-        .then(res => {
-          setDailyFact(res.data);
-          setShowDailyModal(true);
-          localStorage.setItem('dailyShownDate', today);
-        })
-        .catch(err => console.error("Failed to fetch daily fact:", err));
+    const pendingDailyFactStr = localStorage.getItem('pendingDailyFact');
+    if (pendingDailyFactStr) {
+      try {
+        const pendingDailyFact = JSON.parse(pendingDailyFactStr);
+        setDailyFact(pendingDailyFact);
+        setShowDailyModal(true);
+        // Add to encountered facts 
+        setEncounteredFacts(prev => ({ ...prev, [pendingDailyFact.id]: pendingDailyFact.text }));
+        localStorage.removeItem('pendingDailyFact');
+      } catch (err) {
+        console.error("Failed to parse pending daily fact:", err);
+        localStorage.removeItem('pendingDailyFact');
+      }
     }
   }, []);
 
@@ -278,16 +281,7 @@ function HomePage() {
       ) : (
         <div className="modal-content text-center">
           <h3>Welcome, {user.username}!</h3>
-          <button
-            className="logout-btn"
-            onClick={async () => {
-              await axios.post("/api/user/logout", {}, { withCredentials: true });
-              setUser(null);
-              setShowUserModal(false);
-            }}
-          >
-            Logout
-          </button>
+          <LogoutButton />
         </div>
       )}
     </div>
@@ -351,11 +345,10 @@ function HomePage() {
         <DailyFact
           fact={dailyFact.text}
           factId={dailyFact.id}
-          onStore={() => {
-            addEncounteredFact(dailyFact.id, dailyFact.text);
+          onClose={() => {
+            setShowDailyModal(false);
             markLibraryNewIds([dailyFact.id]);
           }}
-          onClose={() => setShowDailyModal(false)}
         />
       )}
 

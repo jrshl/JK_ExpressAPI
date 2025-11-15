@@ -3,7 +3,7 @@
 /* =========================
    General Container
 ========================= */
-.admin-container {
+.admin-facts-container {
   position: fixed;
   top: 0;
   left: 0;
@@ -12,45 +12,45 @@
   background: #f5ebe0;
   padding: 40px 20px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
 }
 
 /* Custom Scrollbar */
-.admin-container::-webkit-scrollbar {
+.admin-facts-container::-webkit-scrollbar {
   width: 12px;
 }
 
-.admin-container::-webkit-scrollbar-track {
+.admin-facts-container::-webkit-scrollbar-track {
   background: #e3d5ca;
 }
 
-.admin-container::-webkit-scrollbar-thumb {
+.admin-facts-container::-webkit-scrollbar-thumb {
   background: #a67c52;
   border-radius: 6px;
 }
 
-.admin-container::-webkit-scrollbar-thumb:hover {
+.admin-facts-container::-webkit-scrollbar-thumb:hover {
   background: #8b6239;
 }
 
 /* =========================
    Header Section
 ========================= */
-.admin-header {
-  max-width: 900px;
+.admin-facts-header {
+  max-width: 1200px;
   margin: 0 auto 32px;
   text-align: center;
 }
 
-.admin-header h1 {
+.admin-facts-header h1 {
   color: #5d4037;
   margin: 0 0 8px 0;
   font-size: 28px;
   font-weight: 600;
 }
 
-.admin-header p {
+.admin-facts-header p {
   color: #8d6e63;
   font-size: 14px;
   margin: 0;
@@ -59,7 +59,7 @@
 /* =========================
    Back Button
 ========================= */
-.back-button {
+.admin-facts-back-btn {
   position: fixed;
   top: 20px;
   left: 20px;
@@ -74,15 +74,15 @@
   z-index: 1000;
 }
 
-.back-button:hover {
+.admin-facts-back-btn:hover {
   background: #5d4037;
 }
 
 /* =========================
-   Search & Controls
+   Controls Section
 ========================= */
-.search-section {
-  max-width: 900px;
+.admin-facts-controls {
+  max-width: 1200px;
   margin: 0 auto 24px;
   display: flex;
   align-items: center;
@@ -91,64 +91,95 @@
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #d7ccc8;
+  flex-wrap: wrap;
 }
 
-.search-input {
+.admin-facts-search-wrapper {
+  position: relative;
   flex: 1;
-  padding: 8px 12px;
-  border: 1px solid #d7ccc8;
+  min-width: 250px;
+  max-width: 500px;
+  display: block;
+}
+
+.admin-facts-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8d6e63;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.admin-facts-search-input {
+  width: 100%;
+  height: 40px;
+  padding: 8px 12px 8px 38px;
+  border: 2px solid #d7ccc8;
   border-radius: 6px;
   font-size: 14px;
-  background: #faf8f5;
+  background: #ffffff;
+  color: #4e342e;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: block;
+  line-height: normal;
 }
 
-.search-input:focus {
+.admin-facts-search-input:focus {
   outline: none;
   border-color: #a1887f;
   background: white;
 }
 
-.fact-count {
+.admin-facts-count {
   font-size: 14px;
   color: #8d6e63;
   white-space: nowrap;
 }
 
-.btn-create {
+.admin-facts-btn-create {
   background: #6d4c41;
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 8px 16px;
   cursor: pointer;
   transition: background 0.2s;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-size: 14px;
+  margin-left: auto;
 }
 
-.btn-create:hover {
+.admin-facts-btn-create:hover {
   background: #5d4037;
 }
 
-/* --- STYLE FOR POPULATE BUTTON --- */
-.btn-populate {
-  background: #5d4037;
+.admin-facts-btn-populate {
+  background: #6d4c41;
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 8px 16px;
   cursor: pointer;
   transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   white-space: nowrap;
-  margin-left: 10px;
+  font-size: 14px;
 }
 
-.btn-populate:hover {
-  background: #0056b3;
+.admin-facts-btn-populate:hover {
+  background: #5d4037;
 }
 
-.btn-populate:disabled {
+.admin-facts-btn-populate:disabled {
   background: #a1a1a1;
   cursor: not-allowed;
 }
@@ -156,8 +187,8 @@
 /* =========================
    Messages
 ========================= */
-.error-message {
-  max-width: 900px;
+.admin-facts-error {
+  max-width: 1200px;
   margin: 0 auto 20px;
   background: #ffebee;
   color: #c62828;
@@ -167,9 +198,9 @@
   font-size: 14px;
 }
 
-.loading,
-.no-facts {
-  max-width: 900px;
+.admin-facts-loading,
+.admin-facts-empty {
+  max-width: 1200px;
   margin: 40px auto;
   text-align: center;
   padding: 40px;
@@ -181,152 +212,207 @@
 }
 
 /* =========================
-   Facts List
+   Table
 ========================= */
-.facts-list {
-  max-width: 900px;
+.admin-facts-table-wrapper {
+  max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding-bottom: 40px;
-}
-
-.fact-item {
-  background: #fff;
-  border: 1px solid #d7ccc8;
+  background: white;
   border-radius: 8px;
-  padding: 16px;
-  padding-top: 40px;
-  transition: border-color 0.2s;
-  position: relative;
-}
-
-.fact-item:hover {
-  border-color: #a1887f;
-}
-
-.fact-id {
-  position: absolute;
-  top: 12px;
-  left: 16px;
-  background: #efebe9;
-  color: #6d4c41;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 4px;
-}
-
-.view-mode {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-.fact-text {
-  flex: 1;
-  margin: 0;
-  padding-right: 16px;
-  color: #4e342e;
-  line-height: 1.6;
-  font-size: 14px;
-}
-
-.fact-actions {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-/* Edit Mode */
-.edit-mode {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.edit-textarea {
-  width: 100%;
-  padding: 10px 12px;
+  overflow: hidden;
   border: 1px solid #d7ccc8;
-  border-radius: 6px;
-  font-size: 14px;
-  font-family: inherit;
-  resize: vertical;
-  min-height: 80px;
-  line-height: 1.6;
-  background-color: #f7e8e5;
-  color: #302724;
 }
 
-.edit-textarea:focus {
-  outline: none;
-  border-color: #a1887f;
+.admin-facts-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-.edit-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-/* =========================
-   Buttons
-========================= */
-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.icon-btn {
-  background: #efebe9;
-  border: none;
-  padding: 6px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-
-.icon-btn:hover {
-  background: #d7ccc8;
-}
-
-.icon-btn.edit svg {
-  color: #6d4c41;
-}
-
-.icon-btn.delete svg {
-  color: #c62828;
-}
-
-.btn-save {
+.admin-facts-table thead {
   background: #6d4c41;
   color: white;
 }
 
-.btn-save:hover {
-  background: #5d4037;
+.admin-facts-table th {
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.btn-cancel {
-  background: #d7ccc8;
+.admin-facts-th-num {
+  width: 60px;
+  text-align: center;
+}
+
+.admin-facts-th-id {
+  width: 100px;
+}
+
+.admin-facts-th-text {
+  width: auto;
+}
+
+.admin-facts-th-actions {
+  width: 120px;
+  text-align: center;
+}
+
+.admin-facts-row {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background 0.2s;
+  height: 60px;
+}
+
+.admin-facts-row:hover {
+  background: #faf8f5;
+}
+
+.admin-facts-row:last-child {
+  border-bottom: none;
+}
+
+.admin-facts-table td {
+  padding: 16px;
+  vertical-align: middle;
+}
+
+.admin-facts-td-num {
+  text-align: center;
+  font-weight: 600;
+  color: #6d4c41;
+  font-size: 14px;
+}
+
+.admin-facts-td-id {
+  color: #8d6e63;
+  font-size: 13px;
+  font-family: 'Courier New', monospace;
+}
+
+.admin-facts-td-text {
   color: #4e342e;
+  font-size: 14px;
+  line-height: 1.5;
+  max-width: 600px;
 }
 
-.btn-cancel:hover {
-  background: #bcaaa4;
+.admin-facts-text-ellipsis {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-facts-td-actions {
+  text-align: center;
+}
+
+/* =========================
+   Action Buttons
+========================= */
+.admin-facts-icon-btn {
+  background: #efebe9;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 4px;
+}
+
+.admin-facts-icon-btn:hover {
+  background: #d7ccc8;
+}
+
+.admin-facts-edit-btn svg {
+  color: #6d4c41;
+}
+
+.admin-facts-delete-btn svg {
+  color: #c62828;
+}
+
+/* =========================
+   Pagination
+========================= */
+.admin-facts-pagination {
+  max-width: 1200px;
+  margin: 24px auto 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-facts-page-btn {
+  background: #fff;
+  border: 1px solid #d7ccc8;
+  color: #6d4c41;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-facts-page-btn:hover:not(:disabled) {
+  background: #6d4c41;
+  color: white;
+  border-color: #6d4c41;
+}
+
+.admin-facts-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.admin-facts-page-numbers {
+  display: flex;
+  gap: 4px;
+}
+
+.admin-facts-page-num {
+  background: #fff;
+  border: 1px solid #d7ccc8;
+  color: #6d4c41;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  min-width: 40px;
+}
+
+.admin-facts-page-num:hover {
+  background: #f5ebe0;
+  border-color: #a1887f;
+}
+
+.admin-facts-active-page {
+  background: #6d4c41;
+  color: white;
+  border-color: #6d4c41;
+}
+
+.admin-facts-active-page:hover {
+  background: #5d4037;
+  border-color: #5d4037;
 }
 
 /* =========================
    Modal
 ========================= */
-.modal-overlay {
+.admin-facts-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -339,50 +425,135 @@ button {
   z-index: 2000;
 }
 
-.modal-content {
+.admin-facts-modal-content {
   background: white;
-  padding: 24px;
+  padding: 28px;
   border-radius: 8px;
   width: 90%;
-  max-width: 480px;
+  max-width: 520px;
   border: 1px solid #d7ccc8;
 }
 
-.modal-content h2 {
+.admin-facts-modal-content h2 {
   color: #5d4037;
-  margin: 0 0 16px 0;
+  margin: 0 0 20px 0;
   font-size: 20px;
   font-weight: 600;
 }
 
-.modal-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 20px;
+.admin-facts-modal-content p {
+  color: #4e342e;
+  margin: 0 0 16px 0;
+  line-height: 1.6;
 }
 
+.admin-facts-modal-fact-preview {
+  background: #faf8f5;
+  padding: 12px;
+  border-radius: 6px;
+  font-style: italic;
+  color: #6d4c41;
+  border-left: 3px solid #a67c52;
+}
+
+.admin-facts-textarea {
+  width: 95%;
+  padding: 12px;
+  border: 1px solid #d7ccc8;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.6;
+  background-color: #faf8f5;
+  color: #4e342e;
+  margin-bottom: 20px;
+}
+
+.admin-facts-textarea:focus {
+  outline: none;
+  border-color: #a1887f;
+  background: white;
+}
+
+.admin-facts-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.admin-facts-btn-save,
+.admin-facts-btn-delete,
+.admin-facts-btn-cancel {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.admin-facts-btn-save {
+  background: #6d4c41;
+  color: white;
+}
+
+.admin-facts-btn-save:hover {
+  background: #5d4037;
+}
+
+.admin-facts-btn-delete {
+  background: #c62828;
+  color: white;
+}
+
+.admin-facts-btn-delete:hover {
+  background: #b71c1c;
+}
+
+.admin-facts-btn-cancel {
+  background: #d7ccc8;
+  color: #4e342e;
+}
+
+.admin-facts-btn-cancel:hover {
+  background: #bcaaa4;
+}
+
+/* =========================
+   Responsive Design
+========================= */
 @media (max-width: 768px) {
-  .admin-container {
+  .admin-facts-container {
     padding: 20px 12px;
   }
   
-  .view-mode {
+  .admin-facts-controls {
     flex-direction: column;
+    align-items: stretch;
   }
   
-  .fact-text {
-    padding-right: 0;
-    margin-bottom: 10px;
+  .admin-facts-search-wrapper {
+    width: 100%;
   }
   
-  .fact-id {
-    position: static;
-    display: inline-block;
-    margin-bottom: 10px;
+  .admin-facts-btn-create,
+  .admin-facts-btn-populate {
+    justify-content: center;
   }
   
-  .fact-item {
-    padding-top: 16px;
+  .admin-facts-table-wrapper {
+    overflow-x: auto;
+  }
+  
+  .admin-facts-table {
+    min-width: 600px;
+  }
+  
+  .admin-facts-th-text,
+  .admin-facts-td-text {
+    max-width: 300px;
   }
 }

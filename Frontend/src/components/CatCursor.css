@@ -3,6 +3,33 @@
   cursor: none !important;
 }
 
+/* Show normal cursor on modals and loaders */
+.hide-native-cursor .modal-box,
+.hide-native-cursor .modal-box *,
+.hide-native-cursor .auth-loader-overlay,
+.hide-native-cursor .auth-loader-overlay *,
+.hide-native-cursor .success-modal-overlay,
+.hide-native-cursor .success-modal-overlay *,
+.hide-native-cursor .page-loader,
+.hide-native-cursor .page-loader * {
+  cursor: auto !important;
+}
+
+.hide-native-cursor .modal-box button,
+.hide-native-cursor .success-modal-overlay button,
+.hide-native-cursor .modal-box input,
+.hide-native-cursor .modal-box select,
+.hide-native-cursor .modal-box a {
+  cursor: pointer !important;
+}
+
+.hide-native-cursor .modal-box input[type="text"],
+.hide-native-cursor .modal-box input[type="password"],
+.hide-native-cursor .modal-box input[type="email"],
+.hide-native-cursor .modal-box textarea {
+  cursor: text !important;
+}
+
 .cat-cursor {
   position: fixed;
   bottom: -10px; 

@@ -202,6 +202,8 @@ html, body, #root {
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s, transform 0.1s;
+  display: block;
+  margin: 0 auto;
 }
 
 .logout-btn:hover {
@@ -211,6 +213,13 @@ html, body, #root {
 
 .logout-btn:active {
   transform: scale(0.95);
+}
+
+.logout-btn:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
 }
 
 

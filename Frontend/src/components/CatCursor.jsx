@@ -31,6 +31,7 @@ export default function CatCursor({ enabled = true }) {
       return localStorage.getItem('catCursorDebug') === '1';
     } catch { return false; }
   });
+  const [isOverModal, setIsOverModal] = useState(false);
 
   useEffect(() => {
     if (!active) return;
@@ -116,6 +117,11 @@ export default function CatCursor({ enabled = true }) {
     setBottom(computeBottomFor(y, height));
       const nextTilt = Math.max(-12, Math.min(12, (e.movementX || 0) / 4));
       setTilt(nextTilt);
+      
+      // check if cursor is over the login modal
+      const target = e.target;
+      const isModal = target.closest('.modal-box, .auth-loader-overlay, .success-modal-overlay, .page-loader');
+      setIsOverModal(!!isModal);
     };
 
     const onMouseDown = () => setPressed(true);
@@ -148,7 +154,7 @@ export default function CatCursor({ enabled = true }) {
     };
   }, [active, height, tipFracY]);
 
-  if (!active) return null;
+  if (!active || isOverModal) return null;
 
   return (
     <div

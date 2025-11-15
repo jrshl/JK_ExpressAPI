@@ -25,15 +25,6 @@
   margin-bottom: 8px;
 }
 
-.modal {
-    background: transparent;
-    padding: 2rem;
-    border-radius: 14px;
-    width: 600px;
-    width: 90%;
-    text-align: center;
-}
-
 .modal-header {
   display: flex;
   justify-content: space-between;
