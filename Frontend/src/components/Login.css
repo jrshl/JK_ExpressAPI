@@ -1,24 +1,23 @@
 .login-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 12px; /* more gap to prevent overlap */
+  gap: 12px;
   width: 100%;
   box-sizing: border-box;
 }
 
+/* center the heading */
 .login-wrapper h2 {
-  font-family: "Press Start 2P", monospace;
-  font-size: 18px;
   text-align: center;
-  color: #3b1f1f;
-  margin-bottom: 20px;
+  width: 100%;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  width: 100%;
+  width: 80vh;
+  padding-left: 15px;
 }
 
 .login-form label {
@@ -28,7 +27,7 @@
 
 .login-form input {
   display: block;
-  width: 100%;
+  width: 60vh;
   height: 40px;
   padding: 8px 10px;
   border: 1px solid #aaa;
@@ -59,6 +58,7 @@
   font-weight: bold;
   font-family: "Press Start 2P", monospace;
   transition: 0.2s ease;
+  width: 60vh;
 }
 
 .login-btn:hover:not(:disabled) {
@@ -76,13 +76,4 @@
   text-align: center;
   font-size: 13px;
   color: #444;
-}
-
-/* Force visibility inside modal */
-.modal-box .login-wrapper {
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  overflow: visible !important;
-  position: relative !important;
 }

@@ -45,10 +45,14 @@ export default function Register({ onRegister }) {
     <>
       {isLoading && <AuthLoader message="Registering..." />}
       {showSuccess && (
-        <SuccessModal 
-          message="Successfully Registered!" 
-          onClose={handleSuccessClose} 
-        />
+        <div className="modal-overlay">
+          <div className="modal-inner">
+            <SuccessModal 
+              message="Successfully Registered!" 
+              onClose={handleSuccessClose} 
+            />
+          </div>
+        </div>
       )}
       
       <div className="form-container">

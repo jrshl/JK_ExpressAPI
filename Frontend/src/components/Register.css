@@ -1,40 +1,56 @@
-.register-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px; /* more gap to prevent overlap */
+.form-container {
   width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 20px;
   box-sizing: border-box;
 }
 
-.register-form input,
-.register-form select {
-  display: block;
+/* Center only the heading */
+.form-container h2 {
+  text-align: center;
   width: 100%;
-  height: 40px;
-  padding: 8px 10px;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Inputs on the left (normal alignment) */
+.register-form input {
+  width: 100%;
+  padding: 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 14px;
-  background-color: #fff; /* make sure visible */
+  background: #fff;
   color: #000;
+  box-sizing: border-box;
+  display: block;
 }
 
+/* Disabled input style */
 .register-form input:disabled {
   background: #f5f5f5;
   cursor: not-allowed;
   opacity: 0.7;
 }
 
-
+/* Center the button */
 .submit-btn {
+  width: 50%;               /* adjust this if you want bigger/smaller */
+  margin: 0 auto;           /* THIS centers the button */
   background: #713704;
   color: white;
+  padding: 12px;
   border: none;
-  padding: 10px;
   border-radius: 6px;
   cursor: pointer;
+  font-size: 16px;
   font-weight: bold;
-  transition: 0.2s ease;
+  transition: background .2s ease;
 }
 
 .submit-btn:hover:not(:disabled) {
@@ -43,52 +59,14 @@
 
 .submit-btn:disabled {
   background: #999;
-  cursor: not-allowed;
   opacity: 0.7;
+  cursor: not-allowed;
 }
 
+/* Message text */
 .message {
-  margin-top: 8px;
+  margin-top: 10px;
+  font-size: 14px;
   text-align: center;
-  font-size: 13px;
   color: #444;
 }
-
-.auth-form,
-.register-form {
-  width: 100%;
-  overflow: visible;
-}
-
-.auth-form form,
-.register-form form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.auth-form h2,
-.register-form h2 {
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.auth-form form,
-.register-form form {
-  padding-bottom: 20px;
-}
-
-.auth-form,
-.register-form {
-  width: 100%;
-  box-sizing: border-box; /* prevent padding from overflowing */
-}
-
-.form-container {
-  width: 95%;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
-}
-
